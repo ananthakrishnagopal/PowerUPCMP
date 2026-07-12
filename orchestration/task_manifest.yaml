@@ -1,5 +1,5 @@
 manifest_version: "1.0.0"
-last_updated: "2026-07-11T23:54:05+05:30"
+last_updated: "2026-07-12T13:15:47+05:30"
 workflow: single_agent_phase_gated
 allowed_states:
   - PLANNED
@@ -666,6 +666,82 @@ tasks:
       - "governance: 14 YAML, 27-task acyclic DAG, 25 assumptions, 72 Markdown, zero missing links"
       - "R3 validation JSON and trace exact frozen hashes restored after version-aware provenance serialization"
       - "T-WP10 closed COMPLETE at 2026-07-11T23:54:05+05:30 with no task-local work remaining"
+
+  - id: T-COMMS-DEMO
+    title: Reproducible interim WP10 demonstration deck
+    phase: 3
+    state: COMPLETE
+    priority: MEDIUM
+    dependencies: [T-WP10]
+    inputs:
+      - frozen_WP08_reference_artifact
+      - frozen_WP10_validation_artifacts
+      - orchestration/claims_matrix.md
+      - orchestration/decisions/20260712_git_and_interim_communication.md
+    outputs:
+      - presentation/wp10_demo.md
+      - presentation/README.md
+      - scripts/generate_communication_figures.py
+      - reports/figures/communication_figure_manifest.json
+      - reports/presentation/wp10_demo.pdf
+      - reports/presentation/wp10_demo.pptx
+    files_owned:
+      - presentation/
+      - scripts/generate_communication_figures.py
+      - reports/figures/
+      - reports/presentation/
+    acceptance_tests:
+      - figures_regenerated_from_frozen_reviewed_artifacts
+      - output_manifest_records_input_and_figure_SHA256
+      - PDF_renders_and_representative_slides_pass_visual_review
+      - PPTX_container_and_slide_content_pass_structural_audit
+      - synthetic_public_and_pending_results_are_separated
+      - prohibited_or_premature_control_claims_are_absent
+      - governance_and_complete_test_suite_pass
+    assumptions: [A-003, A-018]
+    blockers: []
+    notes:
+      - Canonical Markdown source generates a 17-page Beamer PDF and a 23-slide editable PPTX; Pandoc separates six dense visual/table continuations in the PPTX.
+      - Independent LibreOffice rendering is an environment limitation and is not claimed as a passed check.
+    validation_evidence:
+      - "conda run -n devkki make presentation: exit 0"
+      - "PDF: 17-page 16:9 document; representative visual review passed after layout corrections"
+      - "PPTX: Microsoft PowerPoint 2007+; unzip integrity passed; 23 non-empty slide XML parts and all source sections present"
+      - "figure manifest records four frozen inputs, six generated outputs, SHA-256 values, and the interim claim boundary"
+      - "governance: 14 YAML, 29-task acyclic DAG, 25 assumptions, 81 Markdown, zero missing links"
+      - "conda run -n devkki python -m pytest: 154 passed in 40.18 s"
+
+  - id: T-PAPER-DRAFT
+    title: Journal-neutral living LaTeX manuscript
+    phase: 3
+    state: READY
+    priority: MEDIUM
+    dependencies: [T-COMMS-DEMO]
+    inputs:
+      - docs/running_paper.md
+      - orchestration/claims_matrix.md
+      - orchestration/assumptions.yaml
+      - orchestration/reports/wp08_cmp_validation.md
+      - orchestration/reports/wp10_literature_review.md
+      - orchestration/reports/wp10_coupling_validation.md
+      - reports/figures/communication_figure_manifest.json
+    outputs:
+      - paper/main.tex
+      - paper/references.bib
+      - paper/README.md
+      - reports/paper/semifab_cmp_poc_draft.pdf
+    files_owned:
+      - paper/
+      - reports/paper/
+    acceptance_tests:
+      - journal_neutral_two_column_source_compiles
+      - completed_methods_and_results_have_traceable_evidence
+      - unfinished_work_is_explicitly_marked_pending
+      - bibliography_matches_reviewed_local_sources
+      - unsupported_defect_yield_real_fab_and_controller_claims_are_absent
+      - build_is_reproducible_in_conda_environment_devkki
+    assumptions: [A-001, A-003, A-007, A-008, A-018]
+    blockers: []
 
   - id: T-WP11
     title: WP11 deterministic declarative scenario engine

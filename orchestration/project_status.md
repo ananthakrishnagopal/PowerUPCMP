@@ -1,9 +1,9 @@
 # Project status
 
-Last updated: 2026-07-11 23:54 IST  
-Current phase: Phase 3 — scientific modelling and coupling  
-Phase state: SCIENTIFIC MODEL FREEZE IN PROGRESS  
-Active task: T-WP10 COMPLETE; next is the WP12 safe-envelope/horizon/uncertainty scientific freeze
+Last updated: 2026-07-12 13:15 IST<br>
+Current phase: Phase 3 — scientific modelling and coupling<br>
+Phase state: SCIENTIFIC MODEL FREEZE IN PROGRESS<br>
+Active task: T-COMMS-DEMO COMPLETE; T-PAPER-DRAFT READY; scientific critical path remains the WP12 safe-envelope/horizon/uncertainty freeze
 
 ## Review outcome
 
@@ -167,6 +167,28 @@ efficacy.
 - Dataset network transfer: none; the archive was supplied locally.
 - Agent/subagent actions: none.
 
+## Git and interim communication state
+
+- Git is active on branch `main`. Commit `51ba07a` is the protected validated
+  WP10 scientific/software baseline; raw PHM tables, the source archive, local
+  paper PDFs, private Codex/agent state, and transient build files remain
+  excluded by policy.
+- T-COMMS-DEMO is COMPLETE. One canonical Markdown source reproducibly builds
+  a 17-page PDF and a 23-slide editable PPTX from six figures regenerated from
+  frozen WP08/WP10 artifacts. The figure manifest records all input/output
+  SHA-256 values and the synthetic-only claim boundary.
+- The PDF passed representative-page visual review. The PPTX passes file-type,
+  ZIP-member, embedded-media, and non-empty slide-content checks; independent
+  LibreOffice rendering is recorded as an environment limitation, not a
+  passed test.
+- The deck explicitly marks public-data modelling, early warning, attribution,
+  controllers, safety filtering, and paired efficacy evaluation as pending.
+  It makes no physical-defect, yield, equipment-protection, real-fab, or
+  production-control claim.
+- T-PAPER-DRAFT is READY. It will convert the running evidence ledger into a
+  journal-neutral two-column LaTeX manuscript while retaining visible pending
+  markers for unexecuted Phase 3/4 work.
+
 ## Next Phase 3 work
 
 T-WP08 and T-WP10 are scientifically closed within their synthetic claim
@@ -178,5 +200,5 @@ virtual-metrology decisions also remain unfrozen and cannot mix the PHM native
 numeric target with SI simulator coefficients.
 
 Current governance evidence: 14 YAML files parse with zero duplicate keys; all
-27 tasks form an acyclic dependency graph and reference 25 valid assumptions;
-72 Markdown files have zero missing local links.
+29 tasks form an acyclic dependency graph and reference 25 valid assumptions;
+81 Markdown files contain 55 valid local links and zero missing local links.

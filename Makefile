@@ -1,14 +1,19 @@
 PYTHON ?= python3
+PANDOC ?= pandoc
+MPLCONFIGDIR ?= /tmp/semifab-poc-matplotlib
 export PYTHONPATH := src
+export MPLCONFIGDIR
 
-.PHONY: help test test-unit validate-config package-check
+.PHONY: help test test-unit validate-config package-check figures presentation
 
 help:
 	@printf '%s\n' \
 		'test            Run the complete local pytest suite' \
 		'test-unit       Run unit tests only' \
 		'validate-config Validate a YAML runtime configuration (CONFIG=path)' \
-		'package-check   Verify the package imports without installing optional extras'
+		'package-check   Verify the package imports without installing optional extras' \
+		'figures         Regenerate reviewed WP08/WP10 communication figures' \
+		'presentation    Build the interim WP10 PDF and PPTX deck'
 
 test:
 	$(PYTHON) -m pytest
@@ -22,3 +27,11 @@ validate-config:
 
 package-check:
 	$(PYTHON) -c "import semifab_poc; print(semifab_poc.__version__)"
+
+figures:
+	$(PYTHON) scripts/generate_communication_figures.py
+
+presentation: figures
+	mkdir -p reports/presentation presentation/build
+	$(PANDOC) presentation/wp10_demo.md --from markdown+tex_math_dollars --slide-level=2 --resource-path=.:presentation:reports/figures -o reports/presentation/wp10_demo.pptx
+	$(PANDOC) presentation/wp10_demo.md --from markdown+tex_math_dollars --to beamer --slide-level=2 --resource-path=.:presentation:reports/figures --pdf-engine=xelatex -V aspectratio=169 -o reports/presentation/wp10_demo.pdf

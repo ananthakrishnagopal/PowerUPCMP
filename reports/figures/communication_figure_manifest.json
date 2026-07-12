@@ -1,0 +1,21 @@
+{
+  "claims_boundary": "Interim WP08/WP10 synthetic evidence only; no public-data model, real-fab, defect, yield, predictive-control, or equipment claim.",
+  "controller_results_included": false,
+  "evidence_plane": "SYNTHETIC_SIMULATOR",
+  "inputs": {
+    "reports/cmp/wp08_reference_trace.csv": "0bc42acf4e0a334615908c4a9402b31bd026d10a66692d857bd0a888e66def4f",
+    "reports/sensitivity/wp10_coupling_validation.json": "b9b53a8dc424dad42e13f8164297bb1718e56f19051bdbed8ecbd485a73bfdad",
+    "reports/sensitivity/wp10_negative_control_trace.csv": "660271c596f47770f55f77fd8c39b91972ede7124b18adcfcd255cfc924ff0ed",
+    "reports/sensitivity/wp10_positive_chain_trace.csv": "656d22ee1fc199f8e3ca68d31b9deaff7afc680c8861a9b84d76baee5fc11cc9"
+  },
+  "manifest_id": "INTERIM_COMMUNICATION_FIGURES_WP10_V1",
+  "outputs": {
+    "reports/figures/system_architecture_wp10.png": "eb2894c6f01b5543728705313fe7a4d0fc7e38622087f7ba2b206cd2d926e851",
+    "reports/figures/wp08_reference_trace.png": "517cd6ebccae253d927178957f075d00bf8d01ca0dfb03fa60c1d0f3ca44c606",
+    "reports/figures/wp10_delayed_mrr_result.png": "ad9181e6eb4febae7c992e922a7df1197a7384d9621b2b436e1fa43c638e461a",
+    "reports/figures/wp10_global_sensitivity.png": "ef7dfeb96c9a02261c3e4841fa9a0dcd9e825e391e3c76eec652da9e4b74c73f",
+    "reports/figures/wp10_negative_control.png": "8fe41485ba7f092040aa745b05478dab3f3edb12f27f9394110be1ce8828799e",
+    "reports/figures/wp10_positive_chain.png": "8be62f328a31f25cfb3d5169f06a37de9b848099ea8e81190aed21f42af4f521"
+  },
+  "public_data_model_results_included": false
+}

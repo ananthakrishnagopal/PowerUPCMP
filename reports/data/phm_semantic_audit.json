@@ -1,0 +1,198 @@
+{
+  "absolute_timestamp_is_predictor": false,
+  "dataset_id": "PHM_2016_CMP",
+  "gap_threshold_s": 10.0,
+  "machine_split_evidence": {
+    "machine_data_holdout_feasible": false,
+    "machine_data_interpretation": "DESCRIPTIVE_INPUT_NOT_MACHINE_OR_REGIME_GENERALIZATION",
+    "machine_data_multi_value_wafer_stage_groups": {
+      "test": 424,
+      "training": 1979,
+      "validation": 424
+    },
+    "machine_data_values": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "machine_ids": [
+      "2"
+    ],
+    "physical_machine_holdout_feasible": false
+  },
+  "original_target_unit_status": "NOT_DECLARED_BY_ORIGINAL_SOURCE",
+  "phase_labels_are": "INPUT_ONLY_PROCESS_MODE_PROXIES_NOT_MEASURED_PHASES",
+  "process_signal_units": "PROPRIETARY_SCALED_WITH_HIDDEN_FACTORS",
+  "public_target": "AVG_REMOVAL_RATE",
+  "splits": {
+    "test": {
+      "continuity_segment_count": 858,
+      "long_gap_count": 427,
+      "mode_row_count": {
+        "ACTIVE_POLISH_PROXY": 79988,
+        "ENDING_OR_CLEANING_PROXY": 13187,
+        "PREPARE_PROXY": 9787,
+        "TRANSITION_WITHIN_POLISH_PROXY": 11263,
+        "UNRESOLVED_PROXY": 42037
+      },
+      "negative_timestamp_increment_count": 0,
+      "negative_timestamp_increment_rows": [],
+      "positive_timestamp_increment_quantiles_s": {
+        "max": 14654.666999995708,
+        "p50": 1.0,
+        "p90": 1.3330000042915344,
+        "p99": 3.3330000042915344,
+        "p99_5": 5.0,
+        "p99_9": 17.0
+      },
+      "row_count": 156262,
+      "supported_duration_s": 156231.67199993134,
+      "unresolved_wafer_stage_group_count": 43,
+      "wafer_stage_group_count": 424,
+      "zero_timestamp_increment_count": 188
+    },
+    "training": {
+      "continuity_segment_count": 4013,
+      "long_gap_count": 2004,
+      "mode_row_count": {
+        "ACTIVE_POLISH_PROXY": 367334,
+        "ENDING_OR_CLEANING_PROXY": 66085,
+        "PREPARE_PROXY": 47704,
+        "TRANSITION_WITHIN_POLISH_PROXY": 52650,
+        "UNRESOLVED_PROXY": 138971
+      },
+      "negative_timestamp_increment_count": 3,
+      "negative_timestamp_increment_rows": [
+        {
+          "continuity_segment_index": 2,
+          "delta_from_previous_s": -6.0,
+          "source_row_index": 1044,
+          "stage": "A",
+          "timestamp": 483780443.667,
+          "trace_id": "CMP-training-067",
+          "wafer_id": "4223773480"
+        },
+        {
+          "continuity_segment_index": 1,
+          "delta_from_previous_s": -2804.0,
+          "source_row_index": 1625,
+          "stage": "B",
+          "timestamp": 483963957.333,
+          "trace_id": "CMP-training-073",
+          "wafer_id": "-4019511766"
+        },
+        {
+          "continuity_segment_index": 3,
+          "delta_from_previous_s": -2820.0,
+          "source_row_index": 1796,
+          "stage": "B",
+          "timestamp": 483964043.333,
+          "trace_id": "CMP-training-073",
+          "wafer_id": "-4019511766"
+        }
+      ],
+      "positive_timestamp_increment_quantiles_s": {
+        "max": 15225.333999991417,
+        "p50": 1.0,
+        "p90": 1.3330000042915344,
+        "p99": 3.3330000042915344,
+        "p99_5": 5.333000004291534,
+        "p99_9": 17.0
+      },
+      "row_count": 672744,
+      "supported_duration_s": 671278.370999515,
+      "unresolved_wafer_stage_group_count": 221,
+      "wafer_stage_group_count": 1981,
+      "zero_timestamp_increment_count": 2221
+    },
+    "validation": {
+      "continuity_segment_count": 856,
+      "long_gap_count": 424,
+      "mode_row_count": {
+        "ACTIVE_POLISH_PROXY": 79265,
+        "ENDING_OR_CLEANING_PROXY": 14486,
+        "PREPARE_PROXY": 9525,
+        "TRANSITION_WITHIN_POLISH_PROXY": 10685,
+        "UNRESOLVED_PROXY": 30187
+      },
+      "negative_timestamp_increment_count": 2,
+      "negative_timestamp_increment_rows": [
+        {
+          "continuity_segment_index": 1,
+          "delta_from_previous_s": -2392.0,
+          "source_row_index": 150,
+          "stage": "A",
+          "timestamp": 486539167.667,
+          "trace_id": "CMP-validation-162",
+          "wafer_id": "2070207730"
+        },
+        {
+          "continuity_segment_index": 3,
+          "delta_from_previous_s": -2402.666000008583,
+          "source_row_index": 260,
+          "stage": "A",
+          "timestamp": 486539226.667,
+          "trace_id": "CMP-validation-162",
+          "wafer_id": "2070207730"
+        }
+      ],
+      "positive_timestamp_increment_quantiles_s": {
+        "max": 2353.3330000042915,
+        "p50": 1.0,
+        "p90": 1.3330000042915344,
+        "p99": 3.333999991416931,
+        "p99_5": 5.333000004291534,
+        "p99_9": 17.0
+      },
+      "row_count": 144148,
+      "supported_duration_s": 143855.3409999013,
+      "unresolved_wafer_stage_group_count": 42,
+      "wafer_stage_group_count": 424,
+      "zero_timestamp_increment_count": 498
+    }
+  },
+  "training_label_anomalies": {
+    "count": 4,
+    "holdout_selection_forbidden": true,
+    "maximum_other_training_label": 162.6417,
+    "policies": [
+      "ORIGINAL",
+      "EXCLUDE_FOUR_PREREGISTERED",
+      "HYPOTHETICAL_DIVIDE_FOUR_BY_60"
+    ],
+    "primary_policy": "ORIGINAL",
+    "rows": [
+      {
+        "expected_original": 4326.15405,
+        "hypothetical_divide_by_60": 72.1025675,
+        "observed_original": 4326.15405,
+        "stage": "A",
+        "wafer_id": "2058207580"
+      },
+      {
+        "expected_original": 4202.11245,
+        "hypothetical_divide_by_60": 70.0352075,
+        "observed_original": 4202.11245,
+        "stage": "A",
+        "wafer_id": "1834206730"
+      },
+      {
+        "expected_original": 4182.41655,
+        "hypothetical_divide_by_60": 69.7069425,
+        "observed_original": 4182.41655,
+        "stage": "A",
+        "wafer_id": "1834206944"
+      },
+      {
+        "expected_original": 4129.494,
+        "hypothetical_divide_by_60": 68.8249,
+        "observed_original": 4129.494,
+        "stage": "A",
+        "wafer_id": "1834206972"
+      }
+    ]
+  }
+}

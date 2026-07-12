@@ -1,0 +1,86 @@
+schema_version: "2.0.0"
+scenarios:
+  - scenario_id: normal_operation
+    description: Nominal synthetic operation without exogenous events.
+    seed: 100
+    events: []
+
+  - scenario_id: mild_voltage_sag
+    description: Mild grid-voltage sag with recovery.
+    seed: 101
+    events:
+      - {event_id: mild-sag, event_type: voltage_sag, start_s: 1.0, duration_s: 0.20, priority: 10, target: electrical.grid_voltage_delta_pu, profile: PULSE, magnitude: -0.10, unit: pu, initiating_cause: GRID_VOLTAGE_SAG}
+
+  - scenario_id: severe_voltage_sag
+    description: Severe grid-voltage sag with recovery.
+    seed: 102
+    events:
+      - {event_id: severe-sag, event_type: voltage_sag, start_s: 1.0, duration_s: 0.40, priority: 10, target: electrical.grid_voltage_delta_pu, profile: PULSE, magnitude: -0.25, unit: pu, initiating_cause: GRID_VOLTAGE_SAG}
+
+  - scenario_id: ups_transfer
+    description: Short grid interruption that invokes simulated UPS transfer.
+    seed: 103
+    events:
+      - {event_id: interruption, event_type: short_interruption, start_s: 1.0, duration_s: 0.08, priority: 10, target: electrical.force_interruption, profile: PULSE, magnitude: 1.0, unit: "1", initiating_cause: GRID_INTERRUPTION}
+
+  - scenario_id: pump_trip
+    description: Simulated pump-drive trip.
+    seed: 104
+    events:
+      - {event_id: pump-trip, event_type: pump_trip, start_s: 1.0, duration_s: 0.30, priority: 10, target: drive.force_trip, profile: PULSE, magnitude: 1.0, unit: "1", initiating_cause: PUMP_TRIP}
+
+  - scenario_id: valve_restriction
+    description: Reduced UPW valve position.
+    seed: 105
+    events:
+      - {event_id: valve-restrict, event_type: valve_restriction, start_s: 1.0, duration_s: 1.00, priority: 10, target: upw.valve_position, profile: PULSE, magnitude: 0.25, unit: "1", initiating_cause: VALVE_RESTRICTION}
+
+  - scenario_id: tool_demand_spike
+    description: Elevated synthetic tool-water demand.
+    seed: 106
+    events:
+      - {event_id: demand-spike, event_type: demand_spike, start_s: 1.0, duration_s: 0.50, priority: 10, target: upw.tool_demand_m3_s, profile: PULSE, magnitude: 2.0e-4, unit: m^3/s, initiating_cause: TOOL_DEMAND_SPIKE}
+
+  - scenario_id: temperature_excursion
+    description: Elevated synthetic UPW inlet temperature.
+    seed: 107
+    events:
+      - {event_id: inlet-warm, event_type: temperature_excursion, start_s: 1.0, duration_s: 1.00, priority: 10, target: upw.inlet_temperature_k, profile: PULSE, magnitude: 303.15, unit: K, initiating_cause: THERMAL_EXCURSION}
+
+  - scenario_id: pressure_sensor_bias
+    description: Pressure-sensor bias fault for observation testing.
+    seed: 108
+    events:
+      - {event_id: pressure-bias, event_type: sensor_bias, start_s: 1.0, duration_s: 1.00, priority: 10, target: sensor.pressure.bias, profile: PULSE, magnitude: 5000.0, unit: Pa, initiating_cause: PRESSURE_SENSOR_FAULT}
+
+  - scenario_id: sensor_dropout
+    description: Pressure-sensor dropout fault for observation testing.
+    seed: 109
+    events:
+      - {event_id: pressure-dropout, event_type: sensor_dropout, start_s: 1.0, duration_s: 0.50, priority: 10, target: sensor.pressure.packet_loss_probability, profile: PULSE, magnitude: 1.0, unit: "1", initiating_cause: PRESSURE_SENSOR_FAULT}
+
+  - scenario_id: recoverable_disturbance
+    description: Short recoverable voltage disturbance.
+    seed: 110
+    events:
+      - {event_id: recoverable-sag, event_type: voltage_sag, start_s: 1.0, duration_s: 0.10, priority: 10, target: electrical.grid_voltage_delta_pu, profile: PULSE, magnitude: -0.12, unit: pu, initiating_cause: GRID_VOLTAGE_SAG}
+
+  - scenario_id: hold_required_disturbance
+    description: Severe prolonged synthetic grid disturbance; control policy is evaluated later.
+    seed: 111
+    events:
+      - {event_id: hold-sag, event_type: voltage_sag, start_s: 1.0, duration_s: 1.00, priority: 10, target: electrical.grid_voltage_delta_pu, profile: PULSE, magnitude: -0.40, unit: pu, initiating_cause: GRID_VOLTAGE_SAG}
+
+  - scenario_id: compound_disturbance
+    description: Concurrent grid sag and tool demand spike with ordered multi-cause labels.
+    seed: 112
+    compound_cause_policy: MULTI_LABEL_ORDERED
+    events:
+      - {event_id: compound-sag, event_type: voltage_sag, start_s: 1.0, duration_s: 0.40, priority: 10, target: electrical.grid_voltage_delta_pu, profile: PULSE, magnitude: -0.25, unit: pu, initiating_cause: GRID_VOLTAGE_SAG}
+      - {event_id: compound-demand, event_type: demand_spike, start_s: 1.0, duration_s: 0.40, priority: 20, target: upw.tool_demand_m3_s, profile: PULSE, magnitude: 2.0e-4, unit: m^3/s, initiating_cause: TOOL_DEMAND_SPIKE}
+
+  - scenario_id: slow_drift
+    description: Slowly increasing synthetic pressure-sensor drift.
+    seed: 113
+    events:
+      - {event_id: pressure-drift, event_type: sensor_drift, start_s: 1.0, duration_s: 10.0, priority: 10, target: sensor.pressure.drift_per_s, profile: RAMP, magnitude: 50.0, unit: Pa/s, initiating_cause: PRESSURE_SENSOR_FAULT}

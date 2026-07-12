@@ -1,0 +1,303 @@
+registry_version: "3.2.0"
+status: FROZEN_WP10_V3_2
+implementation_gate: WP10_IMPLEMENTATION_AND_VALIDATION
+supersedes: "3.1.0"
+change_decision: orchestration/decisions/wp10_utility_cmp_coupling.md
+effective_date: "2026-07-11"
+canonical_schema_version: "2.4.0"
+compatibility_policy: semantic_versioning
+change_control:
+  required_steps:
+    - record_reason_in_orchestration_decision
+    - analyze_all_callers_and_serialized_artifacts
+    - update_contract_unit_and_integration_tests
+    - update_architecture_schema_manifest_and_user_docs
+  breaking_change: major_version_increment
+  additive_change: minor_version_increment
+  documentation_only: patch_version_increment
+
+common_types:
+  InitialState:
+    description: Typed immutable component-specific state in canonical SI units.
+  ComponentConfig:
+    description: Validated immutable configuration with parameter provenance IDs.
+  State:
+    description: Typed immutable latent state; finite and invariant-valid.
+  Action:
+    schema_ref: canonical_schema.yaml#/records/action_record
+  Disturbance:
+    schema_ref: canonical_schema.yaml#/records/scenario_event_record
+  Observation:
+    schema_ref: canonical_schema.yaml#/records/observation_record
+  ObservationWindow:
+    description: Time-ordered observations no later than the decision cutoff.
+  Prediction:
+    schema_ref: canonical_schema.yaml#/records/prediction_record
+  Constraints:
+    description: Versioned action, slew, process-envelope, uncertainty, hold, and restart constraints.
+  SafetyDecision:
+    schema_ref: canonical_schema.yaml#/records/safety_decision_record
+  Dataset:
+    description: Validated feature/target/groups bundle with provenance and split identity.
+  Event:
+    schema_ref: canonical_schema.yaml#/records/scenario_event_record
+  CmpBoundaryConditions:
+    version: "1.0.0"
+    module: semifab_poc.simulation.cmp
+    description: "Typed, neutral-by-default boundary from a declared WP10 topology into the CMP subsystem; it contains no generic MRR multiplier."
+    fields:
+      dressing_availability: {unit: "1", bounds: [0.0, 1.0]}
+      slurry_utility_availability: {unit: "1", bounds: [0.0, 1.0]}
+      coolant_temperature_k: {unit: K, bounds: configured_cmp_thermal_envelope}
+      cooling_conductance_factor: {unit: "1", bounds: configured_cmp_cooling_envelope}
+      process_discrepancy_m_s: {unit: m/s, online_visible: false, bounds: configured_symmetric_envelope}
+      utilities_valid: {type: boolean}
+      sensors_valid: {type: boolean}
+      force_hold: {type: boolean}
+  CouplingResult:
+    description: Frozen typed CMP boundary plus finite latent coupling diagnostics.
+    fields:
+      topology: {type: enum_utility_cmp_topology}
+      pressure_ratio: {unit: "1", minimum: 0.0}
+      flow_ratio: {unit: "1", minimum: 0.0}
+      pressure_support: {unit: "1", bounds: [0.0, 1.0]}
+      flow_support: {unit: "1", bounds: [0.0, 1.0]}
+      hydraulic_support: {unit: "1", bounds: [0.0, 1.0]}
+      effective_availability: {unit: "1", bounds: [0.0, 1.0]}
+      boundary: {type: CmpBoundaryConditions}
+  SpatialUniformityProxy:
+    version: "1.0.0"
+    module: semifab_poc.simulation.cmp
+    mandatory_label: "Simulated spatial-uniformity proxy; not experimentally validated WIWNU."
+
+interfaces:
+  UtilityToCmpCoupler:
+    version: "1.0.0"
+    module: semifab_poc.simulation.coupling
+    stateful_instance: false
+    rationale: Pure physical connection map; it contains no MRR, observation, prediction, control, or safety logic.
+    constructor:
+      signature: "UtilityToCmpCoupler(config: CouplingConfig, upw_config: UpwConfig, cmp_config: CmpConfig)"
+      postconditions:
+        - all_configs_strictly_validated
+        - no_connection_requires_zero_link_strength
+        - parameter_registry_complete
+    methods:
+      couple:
+        signature: "couple(upw_state: UpwState) -> CouplingResult"
+        preconditions:
+          - input_is_validated_latent_upw_state
+          - no_observed_sensor_record_is_accepted
+        postconditions:
+          - result_is_finite_bounded_and_immutable
+          - boundary_validates_against_cmp_config
+          - no_connection_is_exactly_neutral
+          - zero_link_is_exactly_neutral
+          - water_quality_proxy_has_no_effect
+          - process_discrepancy_and_force_hold_remain_neutral
+
+  DynamicSubsystem:
+    version: "2.0.0"
+    module: semifab_poc.simulation.base
+    stateful_instance: true
+    constructor:
+      signature: "Subsystem(config: ComponentConfig | None = None)"
+      postconditions:
+        - immutable_config_validated_at_construction
+        - config_has_nonempty_parameter_provenance_id
+    methods:
+      reset:
+        signature: "reset(initial_state: InitialState | None = None) -> State"
+        preconditions:
+          - explicit_initial_state_matches_component_or_is_none
+          - explicit_initial_state_numeric_values_are_finite
+        postconditions:
+          - none_selects_documented_nominal_state
+          - returned_state_satisfies_invariants
+          - no_external_side_effects
+      step:
+        signature: "step(state: State, action: Action, disturbance: Disturbance, dt_s: float) -> State"
+        preconditions:
+          - dt_s_greater_than_zero
+          - state_satisfies_invariants
+          - action_effective_at_this_boundary
+        postconditions:
+          - returned_state_is_new_value
+          - input_state_not_mutated
+          - returned_state_satisfies_invariants
+          - output_uses_canonical_SI_units
+    observation_boundary:
+      owner: SensorModel
+      rationale: Observation requires run, source-step, timestamp, sampling, corruption, and communication state and is deliberately excluded from physical subsystems.
+
+  Predictor:
+    version: "1.0.0"
+    planned_module: semifab_poc.models.base
+    stateful_instance: true
+    methods:
+      fit:
+        signature: "fit(dataset: Dataset) -> Predictor"
+        preconditions:
+          - dataset_schema_validated
+          - split_identity_present
+          - no_group_overlap
+        postconditions:
+          - fitted_artifact_records_schema_split_features_and_seed
+          - validation_or_test_groups_not_used_for_fit
+      predict:
+        signature: "predict(observation_window: ObservationWindow) -> Prediction"
+        preconditions:
+          - observations_time_ordered
+          - feature_cutoff_not_after_decision_time
+        postconditions:
+          - prediction_units_declared
+          - uncertainty_validity_declared
+          - input_window_not_mutated
+      save:
+        signature: "save(path: Path) -> None"
+        postconditions:
+          - artifact_written_atomically
+          - metadata_and_checksum_written
+      load:
+        signature: "load(path: Path) -> Predictor"
+        classmethod: true
+        postconditions:
+          - incompatible_major_version_rejected
+          - checksum_verified
+
+  Controller:
+    version: "1.0.0"
+    planned_module: semifab_poc.control.base
+    stateful_instance: true
+    methods:
+      reset:
+        signature: "reset() -> None"
+        postconditions:
+          - controller_history_cleared
+          - configured_policy_unchanged
+      act:
+        signature: "act(observation: ObservationWindow, prediction: Prediction, constraints: Constraints) -> Action"
+        preconditions:
+          - only_observed_data_supplied
+          - prediction_cutoff_matches_observation_cutoff
+        postconditions:
+          - returns_proposed_action_only
+          - does_not_mutate_plant
+          - action_type_in_canonical_vocabulary
+
+  SafetyFilter:
+    version: "1.0.0"
+    planned_module: semifab_poc.control.safety
+    stateful_instance: true
+    independence_requirement: must_not_import_or_call_controller_implementation
+    methods:
+      validate:
+        signature: "validate(proposed_action: Action, observation: ObservationWindow, uncertainty: Prediction, constraints: Constraints) -> SafetyDecision"
+        preconditions:
+          - proposed_action_stage_is_PROPOSED
+          - constraints_version_recorded
+        postconditions:
+          - outcome_in_canonical_safety_vocabulary
+          - final_action_always_present
+          - unsafe_or_indeterminate_proposal_never_passes_unmodified
+          - decision_auditable_by_constraint_id
+
+  Scenario:
+    version: "2.0.0"
+    planned_module: semifab_poc.simulation.scenario
+    stateful_instance: false
+    methods:
+      validate:
+        signature: "validate() -> None"
+        postconditions:
+          - invalid_time_magnitude_unit_or_target_rejected
+          - equal_time_event_order_deterministic
+          - scenario_id_and_schema_version_present
+      events_at:
+        signature: "events_at(time_s: float) -> tuple[Event, ...]"
+        preconditions:
+          - time_s_nonnegative_and_finite
+        postconditions:
+          - events_sorted_by_priority_then_declaration_order
+          - returned_tuple_immutable
+          - repeated_call_returns_equal_value
+
+  SensorModel:
+    version: "2.0.0"
+    planned_module: semifab_poc.simulation.sensors
+    stateful_instance: true
+    rationale: Sole latent-to-observed boundary; kept separate from DynamicSubsystem v2 so sampling and communication clocks cannot contaminate physical state.
+    methods:
+      reset:
+        signature: "reset(seed: int, config: ComponentConfig | None = None) -> None"
+      sample:
+        signature: "sample(state: Sequence[LatentStateRecord], step_index: int, timestamp_s: float) -> tuple[Observation, ...]"
+        postconditions:
+          - latent_state_not_mutated
+          - deterministic_for_seed_config_and_input_history
+          - delay_loss_and_jitter_explicit
+          - returned_observations_have_arrived_by_current_source_time
+          - reported_timestamp_jitter_does_not_change_arrival
+      release_arrived:
+        signature: "release_arrived(decision_timestamp_s: float) -> tuple[Observation, ...]"
+        postconditions:
+          - every_returned_arrival_timestamp_no_later_than_cutoff
+          - each_generated_observation_released_at_most_once
+
+  RootCauseEstimator:
+    version: "1.0.0"
+    planned_module: semifab_poc.models.attribution
+    stateful_instance: true
+    rationale: Keeps attribution vocabulary and evidence separate from prediction.
+    methods:
+      reset:
+        signature: "reset() -> None"
+      estimate:
+        signature: "estimate(observation_window: ObservationWindow, prediction: Prediction) -> Attribution"
+        postconditions:
+          - predicted_cause_in_canonical_vocabulary
+          - unknown_class_supported
+          - causal_proof_always_false
+
+runtime_contract:
+  interface_version: "3.2.0"
+  action_timing: proposed_at_step_k_effective_no_earlier_than_step_k_plus_1
+  online_visibility:
+    allowed:
+      - observation_records_arrived_by_decision_time
+      - prior_predictions
+      - prior_actions_and_safety_decisions
+      - validated_static_configuration
+    forbidden:
+      - latent_state_records
+      - future_observations
+      - future_scenario_events_not_exposed_by_policy
+      - offline_excursion_labels
+      - simulator_initiating_cause_labels
+  atomic_step_commit: true
+  cmp_boundary_owner: WP10_DECLARED_TOPOLOGY_COUPLER
+  cmp_boundary_neutral_default: true
+  direct_generic_upw_to_mrr_multiplier_allowed: false
+  utility_coupling_input: validated_latent_upw_state_only
+  utility_coupling_default_topology: NO_CONNECTION
+
+required_contract_tests:
+  - test_all_plant_components_implement_dynamic_subsystem_v2
+  - test_dynamic_subsystem_config_has_parameter_provenance
+  - test_dynamic_subsystem_does_not_mutate_input
+  - test_dynamic_subsystem_excludes_observation_boundary
+  - test_sensor_model_does_not_change_latent_state
+  - test_predictor_rejects_future_feature_cutoff
+  - test_controller_returns_proposal_without_plant_mutation
+  - test_safety_filter_is_controller_independent
+  - test_scenario_equal_time_order_is_deterministic
+  - test_action_effective_boundary_prevents_algebraic_loop
+  - test_interface_serialization_major_version_guard
+  - test_cmp_implements_dynamic_subsystem_v2_without_observation_boundary
+  - test_cmp_boundary_rejects_unknown_nonfinite_and_out_of_range_values
+  - test_cmp_process_discrepancy_is_never_online_visible
+  - test_coupling_rejects_invalid_configuration_and_boundary
+  - test_coupling_null_topology_and_zero_link_are_exactly_neutral
+  - test_coupling_support_is_bounded_and_monotone
+  - test_coupling_parameter_provenance_is_complete
+  - test_coupling_water_quality_proxy_has_no_effect

@@ -1,0 +1,994 @@
+manifest_version: "1.0.0"
+last_updated: "2026-07-11T23:54:05+05:30"
+workflow: single_agent_phase_gated
+allowed_states:
+  - PLANNED
+  - READY
+  - IN_PROGRESS
+  - IMPLEMENTED
+  - VALIDATED
+  - BLOCKED
+  - FAILED
+  - COMPLETE
+state_transition_policy:
+  - "PLANNED -> READY when all dependencies are COMPLETE and blockers are empty"
+  - "READY -> IN_PROGRESS before mutation"
+  - "IN_PROGRESS -> IMPLEMENTED when deliverables exist"
+  - "IMPLEMENTED -> VALIDATED only after all acceptance tests pass"
+  - "VALIDATED -> COMPLETE when no task-local work remains"
+  - "Any active state -> FAILED only through the documented failure policy"
+  - "BLOCKED requires an explicit blocker and recovery condition"
+
+post_completion_audit:
+  date: "2026-07-11"
+  report: orchestration/reports/phase_1_2_scientific_audit.md
+  phase_2_checkpoint_disposition: PROVISIONAL_PENDING_CORRECTIVE_VALIDATION
+  affected_historical_tasks: [T-WP01, T-WP02, T-WP03, T-WP04, T-WP05, T-WP06, T-WP07, T-WP11]
+  policy: Historical COMPLETE states preserve the execution record; they do not satisfy downstream scientific gates until T-PHASE12-REMEDIATION is COMPLETE.
+  downstream_gate_task: T-PHASE12-REMEDIATION
+
+tasks:
+  - id: T-REPO-ASSESS
+    title: Assess repository baseline and preserve user work
+    phase: 1
+    state: COMPLETE
+    priority: CRITICAL
+    dependencies: []
+    inputs:
+      - repository_filesystem
+      - git_status
+      - python_environment
+    outputs:
+      - orchestration/repository_assessment.md
+      - orchestration/failures/20260710T195553+0530_repository_history_inspection.md
+    files_owned:
+      - orchestration/repository_assessment.md
+      - orchestration/failures/20260710T195553+0530_repository_history_inspection.md
+    acceptance_tests:
+      - git_and_filesystem_baseline_recorded
+      - code_tests_docs_data_and_package_configuration_assessed
+      - pre_existing_dot_codex_files_listed_and_untouched
+      - empty_git_history_recorded
+    assumptions: [A-020]
+    blockers: []
+
+  - id: T-WP00
+    title: WP00 scope, claims, and architecture
+    phase: 1
+    state: COMPLETE
+    priority: CRITICAL
+    dependencies: [T-REPO-ASSESS]
+    inputs:
+      - user_master_prompt
+      - orchestration/repository_assessment.md
+    outputs:
+      - orchestration/project_charter.md
+      - orchestration/claims_matrix.md
+      - orchestration/architecture.md
+    files_owned:
+      - orchestration/project_charter.md
+      - orchestration/claims_matrix.md
+      - orchestration/architecture.md
+    acceptance_tests:
+      - research_question_and_primary_MRR_target_present
+      - causal_chain_and_signal_flow_present
+      - measured_simulated_excursion_proxy_defect_yield_distinctions_present
+      - prohibited_claims_explicitly_rejected
+      - success_metrics_and_non_goals_present
+    assumptions: [A-001, A-003, A-004, A-018, A-019]
+    blockers: []
+
+  - id: T-GOVERNANCE
+    title: Freeze Phase 1 schema, interfaces, assumptions, risks, dependencies, and plan
+    phase: 1
+    state: COMPLETE
+    priority: CRITICAL
+    dependencies: [T-REPO-ASSESS, T-WP00]
+    inputs:
+      - orchestration/project_charter.md
+      - orchestration/architecture.md
+      - user_work_package_requirements
+    outputs:
+      - orchestration/canonical_schema.yaml
+      - orchestration/interface_registry.yaml
+      - orchestration/assumptions.yaml
+      - orchestration/data_sources.yaml
+      - orchestration/risk_register.md
+      - orchestration/dependency_graph.md
+      - orchestration/implementation_plan.md
+      - orchestration/task_manifest.yaml
+      - orchestration/project_status.md
+      - orchestration/checkpoints/phase_1_complete.md
+    files_owned:
+      - orchestration/canonical_schema.yaml
+      - orchestration/interface_registry.yaml
+      - orchestration/assumptions.yaml
+      - orchestration/data_sources.yaml
+      - orchestration/risk_register.md
+      - orchestration/dependency_graph.md
+      - orchestration/implementation_plan.md
+      - orchestration/task_manifest.yaml
+      - orchestration/project_status.md
+      - orchestration/checkpoints/phase_1_complete.md
+    acceptance_tests:
+      - all_YAML_parses
+      - required_interfaces_versioned_and_frozen
+      - all_WP00_through_WP20_tasks_present
+      - dependency_graph_acyclic
+      - every_task_has_required_manifest_fields
+      - phase_1_checkpoint_matches_project_status
+    assumptions: [A-002, A-008, A-011, A-017, A-020]
+    blockers: []
+
+  - id: T-WP01
+    title: WP01 repository foundation
+    phase: 2
+    state: COMPLETE
+    priority: CRITICAL
+    dependencies: [T-WP00, T-GOVERNANCE]
+    inputs:
+      - orchestration/architecture.md
+      - orchestration/interface_registry.yaml
+      - orchestration/implementation_plan.md
+    outputs:
+      - pyproject.toml
+      - Makefile
+      - README.md
+      - src/semifab_poc/__init__.py
+      - src/semifab_poc/config.py
+      - src/semifab_poc/logging.py
+      - src/semifab_poc/cli.py
+      - tests/unit/test_config.py
+    files_owned:
+      - pyproject.toml
+      - Makefile
+      - README.md
+      - src/semifab_poc/
+      - tests/unit/test_config.py
+      - docs/
+    acceptance_tests:
+      - editable_install_succeeds
+      - minimal_import_succeeds
+      - strict_config_rejects_unknown_keys
+      - CLI_help_succeeds
+      - pytest_discovers_tests
+      - core_install_uses_no_optional_dependency
+    validation_evidence:
+      - "conda run -n devkki python -m pip install --no-deps --no-build-isolation -e ."
+      - "conda run -n devkki python -m pytest: 6 passed"
+      - "conda run -n devkki semifab-poc --help: exit 0"
+      - "conda run -n devkki python -c import semifab_poc: version 0.1.0"
+    assumptions: [A-020]
+    blockers: []
+
+  - id: T-WP02
+    title: WP02 data schema and provenance implementation
+    phase: 2
+    state: COMPLETE
+    priority: CRITICAL
+    dependencies: [T-WP01]
+    inputs:
+      - orchestration/canonical_schema.yaml
+      - orchestration/data_sources.yaml
+      - orchestration/interface_registry.yaml
+    outputs:
+      - src/semifab_poc/data/schema.py
+      - src/semifab_poc/data/provenance.py
+      - src/semifab_poc/data/splits.py
+      - data/README.md
+      - tests/unit/test_schema.py
+      - tests/unit/test_provenance.py
+      - tests/unit/test_splits.py
+    files_owned:
+      - src/semifab_poc/data/
+      - data/README.md
+      - tests/unit/test_schema.py
+      - tests/unit/test_provenance.py
+      - tests/unit/test_splits.py
+    acceptance_tests:
+      - canonical_records_validate_units_ranges_and_semantic_class
+      - raw_manifest_requires_SHA256_and_licence
+      - grouped_split_has_zero_group_overlap
+      - fitted_transform_scope_is_training_only
+      - latent_and_observation_records_cannot_be_confused
+    validation_evidence:
+      - "conda run -n devkki python -m pytest: 20 passed"
+      - "data API import smoke check passed"
+      - "canonical schema YAML cross-check passed"
+      - "grouped split leakage-free smoke check passed"
+    assumptions: [A-001, A-002, A-017, A-018]
+    blockers: []
+
+  - id: T-DATA-FETCH
+    title: Prepare registry-gated public data fetch tool without downloading
+    phase: 2
+    state: COMPLETE
+    priority: HIGH
+    dependencies: [T-WP02]
+    inputs:
+      - orchestration/data_sources.yaml
+      - src/semifab_poc/data/provenance.py
+    outputs:
+      - scripts/fetch_data.py
+      - tests/unit/test_fetch_data.py
+    files_owned:
+      - scripts/fetch_data.py
+      - tests/unit/test_fetch_data.py
+    acceptance_tests:
+      - unapproved_URL_is_rejected_before_network
+      - incomplete_licence_or_filename_manifest_is_rejected
+      - raw_existing_file_is_not_overwritten
+      - checksum_and_schema_hooks_are_required
+      - no_silent_mirror_or_synthetic_fallback
+      - tests_use_local_fixtures_only
+    validation_evidence:
+      - "conda run -n devkki python -m pytest: 24 passed"
+      - "full archive dry-run: 558 selected members validated"
+      - "extraction manifest checksum audit: 558/558 files matched"
+      - "58 header-only time-series files retained as empty_trace=true"
+      - "answer tables and derived experiments excluded"
+    assumptions: [A-002]
+    blockers: []
+
+  - id: T-WP03
+    title: WP03 PHM CMP data pipeline and leakage-safe splits
+    phase: 2
+    state: COMPLETE
+    priority: HIGH
+    dependencies: [T-DATA-FETCH]
+    inputs:
+      - verified_PHM_raw_manifest
+      - verified_PHM_schema
+      - canonical_public_measurement_schema
+    outputs:
+      - src/semifab_poc/data/phm_cmp.py
+      - configs/data/phm_2016_cmp.yaml
+      - reports/data/phm_missingness.json
+      - tests/unit/test_phm_cmp.py
+      - tests/integration/test_phm_pipeline.py
+    files_owned:
+      - src/semifab_poc/data/phm_cmp.py
+      - configs/data/phm_2016_cmp.yaml
+      - reports/data/phm_missingness.json
+      - tests/unit/test_phm_cmp.py
+      - tests/integration/test_phm_pipeline.py
+    acceptance_tests:
+      - source_files_match_approved_manifest_and_SHA256
+      - required_columns_and_units_validate
+      - timestamps_wafer_machine_and_trace_groups_preserved
+      - MRR_join_cardinality_audited
+      - missingness_duplicates_and_outliers_reported
+      - zero_group_overlap_and_no_future_feature_leakage
+    assumptions: [A-001, A-002]
+    blockers: []
+    notes:
+      - user_authorized_local_archive_with_dataset_licence_caveat
+      - extraction_manifest_is_required_input_for_loader
+    validation_evidence:
+      - "conda run -n devkki python -m pytest: 27 passed"
+      - "reports/data/phm_missingness.json generated"
+      - "training label join: 1981 keys, 0 missing, 0 orphan labels"
+      - "training feature aggregation and wafer-group split integration passed"
+
+  - id: T-WP04
+    title: WP04 electrical disturbance and UPS model
+    phase: 2
+    state: COMPLETE
+    priority: HIGH
+    dependencies: [T-WP01, T-WP02]
+    inputs:
+      - DynamicSubsystem_v2
+      - canonical_electrical_signals
+      - synthetic_parameter_configuration
+    outputs:
+      - src/semifab_poc/simulation/electrical.py
+      - tests/unit/test_electrical.py
+      - tests/property/test_electrical_properties.py
+    files_owned:
+      - src/semifab_poc/simulation/electrical.py
+      - tests/unit/test_electrical.py
+      - tests/property/test_electrical_properties.py
+    acceptance_tests:
+      - normal_sag_swell_interruption_frequency_transfer_and_recovery_supported
+      - normal_operation_stable
+      - output_finite_and_bounded
+      - deterministic_transition_order
+      - synthetic_parameters_labelled
+    validation_evidence:
+      - "conda run -n devkki python -m pytest: 35 passed"
+      - "normal output converged to 1.0 pu"
+      - "0.70 pu sag: TRANSFER at 0.96 pu, BATTERY transient 0.91394304 pu, settled 0.99900783 pu"
+      - "recovery returned GRID with 0.99999902 pu output"
+      - "boundedness and deterministic replay property tests passed"
+      - orchestration/reports/r3_plant_physics_validation.md
+      - "2026-07-11: UPS output-frequency, energy, depletion, overload, and forced-interruption tests passed"
+    assumptions: [A-005, A-006, A-011, A-019]
+    blockers: []
+
+  - id: T-WP05
+    title: WP05 VFD motor and pump model
+    phase: 2
+    state: COMPLETE
+    priority: HIGH
+    dependencies: [T-WP01, T-WP02]
+    inputs:
+      - DynamicSubsystem_v2
+      - canonical_drive_and_pump_signals
+      - bounded_reference_operating_point
+    outputs:
+      - src/semifab_poc/simulation/drive.py
+      - src/semifab_poc/simulation/pump.py
+      - tests/unit/test_drive.py
+      - tests/unit/test_pump.py
+      - tests/property/test_pump_affinity.py
+    files_owned:
+      - src/semifab_poc/simulation/drive.py
+      - src/semifab_poc/simulation/pump.py
+      - tests/unit/test_drive.py
+      - tests/unit/test_pump.py
+      - tests/property/test_pump_affinity.py
+    acceptance_tests:
+      - command_derating_ramp_trip_and_restart_supported
+      - motor_speed_response_bounded
+      - flow_monotonic_with_speed_at_fixed_conditions
+      - head_and_power_affinity_relations_hold_at_reference
+      - pump_power_nonnegative
+    assumptions: [A-004, A-005, A-011]
+    blockers: []
+    validation_evidence:
+      - "2026-07-11: focused drive/pump suite passed 9/9 in devkki"
+      - "2026-07-11: full pytest suite passed 44/44; one existing PHM pandas FutureWarning"
+      - "orchestration/reports/wp05_drive_pump_validation.md"
+      - orchestration/reports/r3_plant_physics_validation.md
+      - "2026-07-11: speed-scaled pump curve, backpressure monotonicity, check-valve, homologous affinity, and operating-point residual tests passed"
+
+  - id: T-WP06
+    title: WP06 UPW hydraulic and thermal model
+    phase: 2
+    state: COMPLETE
+    priority: HIGH
+    dependencies: [T-WP01, T-WP02]
+    inputs:
+      - DynamicSubsystem_v2
+      - canonical_UPW_signals
+      - synthetic_lumped_parameters
+    outputs:
+      - src/semifab_poc/simulation/upw.py
+      - tests/unit/test_upw.py
+      - tests/property/test_upw_properties.py
+    files_owned:
+      - src/semifab_poc/simulation/upw.py
+      - tests/unit/test_upw.py
+      - tests/property/test_upw_properties.py
+    acceptance_tests:
+      - pressure_flow_resistance_compliance_valve_and_demand_supported
+      - thermal_state_supported
+      - water_quality_state_labelled_proxy
+      - normal_equilibrium_stable
+      - pressure_flow_temperature_finite_and_bounded
+    assumptions: [A-005, A-009, A-011]
+    blockers: []
+    validation_evidence:
+      - "2026-07-11: focused UPW suite passed 6/6 in devkki"
+      - "2026-07-11: full pytest suite passed 50/50; one existing PHM pandas FutureWarning"
+      - "orchestration/reports/wp06_upw_validation.md"
+      - orchestration/reports/r3_plant_physics_validation.md
+      - "2026-07-11: conserved implicit pressure, explicit relief, pump-trip decay, endpoint-flow consistency, thermal-flushing, and timestep-refinement tests passed"
+
+  - id: T-WP07
+    title: WP07 sensor and communication model
+    phase: 2
+    state: COMPLETE
+    priority: HIGH
+    dependencies: [T-WP01, T-WP02]
+    inputs:
+      - SensorModel_v2
+      - latent_state_and_observation_schemas
+      - named_seed_contract
+    outputs:
+      - src/semifab_poc/simulation/sensors.py
+      - tests/unit/test_sensors.py
+      - tests/property/test_sensor_state_separation.py
+    files_owned:
+      - src/semifab_poc/simulation/sensors.py
+      - tests/unit/test_sensors.py
+      - tests/property/test_sensor_state_separation.py
+    acceptance_tests:
+      - all_specified_corruption_modes_supported
+      - latent_state_unchanged_by_corruption
+      - delay_loss_and_jitter_explicit_in_records
+      - source_reported_and_arrival_clocks_separate
+      - delayed_observations_invisible_until_arrival
+      - delivery_exactly_once_and_deterministically_ordered
+      - fixed_seed_is_deterministic
+      - sampling_rate_mismatch_preserves_timestamps
+    assumptions: [A-010, A-011]
+    blockers: []
+    validation_evidence:
+      - "2026-07-11: focused sensor suite passed 6/6 in devkki"
+      - "2026-07-11: full pytest suite passed 56/56; one existing PHM pandas FutureWarning"
+      - "orchestration/reports/wp07_sensor_validation.md"
+      - orchestration/reports/r4_online_scenario_timing_validation.md
+      - "2026-07-11: R4 causal sensor/schema/config suite passed in devkki"
+
+  - id: T-WP08
+    title: WP08 CMP physics model
+    phase: 3
+    state: COMPLETE
+    priority: CRITICAL
+    dependencies: [T-WP01, T-WP02, T-WP06, T-PHASE12-REMEDIATION]
+    inputs:
+      - DynamicSubsystem_v2
+      - approved_Phase_3_replacement_specification
+      - corrected_SI_simulator_contracts
+      - declared_CMP_process_and_utility_topology
+    outputs:
+      - src/semifab_poc/simulation/cmp.py
+      - docs/mathematical_model.md
+      - tests/unit/test_cmp.py
+      - tests/property/test_cmp_properties.py
+      - orchestration/decisions/wp08_cmp_physics.md
+      - orchestration/reports/wp08_cmp_validation.md
+      - scripts/validate_wp08_cmp.py
+      - reports/cmp/wp08_validation.json
+      - reports/cmp/wp08_reference_trace.csv
+    files_owned:
+      - src/semifab_poc/simulation/cmp.py
+      - docs/mathematical_model.md
+      - tests/unit/test_cmp.py
+      - tests/property/test_cmp_properties.py
+      - orchestration/decisions/wp08_cmp_physics.md
+      - orchestration/reports/wp08_cmp_validation.md
+      - scripts/validate_wp08_cmp.py
+      - reports/cmp/
+    acceptance_tests:
+      - generalized_Preston_units_exposure_and_reference_case_correct
+      - process_modes_gate_material_removal
+      - dual_axis_kinematics_and_quadrature_converge
+      - consumable_slurry_thermal_and_cumulative_states_bounded
+      - fully_synthetic_mode_supported
+      - MRR_nonnegative_and_finite
+      - any_spatial_output_has_mandatory_proxy_label
+    assumptions: [A-003, A-009, A-018]
+    blockers: []
+    implementation_decision: orchestration/decisions/wp08_cmp_physics.md
+    validation_evidence:
+      - orchestration/reports/wp08_cmp_validation.md
+      - reports/cmp/wp08_validation.json
+      - reports/cmp/wp08_reference_trace.csv
+      - "2026-07-11: focused CMP/schema/config/interface suite passed 48/48 in devkki"
+      - "2026-07-11: full pytest suite passed 130/130 in 38.09 s"
+      - "2026-07-11: deterministic 700-row reference trace SHA-256 902fa4283ef8cf2150efef14aa08ca6f478aad55503e6d9b111584c33175626e"
+      - "2026-07-11: governance audit passed 10 YAML files, 27-task acyclic DAG, 25 assumptions, and 61 Markdown files with zero missing links"
+
+  - id: T-PHASE12-AUDIT
+    title: Retrospective Phase 1 and Phase 2 scientific audit and CMP redesign
+    phase: 3
+    state: COMPLETE
+    priority: CRITICAL
+    dependencies: [T-GOVERNANCE, T-WP03, T-WP04, T-WP05, T-WP06, T-WP07, T-WP11]
+    inputs:
+      - frozen_Phase_1_contracts
+      - completed_Phase_2_implementation
+      - verified_PHM_archive
+      - primary_CMP_and_pump_references
+    outputs:
+      - orchestration/reports/phase_1_2_scientific_audit.md
+      - orchestration/reports/phase_3_cmp_model_redesign.md
+      - orchestration/decisions/20260711_phase_3_cmp_and_utility_model.md
+    files_owned:
+      - orchestration/reports/phase_1_2_scientific_audit.md
+      - orchestration/reports/phase_3_cmp_model_redesign.md
+      - orchestration/decisions/20260711_phase_3_cmp_and_utility_model.md
+    acceptance_tests:
+      - Phase_1_contracts_and_claims_reviewed
+      - PHM_units_labels_timestamps_phases_and_splits_reviewed
+      - component_invariants_timing_and_reference_chain_reviewed
+      - prior_CMP_decision_withdrawn_with_history_preserved
+      - replacement_model_equations_topologies_uncertainty_and_validation_proposed
+    assumptions: [A-002, A-003, A-004, A-005, A-006, A-007, A-009, A-011]
+    blockers: []
+    validation_evidence:
+      - orchestration/reports/phase_1_2_scientific_audit.md
+      - orchestration/reports/phase_3_cmp_model_redesign.md
+      - "2026-07-11: 8 YAML files parsed; 27 tasks and 25 assumption references validated; task DAG acyclic"
+      - "2026-07-11: 46 Markdown files checked; zero missing local links"
+      - "2026-07-11: full devkki pytest suite passed 60/60; one known pandas FutureWarning"
+
+  - id: T-PHASE12-REMEDIATION
+    title: Correct Phase 1 contracts and Phase 2 scientific defects before CMP implementation
+    phase: 3
+    state: COMPLETE
+    priority: CRITICAL
+    dependencies: [T-PHASE12-AUDIT]
+    inputs:
+      - orchestration/reports/phase_1_2_scientific_audit.md
+      - approved_Phase_3_replacement_specification
+      - frozen_interface_change_control
+      - frozen_schema_change_control
+    outputs:
+      - orchestration/decisions/phase_1_2_remediation.md
+      - configs/default.yaml
+      - corrected_schema_and_interface_contracts
+      - phase_aware_PHM_pipeline_and_audits
+      - conserved_pump_UPW_plant
+      - causal_sensor_and_validated_scenario_models
+      - corrective_unit_property_integration_and_scientific_tests
+    files_owned:
+      - orchestration/decisions/phase_1_2_remediation.md
+      - orchestration/decisions/r2_phm_semantics.md
+      - orchestration/decisions/r3_plant_physics.md
+      - orchestration/decisions/r4_online_scenario_timing.md
+      - orchestration/reports/r1_contract_configuration_validation.md
+      - orchestration/reports/r2_phm_semantics_validation.md
+      - orchestration/reports/r3_plant_physics_validation.md
+      - orchestration/reports/r4_online_scenario_timing_validation.md
+      - configs/default.yaml
+      - configs/checkpoints/r3_default.yaml
+      - src/semifab_poc/data/
+      - src/semifab_poc/simulation/
+      - tests/
+      - reports/data/
+      - reports/plant/
+      - reports/timing/
+    acceptance_tests:
+      - remediation_gate_R1_contract_and_configuration_passes
+      - remediation_gate_R2_PHM_semantics_and_leakage_passes
+      - remediation_gate_R3_plant_physics_and_conservation_passes
+      - remediation_gate_R4_online_and_scenario_timing_passes
+      - all_documentation_governance_and_contract_versions_reconciled
+    assumptions: [A-002, A-004, A-005, A-006, A-009, A-011]
+    blockers: []
+    approval_record:
+      approved_by: user
+      approved_at: "2026-07-11T10:32:00+05:30"
+      scope: phase_3_cmp_model_redesign_as_controlled_basis_and_R1_start
+    active_subgate: ALL_VALIDATED
+    subgate_status:
+      R1_contract_and_configuration: VALIDATED
+      R2_PHM_semantics: VALIDATED
+      R3_plant_physics: VALIDATED
+      R4_online_and_scenario_timing: VALIDATED
+      governance_reconciliation: VALIDATED
+    validation_evidence:
+      - orchestration/reports/r1_contract_configuration_validation.md
+      - "2026-07-11: R1 import and default-config smoke check passed"
+      - "2026-07-11: R1 focused tests passed 21/21 in devkki"
+      - "2026-07-11: full pytest suite passed 70/70; one known pandas FutureWarning assigned to R2"
+      - orchestration/decisions/r2_phm_semantics.md
+      - orchestration/reports/r2_phm_semantics_validation.md
+      - orchestration/decisions/r3_plant_physics.md
+      - reports/data/phm_semantic_audit.json
+      - data/processed/phm_2016_cmp/feature_manifest.yaml
+      - "2026-07-11: R2 focused tests passed 13/13 and real-data integration tests passed 6/6 in devkki"
+      - "2026-07-11: full pytest suite passed 82/82 with zero warnings"
+      - orchestration/reports/r3_plant_physics_validation.md
+      - orchestration/decisions/r4_online_scenario_timing.md
+      - reports/plant/r3_validation.json
+      - reports/plant/r3_healthy_ups_reference_chain.csv
+      - "2026-07-11: R3 focused suite passed 52/52 in devkki"
+      - "2026-07-11: full pytest suite passed 94/94 in 41.91 s"
+      - orchestration/reports/r4_online_scenario_timing_validation.md
+      - reports/timing/r4_validation.json
+      - reports/timing/r4_sensor_delivery_trace.csv
+      - "2026-07-11: R4 focused suite passed 45/45 in devkki"
+      - "2026-07-11: full pytest suite passed 107/107 in 38.60 s"
+      - "2026-07-11: strict governance audit parsed 9 YAML files with zero duplicate keys; 27-task DAG acyclic; 25 assumption references valid; 56 Markdown files with zero missing local links"
+
+  - id: T-WP09
+    title: WP09 CMP virtual metrology comparison
+    phase: 3
+    state: PLANNED
+    priority: HIGH
+    dependencies: [T-WP03, T-PHASE12-REMEDIATION, T-WP08]
+    inputs:
+      - validated_PHM_splits
+      - CMP_physics_baseline
+      - Predictor_v1
+    outputs:
+      - src/semifab_poc/models/virtual_metrology.py
+      - reports/virtual_metrology/
+      - tests/unit/test_virtual_metrology.py
+      - tests/integration/test_vm_evaluation.py
+    files_owned:
+      - src/semifab_poc/models/virtual_metrology.py
+      - reports/virtual_metrology/
+      - tests/unit/test_virtual_metrology.py
+      - tests/integration/test_vm_evaluation.py
+    acceptance_tests:
+      - mean_linear_ridge_physics_tree_and_hybrid_models_compared
+      - identical_grouped_splits_and_features_used
+      - calibration_and_test_isolation_preserved
+      - required_MRR_metrics_and_interval_coverage_reported
+      - public_and_synthetic_results_separated
+    assumptions: [A-001, A-002, A-003, A-018]
+    blockers:
+      - scientific_model_and_uncertainty_decisions_not_frozen
+
+  - id: T-WP10
+    title: WP10 utility-to-CMP coupling and sensitivity
+    phase: 3
+    state: COMPLETE
+    priority: CRITICAL
+    dependencies: [T-WP04, T-WP05, T-WP06, T-PHASE12-REMEDIATION, T-WP08]
+    inputs:
+      - validated_component_models
+      - declared_connection_topology_and_parameter_registry
+      - sensitivity_plan
+    outputs:
+      - src/semifab_poc/simulation/coupling.py
+      - reports/sensitivity/
+      - tests/unit/test_coupling.py
+      - tests/property/test_coupling_properties.py
+      - tests/integration/test_utility_cmp_chain.py
+      - tests/regression/test_wp10_reference.py
+      - scripts/validate_wp10_coupling.py
+      - configs/coupling/
+      - orchestration/decisions/wp10_utility_cmp_coupling.md
+      - orchestration/reports/wp10_literature_review.md
+      - orchestration/reports/wp10_coupling_validation.md
+    files_owned:
+      - src/semifab_poc/simulation/coupling.py
+      - reports/sensitivity/
+      - tests/unit/test_coupling.py
+      - tests/property/test_coupling_properties.py
+      - tests/integration/test_utility_cmp_chain.py
+      - tests/regression/test_wp10_reference.py
+      - scripts/validate_wp10_coupling.py
+      - configs/coupling/
+      - orchestration/decisions/wp10_utility_cmp_coupling.md
+      - orchestration/reports/wp10_literature_review.md
+      - orchestration/reports/wp10_coupling_validation.md
+    acceptance_tests:
+      - full_voltage_to_MRR_chain_explicit
+      - every_coefficient_has_required_provenance_class_units_bounds_and_sign
+      - typed_boundary_conditions_bounded_and_finite
+      - no_connection_topology_has_zero_MRR_effect
+      - local_and_global_sensitivity_reported
+      - parameter_mismatch_cases_defined
+    assumptions: [A-007, A-008, A-009]
+    blockers: []
+    notes:
+      - Four-topology structural ensemble frozen for controlled implementation.
+      - NO_CONNECTION and zero link strength remain mandatory null controls.
+      - Literature supports pathway existence only; transient header transfer coefficients remain synthetic assumptions or engineering approximations.
+      - Implementation opened at 2026-07-11T22:25:35+05:30 after the controlled READY transition.
+      - Task-local implementation, evidence, full-suite validation, historical reproduction, and governance audit complete.
+    validation_evidence:
+      - "50/50 WP10-impacted tests passed in conda environment devkki"
+      - "reports/sensitivity/wp10_coupling_validation.json: all internal checks passed"
+      - "healthy 25 percent/400 ms sag remained exact full-support negative control"
+      - "synthetic degraded-UPS DRESS chain propagated through stored pad state to later MRR"
+      - "4096-base-sample, 36864-evaluation seeded global sensitivity completed"
+      - "conda run -n devkki python -m pytest -q: 154 passed in 43.92 s"
+      - "frozen WP08 trace reproduced with exact SHA-256"
+      - "strict default configuration validated at schema/interface 2.4.0/3.2.0"
+      - "governance: 14 YAML, 27-task acyclic DAG, 25 assumptions, 72 Markdown, zero missing links"
+      - "R3 validation JSON and trace exact frozen hashes restored after version-aware provenance serialization"
+      - "T-WP10 closed COMPLETE at 2026-07-11T23:54:05+05:30 with no task-local work remaining"
+
+  - id: T-WP11
+    title: WP11 deterministic declarative scenario engine
+    phase: 2
+    state: COMPLETE
+    priority: HIGH
+    dependencies: [T-WP01, T-WP02]
+    inputs:
+      - Scenario_v2
+      - scenario_event_schema
+      - canonical_targets_and_units
+    outputs:
+      - src/semifab_poc/simulation/scenario.py
+      - configs/scenarios/
+      - tests/unit/test_scenarios.py
+      - tests/regression/test_scenario_replay.py
+    files_owned:
+      - src/semifab_poc/simulation/scenario.py
+      - configs/scenarios/
+      - tests/unit/test_scenarios.py
+      - tests/regression/test_scenario_replay.py
+    acceptance_tests:
+      - all_fourteen_required_scenario_families_present
+      - invalid_target_unit_time_and_magnitude_rejected
+      - equal_time_event_order_stable
+      - fixed_seed_replay_deterministic
+      - compound_event_cause_policy_explicit
+      - dynamic_profiles_executable_before_replay
+      - target_ranges_and_unknown_keys_strictly_validated
+      - interval_overlap_and_initiating_cause_roles_validated
+    assumptions: [A-011, A-014, A-017]
+    blockers: []
+    validation_evidence:
+      - "2026-07-11: scenario suite passed 4/4 in devkki"
+      - "2026-07-11: full pytest suite passed 60/60; one existing PHM pandas FutureWarning"
+      - "orchestration/reports/wp11_scenario_validation.md"
+      - orchestration/reports/r4_online_scenario_timing_validation.md
+      - "2026-07-11: all 14 schema-2.0 scenarios and 14 events passed R4 validation"
+
+  - id: T-WP12
+    title: WP12 early-warning prediction
+    phase: 3
+    state: PLANNED
+    priority: CRITICAL
+    dependencies: [T-WP07, T-WP10, T-WP11]
+    inputs:
+      - frozen_safe_envelope_and_horizon
+      - leakage_safe_streaming_features
+      - synthetic_scenario_splits
+    outputs:
+      - src/semifab_poc/models/early_warning.py
+      - reports/early_warning/
+      - tests/unit/test_early_warning.py
+      - tests/integration/test_warning_evaluation.py
+    files_owned:
+      - src/semifab_poc/models/early_warning.py
+      - reports/early_warning/
+      - tests/unit/test_early_warning.py
+      - tests/integration/test_warning_evaluation.py
+    acceptance_tests:
+      - future_envelope_target_and_censoring_preregistered
+      - logistic_and_gradient_boosted_models_compared
+      - no_future_or_latent_feature_leakage
+      - precision_recall_PR_AUC_false_alarms_misses_and_lead_time_reported
+      - uncertainty_and_coverage_reported
+    assumptions: [A-012, A-013, A-019]
+    blockers:
+      - Phase_3_safe_envelope_horizon_and_uncertainty_not_frozen
+
+  - id: T-WP13
+    title: WP13 root-cause attribution
+    phase: 3
+    state: PLANNED
+    priority: HIGH
+    dependencies: [T-WP10, T-WP12]
+    inputs:
+      - canonical_root_cause_vocabulary
+      - observed_residuals
+      - simulator_labels_for_offline_evaluation_only
+    outputs:
+      - src/semifab_poc/models/attribution.py
+      - reports/attribution/
+      - tests/unit/test_attribution.py
+    files_owned:
+      - src/semifab_poc/models/attribution.py
+      - reports/attribution/
+      - tests/unit/test_attribution.py
+    acceptance_tests:
+      - all_required_causes_and_UNKNOWN_supported
+      - residual_rules_and_feature_attribution_recorded
+      - simulator_label_hidden_from_online_estimator
+      - held_out_confusion_matrix_and_accuracy_reported
+      - feature_attribution_not_described_as_causal_proof
+    assumptions: [A-014]
+    blockers:
+      - attribution_scoring_and_UNKNOWN_policy_not_frozen
+
+  - id: T-WP14
+    title: WP14 baseline controllers
+    phase: 4
+    state: PLANNED
+    priority: HIGH
+    dependencies: [T-WP01, T-WP02, T-WP11]
+    inputs:
+      - Controller_v1
+      - frozen_threshold_hold_and_resume_constraints
+    outputs:
+      - src/semifab_poc/control/baselines.py
+      - tests/unit/test_baseline_controllers.py
+      - tests/property/test_no_action.py
+    files_owned:
+      - src/semifab_poc/control/baselines.py
+      - tests/unit/test_baseline_controllers.py
+      - tests/property/test_no_action.py
+    acceptance_tests:
+      - no_action_never_changes_commands
+      - fixed_threshold_uses_observed_state_only
+      - hysteresis_prevents_threshold_chatter
+      - safe_hold_and_controlled_resume_are_stateful
+      - proposed_actions_do_not_mutate_plant
+    assumptions: [A-011, A-017]
+    blockers:
+      - Phase_3_threshold_hold_and_resume_constraints_not_frozen
+
+  - id: T-WP15
+    title: WP15 predictive supervisory controller
+    phase: 3
+    state: PLANNED
+    priority: CRITICAL
+    dependencies: [T-WP08, T-WP12]
+    inputs:
+      - frozen_controller_objective_and_horizon
+      - Predictor_v1
+      - Controller_v1
+      - frozen_action_bounds
+    outputs:
+      - src/semifab_poc/control/predictive.py
+      - tests/unit/test_predictive_controller.py
+      - tests/property/test_predictive_action_bounds.py
+    files_owned:
+      - src/semifab_poc/control/predictive.py
+      - tests/unit/test_predictive_controller.py
+      - tests/property/test_predictive_action_bounds.py
+    acceptance_tests:
+      - bounded_search_or_short_horizon_MPC_only
+      - reinforcement_learning_absent
+      - objective_includes_MRR_action_hold_and_recovery_tradeoffs
+      - action_magnitude_and_slew_proposals_bounded
+      - latency_budget_measured
+    assumptions: [A-012, A-015, A-017]
+    blockers:
+      - Phase_3_objective_horizon_and_actions_not_frozen
+
+  - id: T-WP16
+    title: WP16 independent safety filter
+    phase: 3
+    state: PLANNED
+    priority: CRITICAL
+    dependencies: [T-WP02, T-WP15]
+    inputs:
+      - SafetyFilter_v1
+      - frozen_safety_constraints
+      - sensor_validity_and_uncertainty_contracts
+    outputs:
+      - src/semifab_poc/control/safety.py
+      - tests/unit/test_safety_filter.py
+      - tests/property/test_safety_properties.py
+    files_owned:
+      - src/semifab_poc/control/safety.py
+      - tests/unit/test_safety_filter.py
+      - tests/property/test_safety_properties.py
+    acceptance_tests:
+      - all_six_required_outcomes_reachable_and_tested
+      - magnitude_slew_sensor_uncertainty_envelope_and_restart_checked
+      - independent_of_controller_implementation
+      - every_decision_has_final_action_and_constraint_evidence
+      - approved_or_clipped_actions_remain_within_limits
+    assumptions: [A-016]
+    blockers:
+      - Phase_3_safety_envelope_and_restart_conditions_not_frozen
+
+  - id: T-WP17
+    title: WP17 integrated runtime
+    phase: 4
+    state: PLANNED
+    priority: CRITICAL
+    dependencies: [T-WP04, T-WP05, T-WP06, T-WP07, T-WP08, T-WP11, T-WP13, T-WP14, T-WP16]
+    inputs:
+      - all_component_interfaces_v1
+      - runtime_update_order
+      - run_manifest_and_seed_contract
+    outputs:
+      - src/semifab_poc/simulation/runtime.py
+      - scripts/run_simulation.py
+      - tests/integration/test_runtime.py
+      - tests/regression/reference_trace.json
+    files_owned:
+      - src/semifab_poc/simulation/runtime.py
+      - scripts/run_simulation.py
+      - tests/integration/test_runtime.py
+      - tests/regression/reference_trace.json
+    acceptance_tests:
+      - fifteen_step_runtime_order_enforced
+      - single_batch_Monte_Carlo_and_replay_supported
+      - action_effective_no_earlier_than_next_step
+      - atomic_step_and_last_valid_state_preserved
+      - complete_structured_audit_log_written
+      - fixed_seed_reference_trace_reproduces
+    assumptions: [A-010, A-011, A-017, A-019]
+    blockers: []
+
+  - id: T-WP18
+    title: WP18 paired evaluation and robustness
+    phase: 4
+    state: PLANNED
+    priority: CRITICAL
+    dependencies: [T-WP17]
+    inputs:
+      - integrated_runtime
+      - frozen_scenario_splits
+      - frozen_metrics_and_success_tolerances
+    outputs:
+      - src/semifab_poc/evaluation/metrics.py
+      - src/semifab_poc/evaluation/experiments.py
+      - scripts/run_experiments.py
+      - reports/evaluation/
+      - tests/integration/test_paired_evaluation.py
+    files_owned:
+      - src/semifab_poc/evaluation/
+      - scripts/run_experiments.py
+      - reports/evaluation/
+      - tests/integration/test_paired_evaluation.py
+    acceptance_tests:
+      - no_action_threshold_and_predictive_runs_are_paired
+      - required_process_warning_control_safety_attribution_and_latency_metrics_reported
+      - mean_median_std_p05_p95_and_worst_case_reported
+      - all_required_robustness_dimensions_evaluated
+      - public_and_simulator_results_separate
+      - zero_configured_final_action_violations
+    assumptions: [A-007, A-012, A-016, A-017, A-019]
+    blockers:
+      - Phase_3_success_tolerances_not_preregistered
+
+  - id: T-WP19
+    title: WP19 read-only results dashboard
+    phase: 4
+    state: PLANNED
+    priority: MEDIUM
+    dependencies: [T-WP18]
+    inputs:
+      - versioned_run_artifacts
+      - canonical_schema
+      - claims_matrix
+    outputs:
+      - src/semifab_poc/dashboard/
+      - tests/integration/test_dashboard.py
+    files_owned:
+      - src/semifab_poc/dashboard/
+      - tests/integration/test_dashboard.py
+    acceptance_tests:
+      - all_required_signals_predictions_attribution_actions_and_comparison_visible
+      - synthetic_values_clearly_labelled
+      - spatial_proxy_uses_mandatory_label
+      - no_unique_model_or_control_logic_in_dashboard
+      - local_smoke_test_succeeds
+    assumptions: [A-018, A-020]
+    blockers: []
+
+  - id: T-WP20
+    title: WP20 documentation, reproducibility, and technical report
+    phase: 4
+    state: PLANNED
+    priority: HIGH
+    dependencies: [T-WP18, T-WP19]
+    inputs:
+      - validated_implementation_and_evidence
+      - claims_matrix
+      - data_and_parameter_provenance
+    outputs:
+      - README.md
+      - docs/architecture.md
+      - docs/mathematical_model.md
+      - docs/datasets.md
+      - docs/assumptions_and_limitations.md
+      - docs/real_fab_data_contract.md
+      - docs/reproduction.md
+      - reports/technical_report.html
+    files_owned:
+      - README.md
+      - docs/
+      - reports/technical_report.html
+    acceptance_tests:
+      - install_and_reproduction_commands_documented
+      - equations_have_units_and_assumptions_have_provenance
+      - public_and_synthetic_evidence_separated
+      - unsupported_claim_scan_passes
+      - real_fab_data_requirements_and_limitations_explicit
+      - report_regenerates_from_local_artifacts
+    assumptions: [A-001, A-002, A-018, A-019]
+    blockers: []
+
+  - id: T-FINAL-AUDIT
+    title: Phase 5 final integration review and audit
+    phase: 5
+    state: PLANNED
+    priority: CRITICAL
+    dependencies: [T-WP20]
+    inputs:
+      - complete_repository
+      - all_validation_evidence
+      - user_final_audit_checklist
+    outputs:
+      - orchestration/final_audit.md
+      - orchestration/checkpoints/phase_5_complete.md
+    files_owned:
+      - orchestration/final_audit.md
+      - orchestration/checkpoints/phase_5_complete.md
+    acceptance_tests:
+      - all_eighteen_user_audit_items_evidenced
+      - clean_install_and_full_tests_pass
+      - reference_demonstration_reproduces
+      - dashboard_and_report_regenerate
+      - no_credentials_secrets_or_unapproved_external_actions
+      - all_supported_claims_trace_to_evidence
+    assumptions: [A-001, A-002, A-016, A-017, A-018, A-019]
+    blockers: []

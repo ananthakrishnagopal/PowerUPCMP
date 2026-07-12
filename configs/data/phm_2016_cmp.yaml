@@ -1,0 +1,50 @@
+dataset_id: PHM_2016_CMP
+extraction_root: data/raw/phm_2016_cmp
+extraction_manifest: data/raw/phm_2016_cmp/extraction_manifest.yaml
+verify_checksums: true
+time_series_columns: 25
+expected_trace_count_by_split:
+  training: 185
+  test: 185
+  validation: 185
+empty_trace_policy: retain_as_empty_trace_true_without_imputation
+label_join:
+  keys: [WAFER_ID, STAGE]
+  validation: many_to_one
+  train_only_for_fit: true
+  test_validation_labels: offline_evaluation_only
+split_policy:
+  official_hierarchy: [training_fit_and_tuning, test_offline_holdout, validation_final_holdout]
+  inner_primary_group: WAFER_ID
+  forbidden: random_row_split_within_group
+  transforms_fit_scope: training_groups_only
+  chronological_stress:
+    group: WAFER_ID
+    ordering_metadata: META_GROUP_START_TIMESTAMP
+    absolute_timestamp_predictor: false
+  physical_machine_holdout:
+    column: META_MACHINE_ID
+    expected_feasibility: false
+  machine_data_holdout:
+    column: META_MACHINE_DATA
+    enabled: false
+    reason: MACHINE_DATA_varies_within_nearly_every_wafer_stage_group
+    interpretation: DESCRIPTIVE_INPUT_NOT_MACHINE_OR_REGIME_GENERALIZATION
+semantic_processing:
+  source_order_column: SOURCE_ROW_INDEX
+  gap_threshold_s: 10.0
+  time_weight: centered_adjacent_valid_intervals
+  process_modes:
+    - PREPARE_PROXY
+    - ACTIVE_POLISH_PROXY
+    - TRANSITION_WITHIN_POLISH_PROXY
+    - ENDING_OR_CLEANING_PROXY
+    - UNRESOLVED_PROXY
+  process_mode_evidence: input_signals_only_no_MRR_label
+  process_mode_claim: proxy_not_measured_physical_phase
+label_anomaly_policy:
+  primary: ORIGINAL
+  sensitivities:
+    - EXCLUDE_FOUR_PREREGISTERED
+    - HYPOTHETICAL_DIVIDE_FOUR_BY_60
+  holdout_selection_forbidden: true

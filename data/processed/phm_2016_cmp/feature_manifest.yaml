@@ -1,0 +1,228 @@
+bundle_version: PHM_PHASE_FEATURES_V1
+dataset_id: PHM_2016_CMP
+archive_sha256: 976b23102b576ed610db8f89293de333820391c581d88bcbdb6364da212a1eb9
+canonical_schema_version: 2.0.0
+target: AVG_REMOVAL_RATE
+target_unit_status: NOT_DECLARED_BY_ORIGINAL_SOURCE
+process_signal_units: PROPRIETARY_SCALED_WITH_HIDDEN_FACTORS
+gap_threshold_s: 10.0
+process_modes_are_input_only_proxies: true
+complete_trace_features_streaming_eligible: false
+official_split_roles:
+  training: FIT_AND_TUNING_ONLY
+  test: OFFLINE_HOLDOUT
+  validation: FINAL_PUBLIC_HOLDOUT
+feature_audits:
+  training:
+    feature_contract: PHM_PHASE_AWARE_OFFLINE_VM_V1
+    gap_threshold_s: 10.0
+    group_columns:
+    - WAFER_ID
+    - STAGE
+    group_count: 1981
+    predictor_column_count: 405
+    metadata_columns:
+    - WAFER_ID
+    - STAGE
+    - META_TRACE_COUNT
+    - META_CONTINUITY_SEGMENT_COUNT
+    - META_GROUP_START_TIMESTAMP
+    - META_GROUP_END_TIMESTAMP
+    - META_MACHINE_ID
+    - META_MACHINE_DATA
+    - META_CHAMBER
+    - META_MACHINE_ID_NUNIQUE
+    - META_MACHINE_DATA_NUNIQUE
+    - META_CHAMBER_NUNIQUE
+    absolute_timestamp_is_predictor: false
+    unresolved_group_count: 221
+    process_mode_values:
+    - PREPARE_PROXY
+    - ACTIVE_POLISH_PROXY
+    - TRANSITION_WITHIN_POLISH_PROXY
+    - ENDING_OR_CLEANING_PROXY
+    - UNRESOLVED_PROXY
+    spatial_or_defect_claim: false
+  test:
+    feature_contract: PHM_PHASE_AWARE_OFFLINE_VM_V1
+    gap_threshold_s: 10.0
+    group_columns:
+    - WAFER_ID
+    - STAGE
+    group_count: 424
+    predictor_column_count: 405
+    metadata_columns:
+    - WAFER_ID
+    - STAGE
+    - META_TRACE_COUNT
+    - META_CONTINUITY_SEGMENT_COUNT
+    - META_GROUP_START_TIMESTAMP
+    - META_GROUP_END_TIMESTAMP
+    - META_MACHINE_ID
+    - META_MACHINE_DATA
+    - META_CHAMBER
+    - META_MACHINE_ID_NUNIQUE
+    - META_MACHINE_DATA_NUNIQUE
+    - META_CHAMBER_NUNIQUE
+    absolute_timestamp_is_predictor: false
+    unresolved_group_count: 43
+    process_mode_values:
+    - PREPARE_PROXY
+    - ACTIVE_POLISH_PROXY
+    - TRANSITION_WITHIN_POLISH_PROXY
+    - ENDING_OR_CLEANING_PROXY
+    - UNRESOLVED_PROXY
+    spatial_or_defect_claim: false
+  validation:
+    feature_contract: PHM_PHASE_AWARE_OFFLINE_VM_V1
+    gap_threshold_s: 10.0
+    group_columns:
+    - WAFER_ID
+    - STAGE
+    group_count: 424
+    predictor_column_count: 405
+    metadata_columns:
+    - WAFER_ID
+    - STAGE
+    - META_TRACE_COUNT
+    - META_CONTINUITY_SEGMENT_COUNT
+    - META_GROUP_START_TIMESTAMP
+    - META_GROUP_END_TIMESTAMP
+    - META_MACHINE_ID
+    - META_MACHINE_DATA
+    - META_CHAMBER
+    - META_MACHINE_ID_NUNIQUE
+    - META_MACHINE_DATA_NUNIQUE
+    - META_CHAMBER_NUNIQUE
+    absolute_timestamp_is_predictor: false
+    unresolved_group_count: 42
+    process_mode_values:
+    - PREPARE_PROXY
+    - ACTIVE_POLISH_PROXY
+    - TRANSITION_WITHIN_POLISH_PROXY
+    - ENDING_OR_CLEANING_PROXY
+    - UNRESOLVED_PROXY
+    spatial_or_defect_claim: false
+label_join_audits:
+  training:
+    split: training
+    join_stage: after_feature_engineering
+    join_validation: one_to_one
+    feature_key_count: 1981
+    label_key_count: 1981
+    missing_label_key_count: 0
+    orphan_label_key_count: 0
+  test:
+    split: test
+    join_stage: after_feature_engineering
+    join_validation: one_to_one
+    feature_key_count: 424
+    label_key_count: 424
+    missing_label_key_count: 0
+    orphan_label_key_count: 0
+  validation:
+    split: validation
+    join_stage: after_feature_engineering
+    join_validation: one_to_one
+    feature_key_count: 424
+    label_key_count: 424
+    missing_label_key_count: 0
+    orphan_label_key_count: 0
+label_policy_audits:
+  ORIGINAL:
+    policy: ORIGINAL
+    primary_policy: true
+    input_row_count: 1981
+    output_row_count: 1981
+    matched_preregistered_key_count: 4
+    raw_label_preserved: true
+    holdout_metrics_used_to_select_policy: false
+  EXCLUDE_FOUR_PREREGISTERED:
+    policy: EXCLUDE_FOUR_PREREGISTERED
+    primary_policy: false
+    input_row_count: 1981
+    output_row_count: 1977
+    matched_preregistered_key_count: 4
+    raw_label_preserved: true
+    holdout_metrics_used_to_select_policy: false
+  HYPOTHETICAL_DIVIDE_FOUR_BY_60:
+    policy: HYPOTHETICAL_DIVIDE_FOUR_BY_60
+    primary_policy: false
+    input_row_count: 1981
+    output_row_count: 1981
+    matched_preregistered_key_count: 4
+    raw_label_preserved: true
+    holdout_metrics_used_to_select_policy: false
+files:
+  training_features:
+    path: data/processed/phm_2016_cmp/training_phase_features.csv
+    row_count: 1981
+    column_count: 417
+    byte_size: 7323911
+    sha256: a30e6d75192dae717d72af0d54f8c3ee7a122511c176ba0e62775b092213eb86
+    role: OFFLINE_VM_FEATURES_WITHOUT_TARGET
+    contains_target: false
+  training_labels:
+    path: data/processed/phm_2016_cmp/training_labels_native.csv
+    row_count: 1981
+    column_count: 5
+    byte_size: 146127
+    sha256: 65477eb6360e7e65dc5755d1b1cccfa402663bae49338b02bbfcbae035cc98c6
+    role: OFFLINE_NATIVE_TARGETS_SEPARATE_FROM_FEATURES
+    source_unit_status: NOT_DECLARED_BY_ORIGINAL_SOURCE
+  test_features:
+    path: data/processed/phm_2016_cmp/test_phase_features.csv
+    row_count: 424
+    column_count: 417
+    byte_size: 1597328
+    sha256: 3cca13fd68f26f884de820d69fbd59b66ac512b0ba20b8e6dca0f571089bfd48
+    role: OFFLINE_VM_FEATURES_WITHOUT_TARGET
+    contains_target: false
+  test_labels:
+    path: data/processed/phm_2016_cmp/test_labels_native.csv
+    row_count: 424
+    column_count: 5
+    byte_size: 27891
+    sha256: ebd106a8b3652fa95f071e0cebbb7ee0f3e3b229eb924321f591d518382f7f6a
+    role: OFFLINE_NATIVE_TARGETS_SEPARATE_FROM_FEATURES
+    source_unit_status: NOT_DECLARED_BY_ORIGINAL_SOURCE
+  validation_features:
+    path: data/processed/phm_2016_cmp/validation_phase_features.csv
+    row_count: 424
+    column_count: 417
+    byte_size: 1604653
+    sha256: 919843e348940d92b31b266b559cd9dc02adf0d7c09c5bd61dff2adf5833934e
+    role: OFFLINE_VM_FEATURES_WITHOUT_TARGET
+    contains_target: false
+  validation_labels:
+    path: data/processed/phm_2016_cmp/validation_labels_native.csv
+    row_count: 424
+    column_count: 5
+    byte_size: 32991
+    sha256: b70a91fd0655584a65343af4f8e4be16233983a408f2c73cca2510f42ed1fa6a
+    role: OFFLINE_NATIVE_TARGETS_SEPARATE_FROM_FEATURES
+    source_unit_status: NOT_DECLARED_BY_ORIGINAL_SOURCE
+  training_label_policy_original:
+    path: data/processed/phm_2016_cmp/training_labels_original.csv
+    row_count: 1981
+    column_count: 6
+    byte_size: 163311
+    sha256: d1f3adb1d2a7d8a9a2217209869f78ce7a9a43d610afe9ec42fcf42595bab9a5
+    role: PREREGISTERED_TRAINING_LABEL_TREATMENT
+    policy: ORIGINAL
+  training_label_policy_exclude_four_preregistered:
+    path: data/processed/phm_2016_cmp/training_labels_exclude_four_preregistered.csv
+    row_count: 1977
+    column_count: 6
+    byte_size: 162967
+    sha256: 1c0adba272da815a68ec37fbbf9a0c3f1cb219246922c63b7cc827e0ff106f49
+    role: PREREGISTERED_TRAINING_LABEL_TREATMENT
+    policy: EXCLUDE_FOUR_PREREGISTERED
+  training_label_policy_hypothetical_divide_four_by_60:
+    path: data/processed/phm_2016_cmp/training_labels_hypothetical_divide_four_by_60.csv
+    row_count: 1981
+    column_count: 6
+    byte_size: 163310
+    sha256: 05017d3585b9d61d053ac55f9387830b57b89882e95414efed68d5dc7277feec
+    role: PREREGISTERED_TRAINING_LABEL_TREATMENT
+    policy: HYPOTHETICAL_DIVIDE_FOUR_BY_60

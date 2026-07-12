@@ -1,0 +1,609 @@
+{
+  "all_checks_passed": true,
+  "checks": {
+    "healthy_sag_cmp_trace_matches_null": true,
+    "healthy_sag_remains_full_support": true,
+    "hydraulic_mass_residual_within_1e_12_m3_s": true,
+    "negative_upstream_traces_identical": true,
+    "positive_event_reduces_cumulative_removal": true,
+    "positive_event_reduces_dressing_availability": true,
+    "positive_event_reduces_end_dress_pad_activity": true,
+    "positive_event_reduces_later_mean_mrr": true,
+    "positive_replay_is_deterministic": true,
+    "positive_upstream_traces_identical": true,
+    "pump_curve_residual_within_1e_6_pa": true
+  },
+  "claims_boundary": "Synthetic declared-topology propagation only; no actual tool plumbing, public-data coupling, physical-defect, yield, equipment, production-control, or controller-efficacy claim.",
+  "controller_efficacy_validation": false,
+  "coupling_parameter_provenance": {
+    "flow_full_fraction": "Synthetic assumption",
+    "flow_zero_fraction": "Synthetic assumption",
+    "link_strength": "Synthetic assumption",
+    "pressure_full_fraction": "Synthetic assumption",
+    "pressure_zero_fraction": "Synthetic assumption",
+    "reference_supply_pressure_pa": "Synthetic assumption",
+    "reference_tool_flow_m3_s": "Synthetic assumption",
+    "reference_upw_temperature_k": "Synthetic assumption"
+  },
+  "default_topology": "NO_CONNECTION",
+  "evidence_plane": "SYNTHETIC_SIMULATOR",
+  "functional_form_provenance": {
+    "bounded_linear_support_ramp": "Engineering approximation",
+    "conditioning_and_thermal_pathway_existence": "Literature-supported",
+    "pressure_flow_bottleneck_minimum": "Engineering approximation",
+    "synthetic_slurry_support_pathway": "Synthetic assumption",
+    "temperature_deviation_map": "Engineering approximation",
+    "zero_link_affine_blend": "Engineering approximation"
+  },
+  "global_sensitivity": {
+    "base_sample_count": 4096,
+    "evaluation_count": 36864,
+    "indices": [
+      {
+        "first_order_estimate_raw": 0.526810836900524,
+        "parameter": "link_strength",
+        "range": [
+          0.0,
+          1.0
+        ],
+        "total_order_estimate": 0.6126715857321725
+      },
+      {
+        "first_order_estimate_raw": 0.15510929285596842,
+        "parameter": "reference_supply_pressure_pa",
+        "range": [
+          250000.0,
+          350000.0
+        ],
+        "total_order_estimate": 0.26031093119904014
+      },
+      {
+        "first_order_estimate_raw": 0.08747298570471226,
+        "parameter": "pressure_zero_fraction",
+        "range": [
+          0.4,
+          0.75
+        ],
+        "total_order_estimate": 0.11469376133735112
+      },
+      {
+        "first_order_estimate_raw": 0.01940360353416569,
+        "parameter": "pressure_full_fraction",
+        "range": [
+          0.85,
+          1.0
+        ],
+        "total_order_estimate": 0.020133879537048545
+      },
+      {
+        "first_order_estimate_raw": 0.09713652897020039,
+        "parameter": "reference_tool_flow_m3_s",
+        "range": [
+          8e-05,
+          0.00012
+        ],
+        "total_order_estimate": 0.1705178647468485
+      },
+      {
+        "first_order_estimate_raw": 0.003767116701765986,
+        "parameter": "flow_zero_fraction",
+        "range": [
+          0.3,
+          0.7
+        ],
+        "total_order_estimate": 0.0717619683179047
+      },
+      {
+        "first_order_estimate_raw": 0.017793959202701423,
+        "parameter": "flow_full_fraction",
+        "range": [
+          0.85,
+          1.0
+        ],
+        "total_order_estimate": 0.012751654187002293
+      }
+    ],
+    "method": "seeded Saltelli pick-freeze Monte Carlo estimators",
+    "note": "Raw finite-sample first-order estimates may be slightly negative; they are not clipped or renormalized.",
+    "output": "effective_availability",
+    "output_variance": 0.03964051669872234,
+    "representative_state": {
+      "mass_balance_residual_m3_s": 0.0,
+      "pump_inflow_m3_s": 0.0,
+      "relief_flow_m3_s": 0.0,
+      "return_flow_m3_s": 0.0,
+      "return_pressure_pa": 100000.0,
+      "storage_flow_m3_s": 0.0,
+      "supply_pressure_pa": 240000.0,
+      "temperature_k": 293.15,
+      "tool_demand_m3_s": 0.0001,
+      "tool_flow_m3_s": 8e-05,
+      "valve_position": 1.0,
+      "water_quality_deviation_proxy": 0.0
+    },
+    "seed": 20260711
+  },
+  "interface_version": "3.2.0",
+  "local_sensitivity": {
+    "cases": [
+      {
+        "centered_derivative": -0.42857142857122277,
+        "output": "effective_availability",
+        "parameter": "link_strength",
+        "state_case": "pressure_limiting",
+        "step": 0.0001
+      },
+      {
+        "centered_derivative": -3.8095238137469954e-06,
+        "output": "effective_availability",
+        "parameter": "reference_supply_pressure_pa",
+        "state_case": "pressure_limiting",
+        "step": 10.0
+      },
+      {
+        "centered_derivative": -0.612244947938434,
+        "output": "effective_availability",
+        "parameter": "pressure_zero_fraction",
+        "state_case": "pressure_limiting",
+        "step": 0.0001
+      },
+      {
+        "centered_derivative": -0.8163265972510603,
+        "output": "effective_availability",
+        "parameter": "pressure_full_fraction",
+        "state_case": "pressure_limiting",
+        "step": 0.0001
+      },
+      {
+        "centered_derivative": -8888.888977776065,
+        "output": "effective_availability",
+        "parameter": "reference_tool_flow_m3_s",
+        "state_case": "flow_limiting",
+        "step": 1e-08
+      },
+      {
+        "centered_derivative": -0.3703703886603904,
+        "output": "effective_availability",
+        "parameter": "flow_zero_fraction",
+        "state_case": "flow_limiting",
+        "step": 0.0001
+      },
+      {
+        "centered_derivative": -0.7407407773202257,
+        "output": "effective_availability",
+        "parameter": "flow_full_fraction",
+        "state_case": "flow_limiting",
+        "step": 0.0001
+      },
+      {
+        "centered_derivative": -0.49999999998817657,
+        "output": "coolant_temperature_k",
+        "parameter": "reference_upw_temperature_k",
+        "state_case": "thermal_deviation",
+        "step": 0.001
+      }
+    ],
+    "method": "centered finite difference at declared off-kink states"
+  },
+  "negative_control": {
+    "dressing_water_support": {
+      "final_cumulative_removal_m": 2.0396628215046173e-09,
+      "maximum_hydraulic_mass_balance_residual_m3_s": 9.99762496097302e-13,
+      "maximum_pump_curve_residual_pa": 5.820766091346741e-11,
+      "mean_polish_mrr_m_s": 1.0198314107523088e-09,
+      "minimum_dressing_availability_during_dress": 1.0,
+      "minimum_effective_availability": 1.0,
+      "minimum_hydraulic_support": 1.0,
+      "minimum_motor_speed_rad_s": 187.16567425102727,
+      "minimum_pump_flow_m3_s": 0.00019724374643984813,
+      "minimum_supply_pressure_pa": 298879.7567319125,
+      "minimum_tool_flow_m3_s": 0.0001,
+      "minimum_ups_output_voltage_pu": 0.8655360000000001,
+      "pad_surface_activity_at_dress_end": 0.5511876609029458,
+      "scenario": "healthy_25pct_400ms_sag",
+      "topology": "DRESSING_WATER_SUPPORT",
+      "trace_sha256": "f8359518903a8def6e02d03a8bc73123cc8a32dc5c32ed39dabc26745bfc3f20"
+    },
+    "interpretation": "healthy-UPS 25 percent, 400 ms voltage sag; support remains full",
+    "no_connection": {
+      "final_cumulative_removal_m": 2.0396628215046173e-09,
+      "maximum_hydraulic_mass_balance_residual_m3_s": 9.99762496097302e-13,
+      "maximum_pump_curve_residual_pa": 5.820766091346741e-11,
+      "mean_polish_mrr_m_s": 1.0198314107523088e-09,
+      "minimum_dressing_availability_during_dress": 1.0,
+      "minimum_effective_availability": 1.0,
+      "minimum_hydraulic_support": 1.0,
+      "minimum_motor_speed_rad_s": 187.16567425102727,
+      "minimum_pump_flow_m3_s": 0.00019724374643984813,
+      "minimum_supply_pressure_pa": 298879.7567319125,
+      "minimum_tool_flow_m3_s": 0.0001,
+      "minimum_ups_output_voltage_pu": 0.8655360000000001,
+      "pad_surface_activity_at_dress_end": 0.5511876609029458,
+      "scenario": "healthy_25pct_400ms_sag",
+      "topology": "NO_CONNECTION",
+      "trace_sha256": "352a2a63b338eea0c4ef626d620225fd9de06f665da34f1c9140dd77d77ae6d4"
+    }
+  },
+  "parameter_mismatch": [
+    {
+      "case": "zero_link",
+      "chain": {
+        "final_cumulative_removal_m": 2.0396628215046173e-09,
+        "maximum_hydraulic_mass_balance_residual_m3_s": 9.997629839882797e-13,
+        "maximum_pump_curve_residual_pa": 5.820766091346741e-11,
+        "mean_polish_mrr_m_s": 1.0198314107523088e-09,
+        "minimum_dressing_availability_during_dress": 1.0,
+        "minimum_effective_availability": 1.0,
+        "minimum_hydraulic_support": 0.0,
+        "minimum_motor_speed_rad_s": 2.739022022849944e-05,
+        "minimum_pump_flow_m3_s": 0.0,
+        "minimum_supply_pressure_pa": 100000.00058207661,
+        "minimum_tool_flow_m3_s": 5.820766091346741e-13,
+        "minimum_ups_output_voltage_pu": 5.830561684693793e-28,
+        "pad_surface_activity_at_dress_end": 0.5511876609029458,
+        "scenario": "degraded_ups_3s_interruption_during_dress",
+        "topology": "DRESSING_WATER_SUPPORT",
+        "trace_sha256": "eedd3f781f4dc1265eb83f84bbb559d1c8d9dbb3fa3010ac938494dbdf1aca19"
+      },
+      "config": {
+        "flow_full_fraction": 0.95,
+        "flow_zero_fraction": 0.5,
+        "link_strength": 0.0,
+        "pressure_full_fraction": 0.95,
+        "pressure_zero_fraction": 0.6,
+        "provenance_id": "synthetic-utility-cmp-coupling-v1",
+        "reference_supply_pressure_pa": 300000.0,
+        "reference_tool_flow_m3_s": 0.0001,
+        "reference_upw_temperature_k": 293.15,
+        "topology": "DRESSING_WATER_SUPPORT"
+      }
+    },
+    {
+      "case": "weak_link",
+      "chain": {
+        "final_cumulative_removal_m": 2.0237735456240225e-09,
+        "maximum_hydraulic_mass_balance_residual_m3_s": 9.997629839882797e-13,
+        "maximum_pump_curve_residual_pa": 5.820766091346741e-11,
+        "mean_polish_mrr_m_s": 1.0118867728120114e-09,
+        "minimum_dressing_availability_during_dress": 0.75,
+        "minimum_effective_availability": 0.75,
+        "minimum_hydraulic_support": 0.0,
+        "minimum_motor_speed_rad_s": 2.739022022849944e-05,
+        "minimum_pump_flow_m3_s": 0.0,
+        "minimum_supply_pressure_pa": 100000.00058207661,
+        "minimum_tool_flow_m3_s": 5.820766091346741e-13,
+        "minimum_ups_output_voltage_pu": 5.830561684693793e-28,
+        "pad_surface_activity_at_dress_end": 0.5439802514061232,
+        "scenario": "degraded_ups_3s_interruption_during_dress",
+        "topology": "DRESSING_WATER_SUPPORT",
+        "trace_sha256": "b69e3f66a27d502b4c1436a4887f5d92f8e2fc9b71a042fcda94a419aa6975ce"
+      },
+      "config": {
+        "flow_full_fraction": 0.95,
+        "flow_zero_fraction": 0.5,
+        "link_strength": 0.25,
+        "pressure_full_fraction": 0.95,
+        "pressure_zero_fraction": 0.6,
+        "provenance_id": "synthetic-utility-cmp-coupling-v1",
+        "reference_supply_pressure_pa": 300000.0,
+        "reference_tool_flow_m3_s": 0.0001,
+        "reference_upw_temperature_k": 293.15,
+        "topology": "DRESSING_WATER_SUPPORT"
+      }
+    },
+    {
+      "case": "nominal_link",
+      "chain": {
+        "final_cumulative_removal_m": 1.9745454075180545e-09,
+        "maximum_hydraulic_mass_balance_residual_m3_s": 9.997629839882797e-13,
+        "maximum_pump_curve_residual_pa": 5.820766091346741e-11,
+        "mean_polish_mrr_m_s": 9.872727037590272e-10,
+        "minimum_dressing_availability_during_dress": 0.0,
+        "minimum_effective_availability": 0.0,
+        "minimum_hydraulic_support": 0.0,
+        "minimum_motor_speed_rad_s": 2.739022022849944e-05,
+        "minimum_pump_flow_m3_s": 0.0,
+        "minimum_supply_pressure_pa": 100000.00058207661,
+        "minimum_tool_flow_m3_s": 5.820766091346741e-13,
+        "minimum_ups_output_voltage_pu": 5.830561684693793e-28,
+        "pad_surface_activity_at_dress_end": 0.521657281984193,
+        "scenario": "degraded_ups_3s_interruption_during_dress",
+        "topology": "DRESSING_WATER_SUPPORT",
+        "trace_sha256": "19f440b2fd31959c619c31b851003ac496ff4d3b66c1643a6c6fbbb4951dfa10"
+      },
+      "config": {
+        "flow_full_fraction": 0.95,
+        "flow_zero_fraction": 0.5,
+        "link_strength": 1.0,
+        "pressure_full_fraction": 0.95,
+        "pressure_zero_fraction": 0.6,
+        "provenance_id": "synthetic-utility-cmp-coupling-v1",
+        "reference_supply_pressure_pa": 300000.0,
+        "reference_tool_flow_m3_s": 0.0001,
+        "reference_upw_temperature_k": 293.15,
+        "topology": "DRESSING_WATER_SUPPORT"
+      }
+    },
+    {
+      "case": "earlier_response",
+      "chain": {
+        "final_cumulative_removal_m": 1.971706190403421e-09,
+        "maximum_hydraulic_mass_balance_residual_m3_s": 9.997629839882797e-13,
+        "maximum_pump_curve_residual_pa": 5.820766091346741e-11,
+        "mean_polish_mrr_m_s": 9.858530952017108e-10,
+        "minimum_dressing_availability_during_dress": 0.0,
+        "minimum_effective_availability": 0.0,
+        "minimum_hydraulic_support": 0.0,
+        "minimum_motor_speed_rad_s": 2.739022022849944e-05,
+        "minimum_pump_flow_m3_s": 0.0,
+        "minimum_supply_pressure_pa": 100000.00058207661,
+        "minimum_tool_flow_m3_s": 5.820766091346741e-13,
+        "minimum_ups_output_voltage_pu": 5.830561684693793e-28,
+        "pad_surface_activity_at_dress_end": 0.5203701239477496,
+        "scenario": "degraded_ups_3s_interruption_during_dress",
+        "topology": "DRESSING_WATER_SUPPORT",
+        "trace_sha256": "1007d67d173208de89c27804355931725f8dea77948896de64a79952761e924f"
+      },
+      "config": {
+        "flow_full_fraction": 0.98,
+        "flow_zero_fraction": 0.6,
+        "link_strength": 1.0,
+        "pressure_full_fraction": 0.98,
+        "pressure_zero_fraction": 0.7,
+        "provenance_id": "synthetic-utility-cmp-coupling-v1",
+        "reference_supply_pressure_pa": 300000.0,
+        "reference_tool_flow_m3_s": 0.0001,
+        "reference_upw_temperature_k": 293.15,
+        "topology": "DRESSING_WATER_SUPPORT"
+      }
+    },
+    {
+      "case": "later_response",
+      "chain": {
+        "final_cumulative_removal_m": 1.97983879907503e-09,
+        "maximum_hydraulic_mass_balance_residual_m3_s": 9.997629839882797e-13,
+        "maximum_pump_curve_residual_pa": 5.820766091346741e-11,
+        "mean_polish_mrr_m_s": 9.899193995375149e-10,
+        "minimum_dressing_availability_during_dress": 0.0,
+        "minimum_effective_availability": 0.0,
+        "minimum_hydraulic_support": 0.0,
+        "minimum_motor_speed_rad_s": 2.739022022849944e-05,
+        "minimum_pump_flow_m3_s": 0.0,
+        "minimum_supply_pressure_pa": 100000.00058207661,
+        "minimum_tool_flow_m3_s": 5.820766091346741e-13,
+        "minimum_ups_output_voltage_pu": 5.830561684693793e-28,
+        "pad_surface_activity_at_dress_end": 0.5240571278085379,
+        "scenario": "degraded_ups_3s_interruption_during_dress",
+        "topology": "DRESSING_WATER_SUPPORT",
+        "trace_sha256": "1529fb0302102b4c0bb1024e04a42418aacc6a5f4a14d6268edbe9fdd960c49d"
+      },
+      "config": {
+        "flow_full_fraction": 0.85,
+        "flow_zero_fraction": 0.3,
+        "link_strength": 1.0,
+        "pressure_full_fraction": 0.85,
+        "pressure_zero_fraction": 0.4,
+        "provenance_id": "synthetic-utility-cmp-coupling-v1",
+        "reference_supply_pressure_pa": 300000.0,
+        "reference_tool_flow_m3_s": 0.0001,
+        "reference_upw_temperature_k": 293.15,
+        "topology": "DRESSING_WATER_SUPPORT"
+      }
+    }
+  ],
+  "parameter_registry": [
+    {
+      "expected_effect": "larger values increase connected-topology response when hydraulic support is below one",
+      "hard_lower_bound": 0.0,
+      "hard_upper_bound": 1.0,
+      "name": "link_strength",
+      "nominal_value": 1.0,
+      "provenance_class": "Synthetic assumption",
+      "sensitivity_lower_bound": 0.0,
+      "sensitivity_upper_bound": 1.0,
+      "unit": "1"
+    },
+    {
+      "expected_effect": "larger reference pressure generally lowers normalized pressure support at fixed supply pressure",
+      "hard_lower_bound": 1e-12,
+      "hard_upper_bound": 600000.0,
+      "name": "reference_supply_pressure_pa",
+      "nominal_value": 300000.0,
+      "provenance_class": "Synthetic assumption",
+      "sensitivity_lower_bound": 250000.0,
+      "sensitivity_upper_bound": 350000.0,
+      "unit": "Pa"
+    },
+    {
+      "expected_effect": "larger values generally reduce pressure support inside the transition interval",
+      "hard_lower_bound": 0.0,
+      "hard_upper_bound": 0.949999999999,
+      "name": "pressure_zero_fraction",
+      "nominal_value": 0.6,
+      "provenance_class": "Synthetic assumption",
+      "sensitivity_lower_bound": 0.4,
+      "sensitivity_upper_bound": 0.75,
+      "unit": "1"
+    },
+    {
+      "expected_effect": "larger values generally reduce pressure support inside the transition interval",
+      "hard_lower_bound": 0.600000000001,
+      "hard_upper_bound": 1.0,
+      "name": "pressure_full_fraction",
+      "nominal_value": 0.95,
+      "provenance_class": "Synthetic assumption",
+      "sensitivity_lower_bound": 0.85,
+      "sensitivity_upper_bound": 1.0,
+      "unit": "1"
+    },
+    {
+      "expected_effect": "larger reference flow generally lowers normalized flow support at fixed tool flow",
+      "hard_lower_bound": 1e-12,
+      "hard_upper_bound": 0.0005,
+      "name": "reference_tool_flow_m3_s",
+      "nominal_value": 0.0001,
+      "provenance_class": "Synthetic assumption",
+      "sensitivity_lower_bound": 8e-05,
+      "sensitivity_upper_bound": 0.00012,
+      "unit": "m^3/s"
+    },
+    {
+      "expected_effect": "larger values generally reduce flow support inside the transition interval",
+      "hard_lower_bound": 0.0,
+      "hard_upper_bound": 0.949999999999,
+      "name": "flow_zero_fraction",
+      "nominal_value": 0.5,
+      "provenance_class": "Synthetic assumption",
+      "sensitivity_lower_bound": 0.3,
+      "sensitivity_upper_bound": 0.7,
+      "unit": "1"
+    },
+    {
+      "expected_effect": "larger values generally reduce flow support inside the transition interval",
+      "hard_lower_bound": 0.500000000001,
+      "hard_upper_bound": 1.0,
+      "name": "flow_full_fraction",
+      "nominal_value": 0.95,
+      "provenance_class": "Synthetic assumption",
+      "sensitivity_lower_bound": 0.85,
+      "sensitivity_upper_bound": 1.0,
+      "unit": "1"
+    },
+    {
+      "expected_effect": "sets the zero of the mapped UPW temperature deviation without changing the CMP neutral reference",
+      "hard_lower_bound": 273.15,
+      "hard_upper_bound": 373.15,
+      "name": "reference_upw_temperature_k",
+      "nominal_value": 293.15,
+      "provenance_class": "Synthetic assumption",
+      "sensitivity_lower_bound": 288.15,
+      "sensitivity_upper_bound": 298.15,
+      "unit": "K"
+    }
+  ],
+  "physical_defect_or_yield_validation": false,
+  "positive_causal_chain": {
+    "causal_onsets": {
+      "coupling_availability_below_one_s": 1.24,
+      "grid_interruption_s": 1.0,
+      "motor_below_99pct_nominal_s": 1.19,
+      "polish_start_s": 7.0,
+      "pump_flow_below_99pct_reference_s": 1.04,
+      "ups_output_below_0_9_pu_s": 1.03,
+      "upw_pressure_below_full_support_s": 1.24
+    },
+    "dressing_water_support": {
+      "final_cumulative_removal_m": 1.9745454075180545e-09,
+      "maximum_hydraulic_mass_balance_residual_m3_s": 9.997629839882797e-13,
+      "maximum_pump_curve_residual_pa": 5.820766091346741e-11,
+      "mean_polish_mrr_m_s": 9.872727037590272e-10,
+      "minimum_dressing_availability_during_dress": 0.0,
+      "minimum_effective_availability": 0.0,
+      "minimum_hydraulic_support": 0.0,
+      "minimum_motor_speed_rad_s": 2.739022022849944e-05,
+      "minimum_pump_flow_m3_s": 0.0,
+      "minimum_supply_pressure_pa": 100000.00058207661,
+      "minimum_tool_flow_m3_s": 5.820766091346741e-13,
+      "minimum_ups_output_voltage_pu": 5.830561684693793e-28,
+      "pad_surface_activity_at_dress_end": 0.521657281984193,
+      "scenario": "degraded_ups_3s_interruption_during_dress",
+      "topology": "DRESSING_WATER_SUPPORT",
+      "trace_sha256": "19f440b2fd31959c619c31b851003ac496ff4d3b66c1643a6c6fbbb4951dfa10"
+    },
+    "electrical_config_override": {
+      "battery_capacity_j": 500.0,
+      "initial_battery_energy_j": 500.0
+    },
+    "event": {
+      "end_s": 4.0,
+      "force_interruption": true,
+      "start_s": 1.0
+    },
+    "interpretation": "synthetic degraded-UPS interruption during DRESS; not a real-tool calibration",
+    "no_connection": {
+      "final_cumulative_removal_m": 2.0396628215046173e-09,
+      "maximum_hydraulic_mass_balance_residual_m3_s": 9.997629839882797e-13,
+      "maximum_pump_curve_residual_pa": 5.820766091346741e-11,
+      "mean_polish_mrr_m_s": 1.0198314107523088e-09,
+      "minimum_dressing_availability_during_dress": 1.0,
+      "minimum_effective_availability": 1.0,
+      "minimum_hydraulic_support": 0.0,
+      "minimum_motor_speed_rad_s": 2.739022022849944e-05,
+      "minimum_pump_flow_m3_s": 0.0,
+      "minimum_supply_pressure_pa": 100000.00058207661,
+      "minimum_tool_flow_m3_s": 5.820766091346741e-13,
+      "minimum_ups_output_voltage_pu": 5.830561684693793e-28,
+      "pad_surface_activity_at_dress_end": 0.5511876609029458,
+      "scenario": "degraded_ups_3s_interruption_during_dress",
+      "topology": "NO_CONNECTION",
+      "trace_sha256": "3560cb28a4cc8e87d778146f2cf0964290d733da2a0b59bee283659644ae41fc"
+    },
+    "phase_schedule": {
+      "DRESS_end_s": 6.0,
+      "POLISH_start_s": 7.0
+    }
+  },
+  "public_data_validation": false,
+  "real_fab_validation": false,
+  "report_id": "WP10_UTILITY_CMP_COUPLING_VALIDATION_V1",
+  "runtime_config_sha256": "b2b07edbaad458f6f66cf26ce88ffc5deef656a33701a7cccd8da94104d7383f",
+  "schema_version": "2.4.0",
+  "structural_boundary_comparison": [
+    {
+      "boundary": {
+        "coolant_temperature_k": 293.15,
+        "cooling_conductance_factor": 1.0,
+        "dressing_availability": 1.0,
+        "force_hold": false,
+        "process_discrepancy_m_s": 0.0,
+        "sensors_valid": true,
+        "slurry_utility_availability": 1.0,
+        "utilities_valid": true
+      },
+      "effective_availability": 1.0,
+      "topology": "NO_CONNECTION"
+    },
+    {
+      "boundary": {
+        "coolant_temperature_k": 293.15,
+        "cooling_conductance_factor": 1.0,
+        "dressing_availability": 0.0,
+        "force_hold": false,
+        "process_discrepancy_m_s": 0.0,
+        "sensors_valid": true,
+        "slurry_utility_availability": 1.0,
+        "utilities_valid": true
+      },
+      "effective_availability": 0.0,
+      "topology": "DRESSING_WATER_SUPPORT"
+    },
+    {
+      "boundary": {
+        "coolant_temperature_k": 303.15,
+        "cooling_conductance_factor": 0.0,
+        "dressing_availability": 1.0,
+        "force_hold": false,
+        "process_discrepancy_m_s": 0.0,
+        "sensors_valid": true,
+        "slurry_utility_availability": 1.0,
+        "utilities_valid": true
+      },
+      "effective_availability": 0.0,
+      "topology": "THERMAL_LOOP"
+    },
+    {
+      "boundary": {
+        "coolant_temperature_k": 293.15,
+        "cooling_conductance_factor": 1.0,
+        "dressing_availability": 1.0,
+        "force_hold": false,
+        "process_discrepancy_m_s": 0.0,
+        "sensors_valid": true,
+        "slurry_utility_availability": 0.0,
+        "utilities_valid": true
+      },
+      "effective_availability": 0.0,
+      "topology": "SYNTHETIC_SLURRY_SUPPORT"
+    }
+  ]
+}

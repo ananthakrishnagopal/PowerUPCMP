@@ -1,0 +1,314 @@
+{
+  "cmp_or_controller_claim": false,
+  "default_config_sha256": "6a47eefbefee0fa3084b3f4f2e780d0aa430bf3cad1f3dbb64a988398bbbaf97",
+  "electrical_ups": {
+    "config": {
+      "battery_capacity_j": 3600000.0,
+      "battery_output_pu": 1.0,
+      "frequency_max_hz": 100.0,
+      "frequency_min_hz": 0.0,
+      "frequency_time_constant_s": 0.1,
+      "initial_battery_energy_j": 3600000.0,
+      "inverter_efficiency": 0.95,
+      "maximum_charge_power_w": 500.0,
+      "minimum_battery_energy_j": 0.0,
+      "nominal_frequency_hz": 50.0,
+      "nominal_ups_load_w": 2500.0,
+      "nominal_voltage_pu": 1.0,
+      "output_time_constant_s": 0.05,
+      "provenance_id": "synthetic-electrical-energy-v2",
+      "recovery_delay_s": 0.25,
+      "recovery_threshold_pu": 0.95,
+      "transfer_delay_s": 0.05,
+      "transfer_output_pu": 0.8,
+      "transfer_threshold_pu": 0.85,
+      "ups_overload_trip_ratio": 1.2,
+      "ups_rated_power_w": 3000.0,
+      "voltage_max_pu": 1.5,
+      "voltage_min_pu": 0.0
+    },
+    "depletion": {
+      "depletion_step": 4,
+      "depletion_time_upper_bound_s": 0.04,
+      "final_energy_j": 0.0,
+      "final_mode": "BYPASS",
+      "initial_energy_j": 100.0
+    },
+    "frequency_step": {
+      "grid_frequency_hz": 49.0,
+      "ups_output_frequency_hz": 49.9
+    },
+    "healthy_sag_energy": {
+      "duration_s": 0.4,
+      "energy_used_j": 1052.6315789483488,
+      "final_energy_j": 3598947.3684210517,
+      "final_mode": "BATTERY",
+      "initial_energy_j": 3600000.0,
+      "load_power_w": 2500.0
+    }
+  },
+  "evidence_plane": "SYNTHETIC_SIMULATOR",
+  "healthy_ups_reference_chain": {
+    "baseline_supply_pressure_pa": 299997.67456320114,
+    "baseline_tool_flow_m3_s": 0.0001,
+    "cmp_or_mrr_effect_applied": false,
+    "dt_s": 0.01,
+    "interpretation": "synthetic negative control; no CMP connection applied",
+    "maximum_absolute_pressure_deviation_pa": 1118.5096867848188,
+    "maximum_hydraulic_mass_balance_residual_m3_s": 9.9744775481459e-13,
+    "maximum_pump_curve_residual_pa": 5.820766091346741e-11,
+    "minimum_motor_speed_rad_s": 187.1656366451557,
+    "minimum_supply_pressure_pa_after_sag_start": 298879.1648764163,
+    "minimum_tool_flow_m3_s_after_sag_start": 0.0001,
+    "minimum_ups_output_voltage_pu": 0.8655360000000001,
+    "modes_observed": [
+      "BATTERY",
+      "GRID",
+      "RECOVERY",
+      "TRANSFER"
+    ],
+    "scenario": "healthy UPS; 25 percent voltage sag for 400 ms",
+    "warmup_s": 3.0
+  },
+  "hydraulics": {
+    "config": {
+      "ambient_thermal_conductance_w_k": 50.0,
+      "hydraulic_balance_tolerance_m3_s": 1e-12,
+      "hydraulic_compliance_m3_pa": 2e-10,
+      "hydraulic_solver_max_iterations": 100,
+      "maximum_flow_m3_s": 0.0005,
+      "maximum_hydraulic_timestep_s": 0.05,
+      "maximum_supply_pressure_pa": 600000.0,
+      "maximum_temperature_k": 373.15,
+      "maximum_water_quality_deviation_proxy": 1.0,
+      "minimum_temperature_k": 273.15,
+      "nominal_return_pressure_pa": 100000.0,
+      "nominal_supply_pressure_pa": 300000.0,
+      "nominal_temperature_k": 293.15,
+      "nominal_tool_demand_m3_s": 0.0001,
+      "nominal_water_quality_deviation_proxy": 0.0,
+      "provenance_id": "synthetic-upw-conserved-v2",
+      "reference_pump_flow_m3_s": 0.0002,
+      "relief_resistance_pa_s_m3": 500000000.0,
+      "relief_set_pressure_pa": 500000.0,
+      "return_resistance_pa_s_m3": 2000000000.0,
+      "thermal_capacity_j_k": 5000.0,
+      "tool_resistance_pa_s_m3": 1000000000.0,
+      "water_density_kg_m3": 997.0,
+      "water_quality_proxy_time_constant_s": 60.0,
+      "water_specific_heat_j_kg_k": 4180.0
+    },
+    "nominal": {
+      "next_state": {
+        "mass_balance_residual_m3_s": 9.546056400867517e-13,
+        "pump_inflow_m3_s": 0.0002,
+        "relief_flow_m3_s": 0.0,
+        "return_flow_m3_s": 9.999999997671694e-05,
+        "return_pressure_pa": 100000.0,
+        "storage_flow_m3_s": -9.313225746154785e-13,
+        "supply_pressure_pa": 299999.9999534339,
+        "temperature_k": 293.15,
+        "tool_demand_m3_s": 0.0001,
+        "tool_flow_m3_s": 0.0001,
+        "valve_position": 1.0,
+        "water_quality_deviation_proxy": 0.0
+      },
+      "pressure_change_pa": -4.6566128730773926e-05,
+      "state": {
+        "mass_balance_residual_m3_s": 0.0,
+        "pump_inflow_m3_s": 0.0002,
+        "relief_flow_m3_s": 0.0,
+        "return_flow_m3_s": 0.0001,
+        "return_pressure_pa": 100000.0,
+        "storage_flow_m3_s": 0.0,
+        "supply_pressure_pa": 300000.0,
+        "temperature_k": 293.15,
+        "tool_demand_m3_s": 0.0001,
+        "tool_flow_m3_s": 0.0001,
+        "valve_position": 1.0,
+        "water_quality_deviation_proxy": 0.0
+      }
+    },
+    "pump_trip": {
+      "duration_s": 1.0,
+      "final_pressure_pa": 100167.97613352537,
+      "first_step_pressure_pa": 290243.90244157985,
+      "maximum_mass_balance_residual_m3_s": 9.89530235942298e-13,
+      "monotone_nonincreasing": true
+    },
+    "relief_case": {
+      "duration_s": 2.0,
+      "final_state": {
+        "mass_balance_residual_m3_s": 7.217749753993599e-13,
+        "pump_inflow_m3_s": 0.0003,
+        "relief_flow_m3_s": 7.999999942258e-05,
+        "return_flow_m3_s": 0.000219999999855645,
+        "return_pressure_pa": 100000.0,
+        "storage_flow_m3_s": 0.0,
+        "supply_pressure_pa": 539999.99971129,
+        "temperature_k": 293.15,
+        "tool_demand_m3_s": 0.0,
+        "tool_flow_m3_s": 0.0,
+        "valve_position": 0.0,
+        "water_quality_deviation_proxy": 0.0
+      },
+      "maximum_mass_balance_residual_m3_s": 8.84756420145745e-13,
+      "relief_active": true
+    },
+    "timestep_convergence": {
+      "disturbance": "instantaneous motor-speed boundary from 1.0 to 0.70 pu",
+      "duration_s": 0.5,
+      "reference_dt_s": 0.0005,
+      "reference_final_supply_pressure_pa": 196187.12087831227,
+      "results": [
+        {
+          "absolute_error_vs_0_5_ms_pa": 89.33105709729716,
+          "dt_s": 0.02,
+          "final_supply_pressure_pa": 196097.78982121497,
+          "relative_error_vs_nominal": 0.0002977701903243239
+        },
+        {
+          "absolute_error_vs_0_5_ms_pa": 36.19270137278363,
+          "dt_s": 0.01,
+          "final_supply_pressure_pa": 196150.9281769395,
+          "relative_error_vs_nominal": 0.00012064233790927877
+        },
+        {
+          "absolute_error_vs_0_5_ms_pa": 16.157013305928558,
+          "dt_s": 0.005,
+          "final_supply_pressure_pa": 196170.96386500634,
+          "relative_error_vs_nominal": 5.385671101976186e-05
+        },
+        {
+          "absolute_error_vs_0_5_ms_pa": 7.085844117682427,
+          "dt_s": 0.0025,
+          "final_supply_pressure_pa": 196180.0350341946,
+          "relative_error_vs_nominal": 2.3619480392274756e-05
+        },
+        {
+          "absolute_error_vs_0_5_ms_pa": 2.0035586203448474,
+          "dt_s": 0.001,
+          "final_supply_pressure_pa": 196185.11731969193,
+          "relative_error_vs_nominal": 6.678528734482825e-06
+        }
+      ]
+    }
+  },
+  "interface_version": "2.0.0",
+  "parameter_provenance": {
+    "drive": "synthetic-drive-v1",
+    "electrical": "synthetic-electrical-energy-v2",
+    "pump": "synthetic-pump-curve-v2",
+    "sensor:upw-supply-pressure": "synthetic-pressure-sensor-v1",
+    "sensor:upw-temperature": "synthetic-temperature-sensor-v1",
+    "sensor:upw-tool-flow": "synthetic-flow-sensor-v1",
+    "upw": "synthetic-upw-conserved-v2"
+  },
+  "pump": {
+    "config": {
+      "hydraulic_efficiency": 0.7,
+      "max_speed_ratio": 1.2,
+      "maximum_flow_m3_s": 0.0005,
+      "operating_point_tolerance_pa": 1e-06,
+      "provenance_id": "synthetic-pump-curve-v2",
+      "reference_flow_m3_s": 0.0002,
+      "reference_head_pa": 200000.0,
+      "reference_motor_speed_rad_s": 188.5,
+      "shutoff_head_pa": 400000.0
+    },
+    "curve_coefficient_pa_s2_m6": 5000000000000.0,
+    "homologous_points": [
+      {
+        "flow_m3_s": 5e-05,
+        "flow_ratio_error": 0.0,
+        "head_pa": 12500.0,
+        "head_ratio_error": 0.0,
+        "operating_point_residual_pa": 0.0,
+        "power_ratio_error": 0.0,
+        "shaft_power_w": 0.8928571428571429,
+        "speed_ratio": 0.25
+      },
+      {
+        "flow_m3_s": 0.0001,
+        "flow_ratio_error": 0.0,
+        "head_pa": 50000.0,
+        "head_ratio_error": 0.0,
+        "operating_point_residual_pa": 0.0,
+        "power_ratio_error": 0.0,
+        "shaft_power_w": 7.142857142857143,
+        "speed_ratio": 0.5
+      },
+      {
+        "flow_m3_s": 0.00015,
+        "flow_ratio_error": -1.1102230246251565e-16,
+        "head_pa": 112500.00000000001,
+        "head_ratio_error": 1.1102230246251565e-16,
+        "operating_point_residual_pa": 1.4551915228366852e-11,
+        "power_ratio_error": 0.0,
+        "shaft_power_w": 24.107142857142858,
+        "speed_ratio": 0.75
+      },
+      {
+        "flow_m3_s": 0.0002,
+        "flow_ratio_error": 0.0,
+        "head_pa": 200000.0,
+        "head_ratio_error": 0.0,
+        "operating_point_residual_pa": 0.0,
+        "power_ratio_error": 0.0,
+        "shaft_power_w": 57.142857142857146,
+        "speed_ratio": 1.0
+      },
+      {
+        "flow_m3_s": 0.00024,
+        "flow_ratio_error": 0.0,
+        "head_pa": 287999.99999999994,
+        "head_ratio_error": -2.220446049250313e-16,
+        "operating_point_residual_pa": -5.820766091346741e-11,
+        "power_ratio_error": 4.440892098500626e-16,
+        "shaft_power_w": 98.74285714285716,
+        "speed_ratio": 1.2
+      }
+    ],
+    "network_pressure_sweep": [
+      {
+        "check_valve_closed": false,
+        "curve_head_pa": 0.0,
+        "differential_pressure_pa": 0.0,
+        "flow_m3_s": 0.000282842712474619,
+        "operating_point_residual_pa": 0.0
+      },
+      {
+        "check_valve_closed": false,
+        "curve_head_pa": 100000.00000000012,
+        "differential_pressure_pa": 100000.0,
+        "flow_m3_s": 0.0002449489742783178,
+        "operating_point_residual_pa": 1.1641532182693481e-10
+      },
+      {
+        "check_valve_closed": false,
+        "curve_head_pa": 200000.0,
+        "differential_pressure_pa": 200000.0,
+        "flow_m3_s": 0.0002,
+        "operating_point_residual_pa": 0.0
+      },
+      {
+        "check_valve_closed": false,
+        "curve_head_pa": 300000.0,
+        "differential_pressure_pa": 300000.0,
+        "flow_m3_s": 0.0001414213562373095,
+        "operating_point_residual_pa": 0.0
+      },
+      {
+        "check_valve_closed": true,
+        "curve_head_pa": 400000.0,
+        "differential_pressure_pa": 400001.0,
+        "flow_m3_s": 0.0,
+        "operating_point_residual_pa": 0.0
+      }
+    ],
+    "reference_power_w": 57.142857142857146
+  },
+  "real_fab_validation": false,
+  "report_id": "R3_PLANT_VALIDATION_V1",
+  "schema_version": "2.1.0"
+}

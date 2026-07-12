@@ -1,0 +1,239 @@
+register_version: "1.3.0"
+effective_date: "2026-07-11"
+basis_vocabulary:
+  coupling_parameter_required_values:
+    - Literature-supported
+    - Data-calibrated
+    - Engineering approximation
+    - Synthetic assumption
+  other_allowed_values:
+    - Project constraint
+    - Unverified precondition
+    - Data-verified evidence
+status_vocabulary: [OPEN, ACCEPTED_FOR_POC, REQUIRES_VALIDATION, BLOCKED]
+
+assumptions:
+  - id: A-001
+    statement: Average MRR is the only primary process target that may receive public-data validation.
+    category: scope
+    basis: Project constraint
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP03, WP09, WP12, WP18]
+    validation: Claims scan and report review.
+    consequence_if_false: The primary scientific claim must be changed with user approval.
+
+  - id: A-002
+    statement: The PHM 2016 CMP dataset is potentially obtainable with sufficient process variables and average-MRR labels for the planned virtual-metrology study.
+    category: data
+    basis: Data-verified evidence
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP03, WP09]
+    validation: R2 validates source-order timing, phase-aware native-unit features, all official one-to-one feature/label joins, anomaly treatments, wafer/chronological splits, and fit-scope audits; model accuracy and the separate dataset licence remain unresolved.
+    consequence_if_false: Remove public-data model claims while preserving verified raw/provenance and semantic-audit evidence.
+
+  - id: A-003
+    statement: Preston's MRR proportionality is a suitable bounded baseline for synthetic CMP average-MRR dynamics.
+    category: physics
+    basis: Literature-supported
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP08, WP09]
+    validation: WP08 records primary structural citations, SI dimensional analysis, nominal power-mean normalization, zero-pressure/speed and process-mode limiting cases, bounded states, thermal residual closure, deterministic replay, and monotone timestep refinement; all parameter values remain synthetic and public-model residual diagnostics remain a separate WP09 requirement.
+    consequence_if_false: Replace the physics baseline through formal interface impact analysis; do not reinterpret residual performance.
+
+  - id: A-004
+    statement: Pump affinity relations are adequate for scaling homologous pump curves near a bounded reference operating point, but do not independently determine both flow and head for an arbitrary network.
+    category: physics
+    basis: Engineering approximation
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP05, WP06, WP10]
+    validation: R3 solves a speed-scaled quadratic pump curve at network differential pressure, checks open-point residual and check-valve complementarity, verifies homologous flow/head/power scaling and backpressure monotonicity, and demonstrates timestep refinement; no manufacturer calibration is implied.
+    consequence_if_false: Replace the reduced pump formulation through controlled interface impact analysis.
+
+  - id: A-005
+    statement: Lumped first-order VFD, motor, hydraulic-compliance, and thermal states are sufficient to demonstrate the intended causal timing at PoC resolution.
+    category: dynamics
+    basis: Engineering approximation
+    status: REQUIRES_VALIDATION
+    applies_to: [WP04, WP05, WP06]
+    validation: R3 validates utility-plant equilibrium, bounded limiting cases, and monotone timestep refinement to a 0.5 ms reference; R4 causal timing and later CMP/coupling mismatch sensitivity remain required before integrated acceptance.
+    consequence_if_false: Add state detail or revise timestep before integrated evaluation.
+
+  - id: A-006
+    statement: UPS transfer can be represented as a configured delay, transient output profile, energy limit, and recovery state rather than switching-electronics waveforms.
+    category: electrical
+    basis: Engineering approximation
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP04]
+    validation: R3 adds output-frequency, battery-energy, load, capacity, constant-efficiency discharge, bounded charging, overload, depletion-to-bypass, interruption, and recovery behavior with deterministic limiting-case tests; waveform, protection, and real-runtime claims remain excluded.
+    consequence_if_false: Restrict the model to prescribed output profiles and make no ride-through-duration or sub-cycle power-quality claim.
+
+  - id: A-007
+    statement: Utility-to-CMP effects can be studied only through an explicit declared physical connection topology that produces typed CMP boundary conditions rather than a generic direct MRR multiplier.
+    category: coupling
+    basis: Synthetic assumption
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP10]
+    validation: WP10 implements dressing-water, thermal-loop, explicitly synthetic slurry-support, and no-connection structures through typed CMP boundaries; exact nulls, limiting cases, deterministic full-chain replay, local/global sensitivity, parameter mismatch, and upstream conservation checks pass. Acceptance is simulation-only and does not establish real tool plumbing.
+    consequence_if_false: Demonstration remains a scenario generator rather than a defensible mechanistic control experiment; utility-induced MRR claims are removed.
+
+  - id: A-008
+    statement: Every utility-to-CMP coefficient can be assigned one of the four required provenance classes and a bounded uncertainty range.
+    category: coupling
+    basis: Project constraint
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP10, WP18]
+    validation: WP10 automated completeness checks cover every numerical CouplingConfig field with provenance class, nominal value, units, hard bounds, expected direction, and sensitivity range; all numerical coefficients are Synthetic assumption and functional forms are classified separately.
+    consequence_if_false: The affected coupling and all dependent claims are blocked.
+
+  - id: A-009
+    statement: UPW pressure, flow, and temperature can serve as boundary variables for explicitly configured dressing-water or thermal connection topologies; their presence alone does not establish a direct CMP effect, and water-quality states remain non-validated proxies.
+    category: scope
+    basis: Engineering approximation
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP06, WP10]
+    validation: Local literature review supports pathway existence but not numerical header transfer; WP10 validates explicit topology selection, dimensions, no-connection and zero-link controls, thermal-reference nulls, water-quality non-effect, and local/global/mismatch sensitivity. Acceptance applies only to declared synthetic experiments.
+    consequence_if_false: Disable the affected topology; additional measured chemistry or tool plumbing data become future requirements rather than inferred states.
+
+  - id: A-010
+    statement: Sensor noise, bias, drift, quantisation, rate mismatch, delay, packet loss, stuck values, and jitter can be generated independently of latent plant-state evolution.
+    category: observation
+    basis: Synthetic assumption
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP07]
+    validation: R4 verifies immutable latent input, exact run/step/source-time matching, causal queued delivery by arrival cutoff, explicit loss/stuck/corruption flags, and fixed-seed equality; real sensor/network distributions remain out of scope.
+    consequence_if_false: Latent/observed separation and online evaluation would be invalid.
+
+  - id: A-011
+    statement: Integer step index plus fixed dt is the canonical simulation clock and actions proposed at step k take effect no earlier than step k+1.
+    category: timing
+    basis: Engineering approximation
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP11, WP17]
+    validation: R4 enforces monotone source steps/timestamps and arrival cutoffs, exact source-boundary matching, deterministic delivery ordering, and scenario replay; future action-effect timing remains subject to integrated-runtime tests.
+    consequence_if_false: Timing contracts, leakage checks, regression traces, and controller evaluation require impact analysis.
+
+  - id: A-012
+    statement: A future safe-envelope excursion can be defined from average MRR and selected utility constraints without treating the event as a physical defect.
+    category: target
+    basis: Synthetic assumption
+    status: OPEN
+    applies_to: [WP12, WP15]
+    validation: Preregister envelope, horizon, persistence rule, and censoring policy in Phase 3.
+    consequence_if_false: Early-warning and predictive-control objectives must be reformulated.
+
+  - id: A-013
+    statement: Logistic regression and gradient-boosted trees are sufficient initial warning-model families.
+    category: modelling
+    basis: Engineering approximation
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP12]
+    validation: Compare against prevalence/constant baselines and calibrate uncertainty.
+    consequence_if_false: Additional bounded model families may be considered after baseline evidence.
+
+  - id: A-014
+    statement: Simulator initiating-cause labels are adequate ground truth for evaluating attribution within the simulator.
+    category: attribution
+    basis: Synthetic assumption
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP13]
+    validation: R4 freezes target-compatible initiating labels, forbids propagation states as scenario initiators, and enforces interval-aware MULTI_LABEL_ORDERED compound truth; held-out attribution confusion matrices including UNKNOWN remain required.
+    consequence_if_false: Attribution becomes descriptive evidence only and accuracy claims are removed.
+
+  - id: A-015
+    statement: Bounded action search or short-horizon MPC is adequate for the first predictive supervisory controller.
+    category: control
+    basis: Engineering approximation
+    status: OPEN
+    applies_to: [WP15]
+    validation: Phase 3 objective/constraint review, feasibility tests, latency benchmark, and comparison to baselines.
+    consequence_if_false: Prefer safe hold/advisory behavior; reinforcement learning remains excluded.
+
+  - id: A-016
+    statement: Independent constraint checking can convert controller proposals into safe simulated final actions under all enumerated sensor and uncertainty states.
+    category: safety
+    basis: Project constraint
+    status: OPEN
+    applies_to: [WP16]
+    validation: Exhaustive outcome tests, property checks, hold fallback, restart state-machine tests, and zero final-action violations.
+    consequence_if_false: Predictive actuation is disabled; advisory or hold-only operation is required.
+
+  - id: A-017
+    statement: Controller comparisons are valid only when scenario, initial state, parameter realization, seed map, and observation corruption are identical within each paired run.
+    category: evaluation
+    basis: Project constraint
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP18]
+    validation: Run-manifest equality assertion excluding controller identity and action-dependent trajectories.
+    consequence_if_false: Comparative efficacy results are invalid.
+
+  - id: A-018
+    statement: Any radial MRR or non-uniformity output without measured spatial metrology is only a synthetic quality-risk proxy.
+    category: claims
+    basis: Project constraint
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP08, WP19, WP20]
+    validation: Mandatory-label tests and final claims audit.
+    consequence_if_false: Spatial output must be removed.
+
+  - id: A-019
+    statement: The PoC timestep will be chosen for numerical fidelity of lumped dynamics, not for microsecond equipment response claims.
+    category: timing
+    basis: Project constraint
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP17, WP18]
+    validation: Timestep convergence and honest measured latency reporting.
+    consequence_if_false: Runtime claims exceed the architecture's evidence.
+
+  - id: A-020
+    statement: A minimal implementation can use NumPy, SciPy, pandas, Pydantic, PyYAML, pytest, and Matplotlib while treating other libraries as optional or separately approved dependencies.
+    category: technology
+    basis: Engineering approximation
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP01, WP09, WP12, WP19]
+    validation: Clean-environment install and optional-dependency tests.
+    consequence_if_false: Revise the dependency decision before adding packages.
+
+  - id: A-021
+    statement: PHM virtual metrology and the SI simulator are separate evidence planes unless a source-supported calibration bridge is established.
+    category: data
+    basis: Project constraint
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP02, WP03, WP08, WP09, WP10]
+    validation: Native-unit schema tests, model-input audits, and report checks that forbid adding SI simulator MRR to residuals fitted on scaled PHM signals.
+    consequence_if_false: Public-data and simulator evidence become dimensionally invalid and all affected results are withdrawn.
+
+  - id: A-022
+    statement: Preparation, active polishing, ending, dressing or cleaning, hold, and recovery must not all be treated as one stationary material-removal phase.
+    category: physics
+    basis: Engineering approximation
+    status: REQUIRES_VALIDATION
+    applies_to: [WP03, WP08, WP09]
+    validation: Input-only phase segmentation, manual trace audit, ablation, fit-scope checks, and time-weighted phase-feature tests.
+    consequence_if_false: Use conservative recipe/stage-specific segmentation and qualify phase labels; do not aggregate all rows as active removal.
+
+  - id: A-023
+    statement: Structural uncertainty for utility coupling must include zero link strength and a no-CMP-connection topology unless real tool plumbing establishes a connection.
+    category: coupling
+    basis: Project constraint
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP10, WP18]
+    validation: Configuration completeness tests and sensitivity reports containing the null structures.
+    consequence_if_false: Control benefit may be an artifact of assumed coupling and cannot support the central qualified claim.
+
+  - id: A-024
+    statement: A healthy UPS may make the 25 percent, 400 ms sag a negative-control scenario rather than a process excursion.
+    category: electrical
+    basis: Engineering approximation
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP04, WP10, WP18]
+    validation: R3 corrected replay gives 0.865536 pu minimum UPS output, 1.119 kPa maximum pressure deviation, and unchanged tool flow for the 25 percent/400 ms case; it is frozen as a synthetic negative control, while later evaluation must compare separately declared positive disturbances.
+    consequence_if_false: Reclassify the scenario from evidence rather than tuning coupling gains to force either outcome.
+
+  - id: A-025
+    statement: Supervisory-control evaluation must track cumulative removal and active-polish time in addition to instantaneous MRR so that hold behavior cannot appear successful by merely stopping removal.
+    category: target
+    basis: Project constraint
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP08, WP12, WP15, WP18]
+    validation: State-equation tests and reports containing cumulative error, active-time MRR, hold duration, recovery time, throughput penalty, and action effort.
+    consequence_if_false: Controller efficacy comparisons are invalid because hold can game the instantaneous-MRR metric.

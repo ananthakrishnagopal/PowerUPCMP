@@ -1,0 +1,68 @@
+"""Canonical data records, provenance checks, and leakage-safe split helpers."""
+
+from .provenance import DatasetManifest, RawFileManifest, sha256_file, verify_raw_file
+from .phm_semantics import (
+    FeatureEngineeringResult,
+    LabelAnomalyPolicy,
+    LabelPolicyResult,
+    ProcessModeProxy,
+    annotate_trace_semantics,
+    apply_training_label_policy,
+    build_official_feature_sets,
+    engineer_phase_aware_features,
+    semantic_audit_report,
+)
+from .schema import (
+    DataOrigin,
+    LatentStateRecord,
+    ObservationRecord,
+    PublicMeasurementRecord,
+    QualityFlag,
+    RunManifest,
+    SemanticClass,
+    SourceUnitStatus,
+)
+from .splits import (
+    FitScopeAudit,
+    HoldoutResult,
+    SplitAudit,
+    SplitResult,
+    audit_fit_scope,
+    chronological_group_split,
+    grouped_split,
+    held_out_group_values,
+    physical_machine_holdout_feasibility,
+)
+
+__all__ = [
+    "DataOrigin",
+    "DatasetManifest",
+    "FeatureEngineeringResult",
+    "FitScopeAudit",
+    "HoldoutResult",
+    "LabelAnomalyPolicy",
+    "LabelPolicyResult",
+    "LatentStateRecord",
+    "ObservationRecord",
+    "ProcessModeProxy",
+    "PublicMeasurementRecord",
+    "QualityFlag",
+    "RawFileManifest",
+    "RunManifest",
+    "SemanticClass",
+    "SourceUnitStatus",
+    "SplitAudit",
+    "SplitResult",
+    "annotate_trace_semantics",
+    "apply_training_label_policy",
+    "audit_fit_scope",
+    "build_official_feature_sets",
+    "chronological_group_split",
+    "engineer_phase_aware_features",
+    "grouped_split",
+    "held_out_group_values",
+    "physical_machine_holdout_feasibility",
+    "semantic_audit_report",
+    "sha256_file",
+    "verify_raw_file",
+]

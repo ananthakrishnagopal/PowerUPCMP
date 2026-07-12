@@ -1,0 +1,384 @@
+schema_version: "2.4.0"
+status: FROZEN_WP10_V2_4
+implementation_gate: WP10_IMPLEMENTATION_AND_VALIDATION
+supersedes: "2.3.0"
+change_decision: orchestration/decisions/wp10_utility_cmp_coupling.md
+effective_date: "2026-07-11"
+owner: sole_engineering_agent
+change_control:
+  requires:
+    - decision_record
+    - impact_analysis
+    - updated_tests
+    - updated_downstream_documentation
+
+conventions:
+  simulator_internal_units: SI
+  public_source_units: preserve_native_or_unknown_until_supported_conversion
+  time_primary_key: step_index
+  timestamp_definition: "timestamp_s = step_index * dt_s from run start"
+  mrr_canonical_unit: m/s
+  mrr_reporting_unit: nm/min
+  mrr_conversion: "1 m/s = 6.0e10 nm/min"
+  temperature_unit: K
+  pressure_unit: Pa
+  volumetric_flow_unit: m^3/s
+  angular_speed_unit: rad/s
+  fraction_range: [0.0, 1.0]
+  per_unit_nominal: 1.0
+  missing_numeric_representation: null
+  infinity_allowed: false
+  unknown_keys_allowed: false
+
+semantic_classes:
+  - MEASURED_PROCESS_OUTPUT
+  - SIMULATED_PHYSICAL_STATE
+  - OBSERVED_SENSOR_STATE
+  - PROCESS_EXCURSION
+  - QUALITY_RISK_PROXY
+  - PHYSICAL_DEFECT
+  - YIELD_OUTCOME
+  - MODEL_OUTPUT
+  - CONTROL_ACTION
+  - SAFETY_DECISION
+
+data_origins:
+  - PUBLIC_MEASURED
+  - SYNTHETIC_SIMULATOR
+  - DERIVED_PUBLIC_DATA
+  - DERIVED_SYNTHETIC
+  - CONFIGURATION
+
+quality_flags:
+  - VALID
+  - MISSING
+  - DELAYED
+  - DROPPED
+  - STUCK
+  - BIASED
+  - DRIFTING
+  - QUANTISED
+  - OUT_OF_RANGE
+  - TIMESTAMP_JITTERED
+  - UNIT_UNRESOLVED
+  - INVALID
+
+records:
+  run_manifest:
+    description: Reproducibility and provenance envelope for one execution.
+    primary_key: [run_id]
+    fields:
+      run_id: {type: string, required: true}
+      scenario_id: {type: string, required: true}
+      controller_id: {type: string, required: true}
+      config_sha256: {type: string, pattern: "^[0-9a-f]{64}$", required: true}
+      code_revision: {type: string, required: true, note: "commit hash or explicit UNCOMMITTED"}
+      run_seed: {type: integer, minimum: 0, required: true}
+      child_seed_map: {type: mapping_string_integer, required: true}
+      dt_s: {type: float, exclusive_minimum: 0.0, unit: s, required: true}
+      duration_s: {type: float, exclusive_minimum: 0.0, unit: s, required: true}
+      started_at_utc: {type: datetime, required: true}
+      software_versions: {type: mapping_string_string, required: true}
+      dataset_manifest_ids: {type: list_string, required: true}
+      parameter_provenance_ids: {type: mapping_string_string, minimum_size: 1, required: true}
+      synthetic_only: {type: boolean, required: true}
+
+  latent_state_record:
+    description: Simulator truth; never exposed directly to online prediction or control.
+    primary_key: [run_id, step_index, signal_id]
+    fixed_semantic_class: SIMULATED_PHYSICAL_STATE
+    fixed_data_origin: SYNTHETIC_SIMULATOR
+    fields:
+      run_id: {type: string, required: true}
+      step_index: {type: integer, minimum: 0, required: true}
+      timestamp_s: {type: float, minimum: 0.0, unit: s, required: true}
+      signal_id: {type: signal_identifier, required: true}
+      value: {type: scalar, finite_if_numeric: true, required: true}
+      unit: {type: string, required: true}
+      subsystem: {type: string, required: true}
+      provenance_id: {type: string, required: true}
+
+  observation_record:
+    description: Sensor/communication output available to online consumers.
+    primary_key: [run_id, sample_index, sensor_id]
+    fixed_semantic_class: OBSERVED_SENSOR_STATE
+    fields:
+      run_id: {type: string, required: true}
+      sample_index: {type: integer, minimum: 0, required: true}
+      source_step_index: {type: integer, minimum: 0, nullable: true, required: true}
+      source_timestamp_s: {type: float, minimum: 0.0, unit: s, nullable: true, required: false, note: "R4-generated records always populate; legacy records without it are not online-eligible"}
+      observed_timestamp_s: {type: float, minimum: 0.0, unit: s, required: true, semantic_name: reported_sensor_timestamp}
+      arrival_timestamp_s: {type: float, minimum: 0.0, unit: s, required: true}
+      sensor_id: {type: string, required: true}
+      signal_id: {type: signal_identifier, required: true}
+      value: {type: scalar, finite_if_numeric: true, nullable: true, required: true}
+      unit: {type: string, required: true}
+      quality_flags: {type: list_quality_flag, required: true}
+      uncertainty_std: {type: float, minimum: 0.0, nullable: true, required: true}
+      data_origin: {type: enum_data_origin, required: true}
+
+  public_measurement_record:
+    description: Verified public-dataset process measurement; never simulator truth.
+    primary_key: [dataset_id, source_row_id, signal_id]
+    fixed_semantic_class: MEASURED_PROCESS_OUTPUT
+    fixed_data_origin: PUBLIC_MEASURED
+    fields:
+      dataset_id: {type: string, required: true}
+      source_file_sha256: {type: string, pattern: "^[0-9a-f]{64}$", required: true}
+      source_row_id: {type: string, required: true}
+      wafer_id: {type: string, nullable: true, required: true}
+      machine_id: {type: string, nullable: true, required: true}
+      trace_id: {type: string, nullable: true, required: true}
+      source_timestamp: {type: datetime_or_numeric, nullable: true, required: true}
+      signal_id: {type: signal_identifier, required: true}
+      value: {type: scalar, finite_if_numeric: true, nullable: true, required: true}
+      source_unit: {type: string, required: true}
+      source_unit_status: {type: enum_source_unit_status, required: true}
+      canonical_value: {type: float, finite: true, nullable: true, required: true}
+      canonical_unit: {type: string, nullable: true, required: true}
+      conversion_id: {type: string, nullable: true, required: true}
+      quality_flags: {type: list_quality_flag, required: true}
+    validation_rules:
+      - source_value_is_validated_without_assigning_canonical_units
+      - available_unconverted_value_requires_UNIT_UNRESOLVED_not_MISSING
+      - null_canonical_value_requires_null_canonical_unit_and_conversion_id
+      - canonical_value_requires_DECLARED_source_unit_and_nonempty_conversion_id
+      - canonical_unit_must_match_signal_catalog
+
+  prediction_record:
+    description: Online prediction produced only from available observations.
+    primary_key: [run_id, decision_step_index, predictor_id, target_id]
+    fixed_semantic_class: MODEL_OUTPUT
+    fields:
+      run_id: {type: string, required: true}
+      decision_step_index: {type: integer, minimum: 0, required: true}
+      decision_timestamp_s: {type: float, minimum: 0.0, unit: s, required: true}
+      predictor_id: {type: string, required: true}
+      predictor_version: {type: string, required: true}
+      target_id: {type: string, required: true}
+      horizon_s: {type: float, minimum: 0.0, unit: s, required: true}
+      point_value: {type: float, finite: true, nullable: true, required: true}
+      lower_value: {type: float, finite: true, nullable: true, required: true}
+      upper_value: {type: float, finite: true, nullable: true, required: true}
+      unit: {type: string, required: true}
+      excursion_probability: {type: float, minimum: 0.0, maximum: 1.0, nullable: true, required: true}
+      uncertainty_valid: {type: boolean, required: true}
+      feature_cutoff_step_index: {type: integer, minimum: 0, required: true}
+      latency_s: {type: float, minimum: 0.0, unit: s, required: true}
+
+  attribution_record:
+    description: Cause classification against a fixed simulator cause vocabulary.
+    primary_key: [run_id, decision_step_index, estimator_id]
+    fields:
+      run_id: {type: string, required: true}
+      decision_step_index: {type: integer, minimum: 0, required: true}
+      estimator_id: {type: string, required: true}
+      predicted_cause: {type: enum_root_cause, required: true}
+      probability_by_cause: {type: mapping_cause_probability, required: true}
+      rule_chain_ids: {type: list_string, required: true}
+      residual_evidence: {type: mapping_string_float, required: true}
+      attribution_method: {type: string, required: true}
+      causal_proof: {type: literal_false, required: true}
+
+  action_record:
+    description: Proposed or final supervisory action; no direct hardware command.
+    primary_key: [run_id, decision_step_index, stage, action_id]
+    fixed_semantic_class: CONTROL_ACTION
+    fields:
+      run_id: {type: string, required: true}
+      decision_step_index: {type: integer, minimum: 0, required: true}
+      effective_step_index: {type: integer, minimum: 1, required: true}
+      stage: {type: enum, values: [PROPOSED, FINAL], required: true}
+      action_id: {type: string, required: true}
+      action_type: {type: enum_action_type, required: true}
+      target: {type: string, required: true}
+      value: {type: float, finite: true, nullable: true, required: true}
+      unit: {type: string, required: true}
+      rationale: {type: string, required: true}
+      controller_id: {type: string, required: true}
+
+  safety_decision_record:
+    description: Independent disposition of a proposed action.
+    primary_key: [run_id, decision_step_index, proposed_action_id]
+    fixed_semantic_class: SAFETY_DECISION
+    fields:
+      run_id: {type: string, required: true}
+      decision_step_index: {type: integer, minimum: 0, required: true}
+      proposed_action_id: {type: string, required: true}
+      outcome: {type: enum_safety_outcome, required: true}
+      final_action_id: {type: string, required: true}
+      violated_constraint_ids: {type: list_string, required: true}
+      sensor_valid: {type: boolean, required: true}
+      uncertainty_acceptable: {type: boolean, required: true}
+      process_envelope_valid: {type: boolean, required: true}
+      latency_s: {type: float, minimum: 0.0, unit: s, required: true}
+
+  scenario_event_record:
+    description: Validated deterministic exogenous disturbance or fault event.
+    primary_key: [scenario_id, event_id]
+    fields:
+      scenario_id: {type: string, required: true}
+      event_id: {type: string, required: true}
+      event_type: {type: string, required: true}
+      start_s: {type: float, minimum: 0.0, unit: s, required: true}
+      duration_s: {type: float, minimum: 0.0, unit: s, required: true}
+      priority: {type: integer, required: true}
+      target: {type: string, required: true}
+      profile: {type: enum, values: [STEP, RAMP, PULSE, PIECEWISE_LINEAR], required: true}
+      magnitude: {type: scalar, required: true}
+      unit: {type: string, required: true}
+      initiating_cause: {type: enum_root_cause, required: true}
+      declaration_order: {type: integer, minimum: 0, required: true}
+
+  excursion_label_record:
+    description: Future-envelope target generated without exposing future state to online features.
+    primary_key: [run_id, decision_step_index, target_id, horizon_s]
+    fixed_semantic_class: PROCESS_EXCURSION
+    fields:
+      run_id: {type: string, required: true}
+      decision_step_index: {type: integer, minimum: 0, required: true}
+      target_id: {type: string, required: true}
+      horizon_s: {type: float, exclusive_minimum: 0.0, unit: s, required: true}
+      excursion_within_horizon: {type: boolean, required: true}
+      first_excursion_step_index: {type: integer, minimum: 0, nullable: true, required: true}
+      envelope_id: {type: string, required: true}
+      generated_offline: {type: literal_true, required: true}
+
+enumerations:
+  source_unit_status:
+    - DECLARED
+    - NATIVE_UNDECLARED
+    - UNKNOWN
+  root_cause:
+    - GRID_VOLTAGE_SAG
+    - GRID_VOLTAGE_SWELL
+    - GRID_INTERRUPTION
+    - GRID_FREQUENCY_DEVIATION
+    - UPS_TRANSFER
+    - VFD_DERATING
+    - PUMP_TRIP
+    - VALVE_RESTRICTION
+    - TOOL_DEMAND_SPIKE
+    - THERMAL_EXCURSION
+    - PRESSURE_SENSOR_FAULT
+    - FLOW_SENSOR_FAULT
+    - UNKNOWN
+  action_type:
+    - NO_ACTION
+    - VFD_COMMAND_ADJUSTMENT
+    - VALVE_ADJUSTMENT
+    - CMP_DOWNFORCE_REDUCTION
+    - HEAD_SPEED_REDUCTION
+    - PLATEN_SPEED_REDUCTION
+    - ADVISORY_WARNING
+    - SAFE_HOLD
+    - CONTROLLED_RESUME
+  safety_outcome:
+    - APPROVED
+    - CLIPPED
+    - REJECTED_OUT_OF_ENVELOPE
+    - REJECTED_SENSOR_INVALID
+    - REJECTED_HIGH_UNCERTAINTY
+    - REPLACED_WITH_HOLD
+
+signal_catalog:
+  - {id: electrical.grid_voltage, subsystem: electrical, dtype: float, unit: pu, valid_range: [0.0, 1.5]}
+  - {id: electrical.grid_frequency, subsystem: electrical, dtype: float, unit: Hz, valid_range: [0.0, 100.0]}
+  - {id: electrical.ups_output_voltage, subsystem: electrical, dtype: float, unit: pu, valid_range: [0.0, 1.5]}
+  - {id: electrical.ups_output_frequency, subsystem: electrical, dtype: float, unit: Hz, valid_range: [0.0, 100.0]}
+  - {id: electrical.ups_battery_energy, subsystem: electrical, dtype: float, unit: J, valid_range: [0.0, null]}
+  - {id: electrical.ups_load_power, subsystem: electrical, dtype: float, unit: W, valid_range: [0.0, null]}
+  - {id: electrical.ups_mode, subsystem: electrical, dtype: enum, unit: "1", values: [GRID, TRANSFER, BATTERY, BYPASS, RECOVERY]}
+  - {id: drive.vfd_command, subsystem: drive, dtype: float, unit: pu, valid_range: [0.0, 1.0]}
+  - {id: drive.vfd_available_output, subsystem: drive, dtype: float, unit: pu, valid_range: [0.0, 1.0]}
+  - {id: drive.vfd_derating, subsystem: drive, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: drive.vfd_trip_state, subsystem: drive, dtype: boolean, unit: "1"}
+  - {id: drive.motor_angular_speed, subsystem: drive, dtype: float, unit: rad/s, valid_range: [0.0, null]}
+  - {id: pump.speed_ratio, subsystem: pump, dtype: float, unit: "1", valid_range: [0.0, 1.2]}
+  - {id: pump.volumetric_flow, subsystem: pump, dtype: float, unit: m^3/s, valid_range: [0.0, null]}
+  - {id: pump.head, subsystem: pump, dtype: float, unit: Pa, valid_range: [0.0, null]}
+  - {id: pump.power, subsystem: pump, dtype: float, unit: W, valid_range: [0.0, null]}
+  - {id: pump.operating_point_residual, subsystem: pump, dtype: float, unit: Pa, valid_range: [null, null]}
+  - {id: upw.supply_pressure, subsystem: upw, dtype: float, unit: Pa, valid_range: [0.0, null]}
+  - {id: upw.return_pressure, subsystem: upw, dtype: float, unit: Pa, valid_range: [0.0, null]}
+  - {id: upw.tool_flow, subsystem: upw, dtype: float, unit: m^3/s, valid_range: [0.0, null]}
+  - {id: upw.valve_position, subsystem: upw, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: upw.tool_demand, subsystem: upw, dtype: float, unit: m^3/s, valid_range: [0.0, null]}
+  - {id: upw.pump_inflow, subsystem: upw, dtype: float, unit: m^3/s, valid_range: [0.0, null]}
+  - {id: upw.return_flow, subsystem: upw, dtype: float, unit: m^3/s, valid_range: [0.0, null]}
+  - {id: upw.relief_flow, subsystem: upw, dtype: float, unit: m^3/s, valid_range: [0.0, null]}
+  - {id: upw.storage_flow, subsystem: upw, dtype: float, unit: m^3/s, valid_range: [null, null]}
+  - {id: upw.mass_balance_residual, subsystem: upw, dtype: float, unit: m^3/s, valid_range: [null, null]}
+  - {id: upw.temperature, subsystem: upw, dtype: float, unit: K, valid_range: [273.15, 373.15]}
+  - {id: upw.conductivity_proxy, subsystem: upw, dtype: float, unit: S/m, valid_range: [0.0, null], proxy: true, deprecated: true, emitted_by_r3_plant: false}
+  - {id: upw.water_quality_deviation_proxy, subsystem: upw, dtype: float, unit: "1", valid_range: [0.0, 1.0], proxy: true, physical_measurement: false}
+  - {id: coupling.topology, subsystem: coupling, dtype: enum, unit: "1", values: [NO_CONNECTION, DRESSING_WATER_SUPPORT, THERMAL_LOOP, SYNTHETIC_SLURRY_SUPPORT]}
+  - {id: coupling.pressure_ratio, subsystem: coupling, dtype: float, unit: "1", valid_range: [0.0, null]}
+  - {id: coupling.flow_ratio, subsystem: coupling, dtype: float, unit: "1", valid_range: [0.0, null]}
+  - {id: coupling.pressure_support, subsystem: coupling, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: coupling.flow_support, subsystem: coupling, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: coupling.hydraulic_support, subsystem: coupling, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: coupling.effective_availability, subsystem: coupling, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: coupling.dressing_availability, subsystem: coupling, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: coupling.slurry_utility_availability, subsystem: coupling, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: coupling.coolant_temperature, subsystem: coupling, dtype: float, unit: K, valid_range: [273.15, 353.15]}
+  - {id: coupling.cooling_conductance_factor, subsystem: coupling, dtype: float, unit: "1", valid_range: [0.0, 2.0]}
+  - {id: cmp.process_mode, subsystem: cmp, dtype: enum, unit: "1", values: [IDLE, PREPARE, POLISH, DRESS, HOLD, RECOVER, COMPLETE]}
+  - {id: cmp.contact_pressure_command, subsystem: cmp, dtype: float, unit: Pa, valid_range: [0.0, null]}
+  - {id: cmp.contact_pressure, subsystem: cmp, dtype: float, unit: Pa, valid_range: [0.0, null]}
+  - {id: cmp.relative_velocity, subsystem: cmp, dtype: float, unit: m/s, valid_range: [0.0, null]}
+  - {id: cmp.head_angular_speed, subsystem: cmp, dtype: float, unit: rad/s, valid_range: [null, null], note: "sign encodes rotation direction"}
+  - {id: cmp.platen_angular_speed, subsystem: cmp, dtype: float, unit: rad/s, valid_range: [null, null], note: "sign encodes rotation direction"}
+  - {id: cmp.slurry_flow, subsystem: cmp, dtype: float, unit: m^3/s, valid_range: [0.0, null]}
+  - {id: cmp.slurry_availability, subsystem: cmp, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: cmp.pressure_velocity_exposure, subsystem: cmp, dtype: float, unit: "1", valid_range: [0.0, null]}
+  - {id: cmp.interface_temperature, subsystem: cmp, dtype: float, unit: K, valid_range: [273.15, 353.15]}
+  - {id: cmp.pad_surface_activity, subsystem: cmp, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: cmp.pad_remaining_life, subsystem: cmp, dtype: float, unit: "1", valid_range: [0.0, 1.0], proxy: true}
+  - {id: cmp.dresser_effectiveness, subsystem: cmp, dtype: float, unit: "1", valid_range: [0.0, 1.0], proxy: true}
+  - {id: cmp.dressing_activity, subsystem: cmp, dtype: float, unit: "1", valid_range: [0.0, 1.0]}
+  - {id: cmp.pad_age, subsystem: cmp, dtype: float, unit: s, valid_range: [0.0, null], deprecated: true, emitted_by_wp08: false}
+  - {id: cmp.dresser_age, subsystem: cmp, dtype: float, unit: s, valid_range: [0.0, null], deprecated: true, emitted_by_wp08: false}
+  - {id: cmp.process_discrepancy, subsystem: cmp, dtype: float, unit: m/s, valid_range: [null, null], online_visible: false}
+  - {id: cmp.thermal_energy_residual, subsystem: cmp, dtype: float, unit: W, valid_range: [null, null]}
+  - {id: cmp.mrr, subsystem: cmp, dtype: float, unit: m/s, valid_range: [0.0, null]}
+  - {id: cmp.mrr_physics, subsystem: cmp, dtype: float, unit: m/s, valid_range: [0.0, null]}
+  - {id: cmp.mrr_deviation, subsystem: cmp, dtype: float, unit: m/s, valid_range: [null, null]}
+  - {id: cmp.cumulative_removal, subsystem: cmp, dtype: float, unit: m, valid_range: [0.0, null]}
+  - {id: cmp.active_polish_time, subsystem: cmp, dtype: float, unit: s, valid_range: [0.0, null]}
+  - {id: cmp.stage_average_mrr, subsystem: cmp, dtype: float, unit: m/s, valid_range: [0.0, null]}
+  - id: cmp.spatial_uniformity_proxy
+    subsystem: cmp
+    dtype: float
+    unit: "1"
+    valid_range: [0.0, null]
+    proxy: true
+    mandatory_label: "Simulated spatial-uniformity proxy; not experimentally validated WIWNU."
+
+split_contract:
+  forbidden: random_row_split_within_trace
+  allowed_primary_group_keys_in_priority_order:
+    - wafer_id
+    - machine_id
+    - trace_id
+    - source_time_block
+  fit_scope:
+    preprocessing: training_groups_only
+    physics_calibration: training_groups_only
+    residual_model: training_groups_only
+    uncertainty_calibration: dedicated_calibration_groups_only
+  audit_requirements:
+    - zero_group_overlap
+    - feature_timestamp_not_after_prediction_cutoff
+    - labels_joined_after_split_key_preservation
+    - duplicate_source_rows_reported
+    - missingness_reported_by_split
+
+spatial_proxy_policy:
+  measured_spatial_metrology_available: false
+  semantic_class: QUALITY_RISK_PROXY
+  required_label: "Simulated spatial-uniformity proxy; not experimentally validated WIWNU."
+  forbidden_terms_without_qualification:
+    - measured_WIWNU
+    - validated_WIWNU
+    - defect_prevention

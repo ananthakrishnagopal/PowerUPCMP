@@ -1,0 +1,11 @@
+coupling:
+  provenance_id: synthetic-utility-cmp-coupling-v1-null
+  topology: NO_CONNECTION
+  link_strength: 0.0
+  reference_supply_pressure_pa: 300000.0
+  pressure_zero_fraction: 0.60
+  pressure_full_fraction: 0.95
+  reference_tool_flow_m3_s: 1.0e-4
+  flow_zero_fraction: 0.50
+  flow_full_fraction: 0.95
+  reference_upw_temperature_k: 293.15

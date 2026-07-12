@@ -1,0 +1,59 @@
+# User-local Codex/agent configuration; preserve but never version here.
+/.codex/
+/.agents/
+
+# Python caches, environments, and build metadata.
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+
+# Local public-data source bytes and locally supplied literature.
+/PHM-Data-Challenge-master.zip
+/fetched_papers/
+/data/raw/phm_2016_cmp/*
+!/data/raw/phm_2016_cmp/extraction_manifest.yaml
+/data/interim/*
+/data/processed/phm_2016_cmp/*.csv
+
+# Generated runtime artifacts and logs not selected as evidence reports.
+/artifacts/
+*.log
+
+# LaTeX/Pandoc/LibreOffice intermediate files. Final PDFs/PPTX under reports
+# are intentionally trackable as reviewed communication artifacts.
+/paper/build/
+/presentation/build/
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+~$*.pptx
+.#*
+
+# Editor and operating-system noise.
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

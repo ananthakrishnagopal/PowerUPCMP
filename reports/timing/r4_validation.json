@@ -1,0 +1,190 @@
+{
+  "default_config_sha256": "7a66469391268dae6e0458255ff88b263e6bf84965e87c93a7b04676caf4fd86",
+  "evidence_plane": "SYNTHETIC_SIMULATOR",
+  "interface_version": "3.0.0",
+  "real_network_or_fault_frequency_validation": false,
+  "report_id": "R4_ONLINE_SCENARIO_TIMING_VALIDATION_V1",
+  "scenarios": {
+    "event_count": 14,
+    "events": [
+      {
+        "end_s": 1.2,
+        "event_id": "mild-sag",
+        "initiating_cause": "GRID_VOLTAGE_SAG",
+        "profile": "PULSE",
+        "scenario_id": "mild_voltage_sag",
+        "start_s": 1.0,
+        "target": "electrical.grid_voltage_delta_pu"
+      },
+      {
+        "end_s": 1.4,
+        "event_id": "severe-sag",
+        "initiating_cause": "GRID_VOLTAGE_SAG",
+        "profile": "PULSE",
+        "scenario_id": "severe_voltage_sag",
+        "start_s": 1.0,
+        "target": "electrical.grid_voltage_delta_pu"
+      },
+      {
+        "end_s": 1.08,
+        "event_id": "interruption",
+        "initiating_cause": "GRID_INTERRUPTION",
+        "profile": "PULSE",
+        "scenario_id": "ups_transfer",
+        "start_s": 1.0,
+        "target": "electrical.force_interruption"
+      },
+      {
+        "end_s": 1.3,
+        "event_id": "pump-trip",
+        "initiating_cause": "PUMP_TRIP",
+        "profile": "PULSE",
+        "scenario_id": "pump_trip",
+        "start_s": 1.0,
+        "target": "drive.force_trip"
+      },
+      {
+        "end_s": 2.0,
+        "event_id": "valve-restrict",
+        "initiating_cause": "VALVE_RESTRICTION",
+        "profile": "PULSE",
+        "scenario_id": "valve_restriction",
+        "start_s": 1.0,
+        "target": "upw.valve_position"
+      },
+      {
+        "end_s": 1.5,
+        "event_id": "demand-spike",
+        "initiating_cause": "TOOL_DEMAND_SPIKE",
+        "profile": "PULSE",
+        "scenario_id": "tool_demand_spike",
+        "start_s": 1.0,
+        "target": "upw.tool_demand_m3_s"
+      },
+      {
+        "end_s": 2.0,
+        "event_id": "inlet-warm",
+        "initiating_cause": "THERMAL_EXCURSION",
+        "profile": "PULSE",
+        "scenario_id": "temperature_excursion",
+        "start_s": 1.0,
+        "target": "upw.inlet_temperature_k"
+      },
+      {
+        "end_s": 2.0,
+        "event_id": "pressure-bias",
+        "initiating_cause": "PRESSURE_SENSOR_FAULT",
+        "profile": "PULSE",
+        "scenario_id": "pressure_sensor_bias",
+        "start_s": 1.0,
+        "target": "sensor.pressure.bias"
+      },
+      {
+        "end_s": 1.5,
+        "event_id": "pressure-dropout",
+        "initiating_cause": "PRESSURE_SENSOR_FAULT",
+        "profile": "PULSE",
+        "scenario_id": "sensor_dropout",
+        "start_s": 1.0,
+        "target": "sensor.pressure.packet_loss_probability"
+      },
+      {
+        "end_s": 1.1,
+        "event_id": "recoverable-sag",
+        "initiating_cause": "GRID_VOLTAGE_SAG",
+        "profile": "PULSE",
+        "scenario_id": "recoverable_disturbance",
+        "start_s": 1.0,
+        "target": "electrical.grid_voltage_delta_pu"
+      },
+      {
+        "end_s": 2.0,
+        "event_id": "hold-sag",
+        "initiating_cause": "GRID_VOLTAGE_SAG",
+        "profile": "PULSE",
+        "scenario_id": "hold_required_disturbance",
+        "start_s": 1.0,
+        "target": "electrical.grid_voltage_delta_pu"
+      },
+      {
+        "end_s": 1.4,
+        "event_id": "compound-sag",
+        "initiating_cause": "GRID_VOLTAGE_SAG",
+        "profile": "PULSE",
+        "scenario_id": "compound_disturbance",
+        "start_s": 1.0,
+        "target": "electrical.grid_voltage_delta_pu"
+      },
+      {
+        "end_s": 1.4,
+        "event_id": "compound-demand",
+        "initiating_cause": "TOOL_DEMAND_SPIKE",
+        "profile": "PULSE",
+        "scenario_id": "compound_disturbance",
+        "start_s": 1.0,
+        "target": "upw.tool_demand_m3_s"
+      },
+      {
+        "end_s": 11.0,
+        "event_id": "pressure-drift",
+        "initiating_cause": "PRESSURE_SENSOR_FAULT",
+        "profile": "RAMP",
+        "scenario_id": "slow_drift",
+        "start_s": 1.0,
+        "target": "sensor.pressure.drift_per_s"
+      }
+    ],
+    "library_path": "configs/scenarios/library.yaml",
+    "library_sha256": "1cec330dfb59657e553d760ec409968d22c1c9e8608c4fc78baa97c586e4add6",
+    "overlap_pairs": [
+      {
+        "causes": [
+          "GRID_VOLTAGE_SAG",
+          "TOOL_DEMAND_SPIKE"
+        ],
+        "left_event": "compound-sag",
+        "policy": "MULTI_LABEL_ORDERED",
+        "right_event": "compound-demand",
+        "same_target": false,
+        "scenario_id": "compound_disturbance"
+      }
+    ],
+    "profile_counts": {
+      "PIECEWISE_LINEAR": 0,
+      "PULSE": 13,
+      "RAMP": 1,
+      "STEP": 0
+    },
+    "propagation_state_as_initiating_cause_count": 0,
+    "replay_sha256": "ef7c6393a77283d6542e64c493a53da25c6019bfc1ef549781ca080b7f17f518",
+    "replay_time_grid_s": [
+      0.0,
+      0.5,
+      1.0,
+      1.05,
+      1.1,
+      1.25,
+      1.5,
+      2.0,
+      5.0,
+      10.5
+    ],
+    "same_target_overlap_count": 0,
+    "scenario_count": 14,
+    "scenario_schema_version": "2.0.0"
+  },
+  "schema_version": "2.2.0",
+  "sensor_delivery": {
+    "deterministic_replay_equal": true,
+    "generated_and_released_count": 101,
+    "maximum_arrival_minus_source_s": 0.025000000000000022,
+    "minimum_arrival_minus_source_s": 0.02499999999999991,
+    "missing_record_count": 10,
+    "pending_after_final_drain": 0,
+    "released_before_arrival_count": 0,
+    "reported_after_source_count": 51,
+    "reported_before_source_count": 49,
+    "seed": 20260711,
+    "unique_sample_index_count": 101
+  }
+}

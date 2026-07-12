@@ -1,0 +1,262 @@
+{
+  "all_checks_passed": true,
+  "checks": {
+    "constant_field_quadrature_within_1e_12": true,
+    "deterministic_replay": true,
+    "dressing_consumes_dresser": true,
+    "dressing_does_not_restore_pad_life": true,
+    "dressing_restores_activity": true,
+    "hold_mrr_zero": true,
+    "nominal_exposure_within_1e_12": true,
+    "nominal_mrr_within_1e_12_relative": true,
+    "polish_accumulates_removal": true,
+    "spatial_proxy_label_exact": true,
+    "ten_ms_error_below_forty_ms_error": true,
+    "thermal_null_has_zero_mrr_effect": true,
+    "thermal_residual_below_1e_7_w": true,
+    "zero_pressure_exposure": true,
+    "zero_speed_exposure": true
+  },
+  "claims_boundary": "Synthetic reduced-order CMP state validation only; no experimental WIWNU, physical-defect, yield, equipment, production-control, or real-fab claim.",
+  "cmp_config": {
+    "angular_quadrature_order": 64,
+    "center_offset_m": 0.2,
+    "dresser_wear_rate_s_inv": 2e-05,
+    "friction_coefficient": 0.05,
+    "friction_heat_fraction": 0.8,
+    "interface_reference_temperature_k": 293.15,
+    "interface_thermal_capacity_j_k": 5000.0,
+    "kinematics_model": "ROTARY_OFFSET_AREA_QUADRATURE",
+    "maximum_abs_head_angular_speed_rad_s": 15.0,
+    "maximum_abs_platen_angular_speed_rad_s": 15.0,
+    "maximum_abs_process_discrepancy_m_s": 1e-09,
+    "maximum_contact_pressure_pa": 60000.0,
+    "maximum_cooling_conductance_factor": 2.0,
+    "maximum_interface_temperature_k": 353.15,
+    "maximum_mrr_m_s": 5e-09,
+    "maximum_recipe_modifier": 1.5,
+    "maximum_temperature_modifier": 1.5,
+    "minimum_interface_temperature_k": 273.15,
+    "minimum_pad_modifier": 0.25,
+    "minimum_recipe_modifier": 0.5,
+    "minimum_recovery_dwell_s": 0.5,
+    "minimum_temperature_modifier": 0.5,
+    "nominal_contact_pressure_pa": 30000.0,
+    "nominal_cooling_conductance_w_k": 200.0,
+    "nominal_head_angular_speed_rad_s": 6.0,
+    "nominal_platen_angular_speed_rad_s": 8.0,
+    "nominal_recipe_modifier": 1.0,
+    "pad_conditioning_rate_s_inv": 0.02,
+    "pad_glazing_rate_s_inv": 0.0002,
+    "pad_life_exponent": 1.0,
+    "pad_wear_dress_rate_s_inv": 5e-05,
+    "pad_wear_polish_rate_s_inv": 1e-05,
+    "pressure_exponent": 1.0,
+    "pressure_ramp_down_pa_s": 200000.0,
+    "pressure_ramp_up_pa_s": 100000.0,
+    "pressure_time_constant_s": 0.2,
+    "provenance_id": "synthetic-cmp-reduced-order-v1",
+    "radial_quadrature_order": 16,
+    "reference_mrr_m_s": 1.6666666666667e-09,
+    "reference_slurry_flow_m3_s": 1e-05,
+    "slurry_density_kg_m3": 1000.0,
+    "slurry_specific_heat_j_kg_k": 4000.0,
+    "slurry_supply_temperature_k": 293.15,
+    "slurry_time_constant_s": 0.4,
+    "spindle_slew_rate_rad_s2": 40.0,
+    "spindle_time_constant_s": 0.15,
+    "temperature_sensitivity_k_inv": 0.0,
+    "velocity_exponent": 1.0,
+    "wafer_radius_m": 0.15
+  },
+  "consumables": {
+    "duration_s": 10.0,
+    "final": {
+      "dresser_effectiveness": 0.8998200179088174,
+      "instantaneous_mrr_m_s": 0.0,
+      "pad_remaining_life": 0.7994999999999968,
+      "pad_surface_activity": 0.5823912561285373
+    },
+    "initial": {
+      "dresser_effectiveness": 0.9,
+      "pad_remaining_life": 0.8,
+      "pad_surface_activity": 0.5
+    }
+  },
+  "convergence": {
+    "cases": [
+      {
+        "contact_pressure_pa": 21034.00103867666,
+        "cumulative_error_vs_1_ms_m": 1.914077128414839e-11,
+        "cumulative_removal_m": 1.2462880821758448e-09,
+        "dt_s": 0.04,
+        "interface_temperature_k": 293.1699050085304,
+        "pressure_error_vs_1_ms_pa": 25.884678532824182,
+        "temperature_error_vs_1_ms_k": 0.0002840384762521353
+      },
+      {
+        "contact_pressure_pa": 21046.383976865884,
+        "cumulative_error_vs_1_ms_m": 9.302089110721453e-12,
+        "cumulative_removal_m": 1.2561267643492717e-09,
+        "dt_s": 0.02,
+        "interface_temperature_k": 293.1700510392546,
+        "pressure_error_vs_1_ms_pa": 13.501740343599522,
+        "temperature_error_vs_1_ms_k": 0.00013800775207073457
+      },
+      {
+        "contact_pressure_pa": 21053.284762983007,
+        "cumulative_error_vs_1_ms_m": 4.400536911722043e-12,
+        "cumulative_removal_m": 1.2610283165482712e-09,
+        "dt_s": 0.01,
+        "interface_temperature_k": 293.1701237673575,
+        "pressure_error_vs_1_ms_pa": 6.6009542264764605,
+        "temperature_error_vs_1_ms_k": 6.527964916358542e-05
+      },
+      {
+        "contact_pressure_pa": 21056.906994482728,
+        "cumulative_error_vs_1_ms_m": 1.9544933094571135e-12,
+        "cumulative_removal_m": 1.263474360150536e-09,
+        "dt_s": 0.005,
+        "interface_temperature_k": 293.17016005487943,
+        "pressure_error_vs_1_ms_pa": 2.9787227267552225,
+        "temperature_error_vs_1_ms_k": 2.8992127226956654e-05
+      },
+      {
+        "contact_pressure_pa": 21058.76033036543,
+        "cumulative_error_vs_1_ms_m": 7.326882798506667e-13,
+        "cumulative_removal_m": 1.2646961651801425e-09,
+        "dt_s": 0.0025,
+        "interface_temperature_k": 293.1701781789519,
+        "pressure_error_vs_1_ms_pa": 1.1253868440544466,
+        "temperature_error_vs_1_ms_k": 1.0868054744150868e-05
+      }
+    ],
+    "reference_dt_s": 0.001,
+    "reference_state": {
+      "contact_pressure_pa": 21059.885717209483,
+      "cumulative_removal_m": 1.2654288534599932e-09,
+      "interface_temperature_k": 293.17018904700666
+    }
+  },
+  "evidence_plane": "SYNTHETIC_SIMULATOR",
+  "interface_version": "3.1.0",
+  "parameter_provenance_classes": {
+    "angular_quadrature_order": "Engineering approximation",
+    "center_offset_m": "Synthetic assumption",
+    "dresser_wear_rate_s_inv": "Synthetic assumption",
+    "friction_coefficient": "Synthetic assumption",
+    "friction_heat_fraction": "Synthetic assumption",
+    "interface_reference_temperature_k": "Synthetic assumption",
+    "interface_thermal_capacity_j_k": "Synthetic assumption",
+    "kinematics_model": "Literature-supported",
+    "maximum_abs_head_angular_speed_rad_s": "Synthetic assumption",
+    "maximum_abs_platen_angular_speed_rad_s": "Synthetic assumption",
+    "maximum_abs_process_discrepancy_m_s": "Synthetic assumption",
+    "maximum_contact_pressure_pa": "Synthetic assumption",
+    "maximum_cooling_conductance_factor": "Synthetic assumption",
+    "maximum_interface_temperature_k": "Synthetic assumption",
+    "maximum_mrr_m_s": "Synthetic assumption",
+    "maximum_recipe_modifier": "Synthetic assumption",
+    "maximum_temperature_modifier": "Synthetic assumption",
+    "minimum_interface_temperature_k": "Synthetic assumption",
+    "minimum_pad_modifier": "Synthetic assumption",
+    "minimum_recipe_modifier": "Synthetic assumption",
+    "minimum_recovery_dwell_s": "Synthetic assumption",
+    "minimum_temperature_modifier": "Synthetic assumption",
+    "nominal_contact_pressure_pa": "Synthetic assumption",
+    "nominal_cooling_conductance_w_k": "Synthetic assumption",
+    "nominal_head_angular_speed_rad_s": "Synthetic assumption",
+    "nominal_platen_angular_speed_rad_s": "Synthetic assumption",
+    "nominal_recipe_modifier": "Synthetic assumption",
+    "pad_conditioning_rate_s_inv": "Synthetic assumption",
+    "pad_glazing_rate_s_inv": "Synthetic assumption",
+    "pad_life_exponent": "Synthetic assumption",
+    "pad_wear_dress_rate_s_inv": "Synthetic assumption",
+    "pad_wear_polish_rate_s_inv": "Synthetic assumption",
+    "pressure_exponent": "Literature-supported",
+    "pressure_ramp_down_pa_s": "Synthetic assumption",
+    "pressure_ramp_up_pa_s": "Synthetic assumption",
+    "pressure_time_constant_s": "Synthetic assumption",
+    "radial_quadrature_order": "Engineering approximation",
+    "reference_mrr_m_s": "Synthetic assumption",
+    "reference_slurry_flow_m3_s": "Synthetic assumption",
+    "slurry_density_kg_m3": "Engineering approximation",
+    "slurry_specific_heat_j_kg_k": "Engineering approximation",
+    "slurry_supply_temperature_k": "Synthetic assumption",
+    "slurry_time_constant_s": "Synthetic assumption",
+    "spindle_slew_rate_rad_s2": "Synthetic assumption",
+    "spindle_time_constant_s": "Synthetic assumption",
+    "temperature_sensitivity_k_inv": "Synthetic assumption",
+    "velocity_exponent": "Literature-supported",
+    "wafer_radius_m": "Synthetic assumption"
+  },
+  "physical_defect_or_yield_validation": false,
+  "public_data_validation": false,
+  "quadrature": {
+    "cases": [
+      {
+        "absolute_velocity_error_vs_48x192_m_s": 2.220446049250313e-16,
+        "angular_order": 32,
+        "area_mean_relative_velocity_m_s": 1.6070416183328249,
+        "constant_field_integral": 0.9999999999999998,
+        "radial_order": 8,
+        "reference_velocity_scale_m_s": 1.6070416183328249
+      },
+      {
+        "absolute_velocity_error_vs_48x192_m_s": 2.220446049250313e-16,
+        "angular_order": 64,
+        "area_mean_relative_velocity_m_s": 1.6070416183328249,
+        "constant_field_integral": 0.9999999999999998,
+        "radial_order": 16,
+        "reference_velocity_scale_m_s": 1.6070416183328249
+      },
+      {
+        "absolute_velocity_error_vs_48x192_m_s": 4.440892098500626e-16,
+        "angular_order": 128,
+        "area_mean_relative_velocity_m_s": 1.6070416183328247,
+        "constant_field_integral": 0.9999999999999998,
+        "radial_order": 32,
+        "reference_velocity_scale_m_s": 1.6070416183328247
+      },
+      {
+        "absolute_velocity_error_vs_48x192_m_s": 0.0,
+        "angular_order": 192,
+        "area_mean_relative_velocity_m_s": 1.607041618332825,
+        "constant_field_integral": 0.9999999999999999,
+        "radial_order": 48,
+        "reference_velocity_scale_m_s": 1.607041618332825
+      }
+    ]
+  },
+  "real_fab_validation": false,
+  "reference": {
+    "classical_preston_coefficient_pa_inv": 3.4570078908840606e-14,
+    "nominal_exposure": 0.9999999999999999,
+    "nominal_mrr_m_s": 1.6666666666666998e-09,
+    "reference_mrr_m_s": 1.6666666666667e-09,
+    "reference_mrr_nm_min": 100.000000000002,
+    "reference_velocity_scale_m_s": 1.6070416183328249
+  },
+  "reference_trace": {
+    "final_active_polish_time_s": 4.999999999999938,
+    "final_cumulative_removal_m": 8.276153498157771e-09,
+    "final_stage_average_mrr_m_s": 1.6552306996315749e-09,
+    "maximum_absolute_thermal_energy_residual_w": 1.4188941577231162e-08,
+    "row_count": 700,
+    "sha256": "902fa4283ef8cf2150efef14aa08ca6f478aad55503e6d9b111584c33175626e"
+  },
+  "report_id": "WP08_CMP_SCIENTIFIC_VALIDATION_V1",
+  "runtime_config_sha256": "99d7876eb76d561de97ed577d77da30e929c70276070bb6f84df0fb9c9e91670",
+  "schema_version": "2.3.0",
+  "spatial_uniformity_proxy": {
+    "coefficient_of_variation": 0.0025316618572622336,
+    "label": "Simulated spatial-uniformity proxy; not experimentally validated WIWNU.",
+    "radial_point_count": 16
+  },
+  "thermal_structural_null": {
+    "cold_interface_temperature_k": 292.7859817900356,
+    "instantaneous_mrr_difference_m_s": 0.0,
+    "temperature_sensitivity_k_inv": 0.0,
+    "warm_interface_temperature_k": 293.567268397958
+  }
+}

@@ -1,0 +1,202 @@
+registry_version: "1.2.0"
+effective_date: "2026-07-11"
+dataset_network_access_used: false
+reference_network_review_used: true
+reviewed_reference_urls:
+  - https://phmsociety.org/conference/annual-conference-of-the-phm-society/annual-conference-of-the-prognostics-and-health-management-society-2016/phm-data-challenge-4/
+  - https://www.energy.gov/sites/prod/files/2014/05/f16/variable_speed_pumping.pdf
+  - https://www.energy.gov/sites/default/files/2014/05/f16/pump.pdf
+  - https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication260-142.pdf
+  - https://www.productinfo.schneider-electric.com/easyups3m/viewer?docidentity=TechnicalDataFor208VSystems-DCE5E7D4&extension=xml&lang=en&manualidentity=TechnicalSpecificationsEasyUPS3M601-D5104BCE
+approved_dataset_transfer_urls: []
+
+policy:
+  raw_data_immutable: true
+  preserve_downloaded_bytes: true
+  checksum_algorithm: SHA-256
+  silent_mirrors_forbidden: true
+  silent_synthetic_substitution_forbidden: true
+  credentials_forbidden_without_user_approval: true
+  downloads_over_1GB_require_user_approval: true
+  unclear_licence_requires_user_decision: true
+  required_manifest_fields:
+    - source_owner
+    - authoritative_url
+    - licence_name_and_url
+    - access_date
+    - expected_filename
+    - byte_size
+    - sha256
+    - schema_version
+    - local_raw_path
+
+sources:
+  - id: PHM_2016_CMP
+    title: PHM 2016 CMP dataset
+    role: PRIMARY_PUBLIC_VALIDATION
+    intended_uses:
+      - average_MRR_prediction
+      - CMP_virtual_metrology
+      - tool_state_modelling
+      - consumable_age_modelling
+      - physics_statistical_and_ML_comparison
+    local_availability: PRESENT_USER_SUPPLIED
+    provenance_status: USER_SUPPLIED_ARCHIVE_INTEGRITY_VERIFIED
+    licence_status: USER_AUTHORIZED_UNVERIFIED_DATASET_LICENCE
+    schema_status: R2_NATIVE_UNIT_PHASE_AWARE_FEATURE_BUNDLE_VALIDATED
+    access_approval: USER_AUTHORIZED_LOCAL_ARCHIVE
+    source_owner: PHM Society 2016 Data Challenge (dataset licence not separately stated)
+    authoritative_url: https://phmsociety.org/conference/annual-conference-of-the-phm-society/annual-conference-of-the-prognostics-and-health-management-society-2016/phm-data-challenge-4/
+    licence_name: null
+    licence_url: null
+    expected_filenames:
+      - CMP-training-000.csv through CMP-training-184.csv
+      - CMP-test-000.csv through CMP-test-184.csv
+      - CMP-validation-000.csv through CMP-validation-184.csv
+      - CMP-training-removalrate.csv
+      - CMP-test-removalrate.csv
+      - CMP-validation-removalrate.csv
+    expected_total_size_bytes: 203033011
+    local_raw_directory: data/raw/phm_2016_cmp
+    loader_status: IMPLEMENTED_WITH_SOURCE_ORDER_ALL_OFFICIAL_JOINS_AND_SEMANTIC_AUDITS
+    original_process_scale_status: PROPRIETARY_SCALED_VALUES_WITH_HIDDEN_FACTORS
+    original_target_unit_status: NOT_DECLARED_BY_ORIGINAL_CHALLENGE_SOURCE
+    literature_target_unit_interpretation:
+      value: nm/min
+      status: LATER_LITERATURE_INTERPRETATION_NOT_ORIGINAL_SOURCE_DECLARATION
+      reference: https://doi.org/10.1109/ICPHM61352.2024.10627679
+    label_anomaly_status:
+      count: 4
+      range_original: [4129.49400, 4326.15405]
+      comparison_max_other_training: 162.6417
+      policy_status: IMPLEMENTED_AND_CHECKSUMMED
+      primary: ORIGINAL
+      sensitivities: [EXCLUDE_FOUR_PREREGISTERED, HYPOTHETICAL_DIVIDE_FOUR_BY_60]
+    time_and_phase_status:
+      training_zero_increments: 2221
+      training_negative_increments: 3
+      training_increments_over_10_s: 2004
+      validation_negative_increments: 2
+      maximum_gap_over_15000_s: true
+      current_feature_pipeline: PHM_PHASE_AWARE_OFFLINE_VM_V1
+      time_weighting: centered_adjacent_valid_intervals
+      phase_status: input_only_proxies_not_measured_physical_phases
+      unresolved_group_counts: {training: 221, test: 43, validation: 42}
+    processed_feature_bundle:
+      directory: data/processed/phm_2016_cmp
+      manifest: data/processed/phm_2016_cmp/feature_manifest.yaml
+      manifest_sha256: ff465151aa621a197aac2d253dd36879dfd39e57cfb29913b5788e3b112ece48
+      feature_rows: {training: 1981, test: 424, validation: 424}
+      predictor_column_count: 405
+      target_in_feature_files: false
+      complete_trace_features_streaming_eligible: false
+    split_status:
+      official_splits_isolated: true
+      inner_wafer_group_split: IMPLEMENTED
+      chronological_wafer_stress_split: IMPLEMENTED
+      fit_scope_audit: IMPLEMENTED
+      physical_machine_holdout_feasible: false
+      machine_data_holdout_feasible: false
+    local_candidate_archive:
+      path: PHM-Data-Challenge-master.zip
+      byte_size: 17399074
+      sha256: 976b23102b576ed610db8f89293de333820391c581d88bcbdb6364da212a1eb9
+      zip_integrity: VERIFIED
+      archive_member_count: 660
+      archive_file_count: 657
+      uncompressed_size_bytes: 203033011
+      user_authorized_on: 2026-07-10
+      user_authorization_scope: local_research_use_despite_dataset_licence_not_separately_stated
+      selected_original_prefixes:
+        - data/2016 PHM Data Challenge/2016 PHM DATA CHALLENGE CMP DATA SET/CMP-data/test/
+        - data/2016 PHM Data Challenge/2016 PHM DATA CHALLENGE CMP DATA SET/CMP-data/training/
+        - data/2016 PHM Data Challenge/2016 PHM DATA CHALLENGE CMP VALIDATION DATA SET/validation/
+        - data/2016 PHM Data Challenge/2016 PHM DATA CHALLENGE CMP DATA SET/CMP-test-removalrate.csv
+        - data/2016 PHM Data Challenge/2016 PHM DATA CHALLENGE CMP DATA SET/CMP-training-removalrate.csv
+        - data/2016 PHM Data Challenge/2016 PHM DATA CHALLENGE CMP VALIDATION DATA SET/CMP-validation-removalrate.csv
+      excluded_prefixes:
+        - data/2016 PHM Data Challenge/PHM16TestValidationAnswers/
+        - two mode division experiment/
+        - three mode division experiment/
+        - __pycache__/
+        - model predict image/
+        - Processed data set/
+      empty_trace_policy:
+        allowed_for:
+          - CMP-test-*.csv
+          - CMP-training-*.csv
+          - CMP-validation-*.csv
+        forbidden_for:
+          - '*-removalrate.csv'
+        representation: header_only_csv_with_empty_trace_true
+        imputation: forbidden
+    blockers:
+      - dataset_licence_not_separately_stated_but_user_authorized_local_use
+      - public_virtual_metrology_models_not_yet_evaluated
+    fallback_policy: Continue synthetic simulator development and mark public-data modelling claims blocked; never substitute synthetic data under this dataset ID.
+
+  - id: UCI_SECOM
+    title: UCI SECOM dataset
+    role: OPTIONAL_SECONDARY
+    intended_uses:
+      - generic_semiconductor_classification_experiments
+      - missing_data_method_experiments
+    prohibited_uses:
+      - core_utility_to_CMP_causal_control_dataset
+      - average_CMP_MRR_validation
+      - merging_with_PHM_or_simulator_control_records
+    local_availability: NOT_PRESENT
+    provenance_status: UNVERIFIED
+    licence_status: UNVERIFIED
+    schema_status: UNVERIFIED
+    access_approval: NOT_REQUESTED
+    source_owner: null
+    authoritative_url: null
+    licence_name: null
+    licence_url: null
+    expected_filenames: []
+    expected_total_size_bytes: null
+    local_raw_directory: data/raw/uci_secom
+    blockers:
+      - optional_source_not_reviewed
+      - user_network_approval_required_before_download
+
+  - id: SEMIFAB_SYNTHETIC_V1
+    title: Local synthetic utility-to-CMP simulator outputs
+    role: PRIMARY_CONTROL_EVALUATION
+    intended_uses:
+      - deterministic_component_validation
+      - scenario_generation
+      - early_warning_training_and_evaluation
+      - root_cause_evaluation_against_simulator_labels
+      - controller_comparison
+    local_availability: NOT_YET_GENERATED
+    provenance_status: PLANNED_INTERNAL_GENERATOR
+    licence_status: NOT_APPLICABLE_INTERNAL_OUTPUT
+    schema_status: FROZEN_SCHEMA_V1
+    generator_entrypoint: null
+    local_raw_directory: null
+    local_processed_directory: data/processed/synthetic
+    mandatory_labels:
+      - synthetic_simulator_output
+    separation_rules:
+      - never_report_as_measured
+      - never_train_public_data_claim_without_separate_result
+      - simulator_cause_label_not_visible_to_online_estimator
+
+fetch_script_contract:
+  planned_path: scripts/fetch_data.py
+  implementation_task: T-DATA-FETCH
+  required_behaviors:
+    - accept_only_registry_source_ids
+    - reject_sources_without_approved_authoritative_url
+    - display_source_licence_and_expected_size_before_transfer
+    - preserve_raw_files_without_overwrite
+    - record_access_date_in_UTC
+    - compute_SHA256_streaming
+    - validate_exact_expected_filenames
+    - run_source_specific_schema_validation
+    - fail_on_checksum_filename_schema_or_licence_mismatch
+    - never_try_an_unregistered_mirror
+    - never_generate_synthetic_fallback
+  implementation_state: IMPLEMENTED_AND_LOCALLY_VALIDATED_WITHOUT_DATASET_NETWORK_TRANSFER

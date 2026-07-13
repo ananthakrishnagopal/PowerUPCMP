@@ -2,7 +2,7 @@
 
 This repository is a simulation-first proof of concept for predictive supervisory control of a semiconductor Chemical Mechanical Planarization (CMP) process under electrical and ultrapure-water (UPW) disturbances.
 
-The repository is in Phase 3 scientific modelling. Corrective gates R1--R4,
+The repository has reached the Phase 3 scientific freeze. Corrective gates R1--R4,
 standalone CMP task WP08, and declared-topology coupling task WP10 are
 validated: canonical schema is version 2.4.0, the runtime interface registry
 is 3.2.0, the DynamicSubsystem method contract
@@ -33,8 +33,15 @@ minimum and the hybrid-improvement claim is rejected. WP13 now provides
 conditional synthetic root-cause classification: the frozen hybrid attains
 0.8636 held-out accuracy/macro recall with all errors abstaining to UNKNOWN,
 while rule only is stronger at 0.9242. Delay and dropout sharply reduce
-diagnostic availability. Controllers, the safety filter, dashboard, and any
-supported control-efficacy result remain pending.
+diagnostic availability. WP15/WP16 now freeze a four-action hold/resume
+supervisor, explicit recipe clock, process-MRR threshold and mandatory utility-
+threshold comparators, independent synthetic constraints, restart logic,
+latency budgets, new TEST seeds, and paired success gates. Thirteen focused
+tests and 21 cross-contract checks pass. A CMP-only limiting case supports a
+feasible warning-timed direction versus no action but shows that direct utility
+thresholding is stronger on MRR at greater hold cost. Controller and filter
+implementation, the integrated runtime, dashboard, and any supported control-
+efficacy result remain Phase 4 work.
 See the current
 [`project status`](orchestration/project_status.md),
 the [Phase 1/2 audit](orchestration/reports/phase_1_2_scientific_audit.md),
@@ -55,6 +62,9 @@ WP12 methods, results, and limitations are in the
 WP13 methods, held-out class metrics, abstention behavior, robustness, and
 artifact hashes are in the
 [attribution validation report](orchestration/reports/wp13_attribution_validation.md).
+WP15/WP16 authority, mathematical protocol, comparator correction, constraint
+contract, feasibility result, and claim boundary are in the
+[Phase 3 control-contract validation report](orchestration/reports/phase3_control_contract_validation.md).
 WP09 methods, point performance, uncertainty failure, sensitivities, and
 artifact hashes are in the
 [virtual-metrology validation report](orchestration/reports/wp09_virtual_metrology_validation.md).

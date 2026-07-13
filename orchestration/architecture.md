@@ -172,6 +172,29 @@ REPLACED_WITH_HOLD
 
 Only the returned final action reaches the runtime actuator boundary. Hold and restart transitions are explicit state machines, not boolean shortcuts.
 
+The Phase 3 primary predictive policy is deliberately narrower than the
+canonical action vocabulary. The validated disturbance mechanism creates
+under-removal after loss of dressing-water support, while the nominal VFD and
+valve commands are already maximal and the permitted CMP numerical actions are
+reductions. The primary policy therefore enables only `NO_ACTION`,
+`ADVISORY_WARNING`, `SAFE_HOLD`, and `CONTROLLED_RESUME`; numerical actions
+remain independently bounded but disabled.
+
+Recipe progress is a separate clock from wall time. `HOLD` and `RECOVER`
+freeze recipe-phase progress, and a controlled resume restores and completes
+the interrupted phase. Paired evaluation is aligned by active-polish progress
+and requires equal recipe completion, so holding cannot shorten the evaluated
+recipe. The required primary threshold baseline is an arrived-MRR hysteresis
+controller; an earlier upstream utility-threshold controller is a mandatory
+fourth comparator and cannot be hidden.
+
+The safety filter is separately configured and may not import a controller.
+It checks proposal timing and schema, arrived-sensor validity, predictor and
+topology binding, uncertainty/applicability, process mode, magnitude, slew,
+hold, and restart conditions. During `DRESS`, loss of conditioning service is
+a simulated quality-risk mechanism rather than a validated equipment hazard,
+so automatic utility-continuation holds apply only in `PREPARE` and `POLISH`.
+
 ## Determinism and time
 
 - Simulation time is integer `step_index` plus `timestamp_s = step_index * dt_s`; floating-point timestamps are never used as primary keys.
@@ -214,12 +237,29 @@ Cross-package imports must follow the dependency graph. Notebooks and the dashbo
 
 State is immutable across a failed step: the runtime computes candidate next states, validates finiteness, units/ranges, and invariants, then commits the step atomically to the in-memory trajectory. A numerical or invariant failure stops the run, preserves the last valid state and configuration, and triggers the project failure-report process during development.
 
-## Architecture decisions still deferred in Phase 3
+## Phase 3 scientific freeze
 
-- MRR safe envelope and prediction horizon.
-- Uncertainty representation and calibration target.
-- Predictive-control objective, horizon, action grid, and terminal/hold costs.
-- Safe process envelope, action bounds, slew limits, and restart dwell conditions.
-- Statistical tolerances for controller comparison.
+Phase 3 has frozen the following design decisions for bounded Phase 4
+implementation:
 
-These are deliberately not fixed during routine Phase 2 implementation.
+- the paired-reference active-polish MRR envelope, 0.25 s persistence, and
+  3.0 s prediction horizon;
+- calibrated probability plus conformal-set uncertainty and explicit
+  topology/configuration applicability checks;
+- the finite predictive action set, lexicographic objective, probability
+  gates, process-clock semantics, latency budgets, and fallback policy;
+- the primary process-MRR threshold comparator and mandatory upstream
+  utility-threshold comparator;
+- independent synthetic action envelopes, slew limits, sensor-validity rules,
+  uncertainty rejection, fail-closed behavior, and controlled-resume dwell;
+  and
+- new seed ranges, equal-recipe paired comparisons, bootstrap requirements,
+  success thresholds, non-inferiority tolerances, and negative-control gates.
+
+The frozen contracts are documented in
+`orchestration/decisions/wp15_predictive_supervisory_control.md` and
+`orchestration/decisions/wp16_independent_safety_filter.md`. Phase 4 still must
+implement the baseline controllers, predictive state machine, independent
+safety filter, and integrated runtime and then evaluate them without retuning
+the frozen TEST criteria. No controller-efficacy or safety-enforcement result
+is implied by the architecture freeze.

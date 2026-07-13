@@ -1,4 +1,4 @@
-register_version: "1.5.0"
+register_version: "1.6.0"
 effective_date: "2026-07-13"
 basis_vocabulary:
   coupling_parameter_required_values:
@@ -143,18 +143,18 @@ assumptions:
     statement: Bounded action search or short-horizon MPC is adequate for the first predictive supervisory controller.
     category: control
     basis: Engineering approximation
-    status: OPEN
+    status: REQUIRES_VALIDATION
     applies_to: [WP15]
-    validation: Phase 3 objective/constraint review, feasibility tests, latency benchmark, and comparison to baselines.
+    validation: Phase 3 freezes a four-action bounded policy, exact warning artifact, lexicographic objective, anti-hold-gaming metrics, latency budget, and paired gates. A CMP-only limiting case shows directional benefit versus no action but inferiority to an immediate utility threshold; Phase 4 still requires implementation, latency, paired process-threshold comparison, and robustness.
     consequence_if_false: Prefer safe hold/advisory behavior; reinforcement learning remains excluded.
 
   - id: A-016
     statement: Independent constraint checking can convert controller proposals into safe simulated final actions under all enumerated sensor and uncertainty states.
     category: safety
     basis: Project constraint
-    status: OPEN
+    status: REQUIRES_VALIDATION
     applies_to: [WP16]
-    validation: Exhaustive outcome tests, property checks, hold fallback, restart state-machine tests, and zero final-action violations.
+    validation: Phase 3 strictly validates all canonical outcome, action, sensor, uncertainty, topology, magnitude, slew, fallback, battery-reserve, hold, recovery, and phase-restoration configuration contracts. Phase 4 still requires exhaustive outcome reachability, controller-independence checks, property sweeps, latency, and zero final-action violations.
     consequence_if_false: Predictive actuation is disabled; advisory or hold-only operation is required.
 
   - id: A-017
@@ -237,3 +237,30 @@ assumptions:
     applies_to: [WP08, WP12, WP15, WP18]
     validation: State-equation tests and reports containing cumulative error, active-time MRR, hold duration, recovery time, throughput penalty, and action effort.
     consequence_if_false: Controller efficacy comparisons are invalid because hold can game the instantaneous-MRR metric.
+
+  - id: A-026
+    statement: Pausing recipe progress during HOLD and RECOVER, then restoring and completing the interrupted phase, is an adequate synthetic supervisory abstraction for evaluating intervention timing.
+    category: control
+    basis: Engineering approximation
+    status: REQUIRES_VALIDATION
+    applies_to: [WP14, WP15, WP16, WP17, WP18]
+    validation: Phase 3 verifies an allowed HOLD to RECOVER to PREPARE to DRESS route and a deterministic CMP-only limiting case at equal DRESS and POLISH completion. WP17 must implement the phase clock without bypassing CMP transitions, and WP18 must report completion failures and cycle extension.
+    consequence_if_false: Hold cannot be interpreted as preserving process work; replace the recipe supervisor or restrict the PoC to advisory-only control.
+
+  - id: A-027
+    statement: Saturated nominal VFD and valve commands plus reduction-only CMP setpoint actions do not provide defensible compensating authority for the primary conditioning-memory under-removal mechanism.
+    category: control
+    basis: Project constraint
+    status: ACCEPTED_FOR_POC
+    applies_to: [WP15, WP16]
+    validation: Phase 3 checks VFD and valve maxima at one, positive Preston exponents, reduction-only supervisory bounds, and disables every numeric action in the primary policy. Any future enabling requires a new mechanism, provenance, safety envelope, sensitivity study, and controlled decision.
+    consequence_if_false: A separately validated compensating actuator may be added through change control; it cannot be inferred from the existing canonical vocabulary.
+
+  - id: A-028
+    statement: The primary fixed-threshold comparator should act on arrived synthetic MRR after process-envelope crossing, while an upstream utility-threshold policy is retained as a mandatory stronger secondary comparator.
+    category: evaluation
+    basis: Project constraint
+    status: REQUIRES_VALIDATION
+    applies_to: [WP14, WP15, WP18]
+    validation: Phase 3 CMP-only development evidence shows the warning-timed hold improves on no action but is inferior on MRR to a utility threshold that sees complete service loss immediately. WP18 must run both threshold policies on identical paired traces and disclose both results.
+    consequence_if_false: A generic claim of improvement over fixed-threshold control is ambiguous or biased; C-005 must be rejected or narrowed to the explicitly tested comparator.

@@ -730,14 +730,213 @@ These are diagnostic-availability failures rather than false known-cause
 substitutions. Full metrics, robustness, hashes, and interpretation are in
 `orchestration/reports/wp13_attribution_validation.md`.
 
-## Decisions still required before predictive control
+## T-WP15 predictive supervision — frozen scientific contract
 
-1. Predictive action set, horizon, cost function, hold/recovery penalties, and
-   latency budget.
-2. Independent action limits, slew rates, topology/applicability checks,
-   invalid-sensor behavior, high-uncertainty behavior, and restart dwell.
-3. Paired comparison gates that prevent a hold-heavy policy from appearing
-   beneficial solely by stopping processing.
+### Authority audit and intervention hypothesis
+
+The validated positive mechanism is conditioning-water loss during `DRESS`,
+stored pad-activity loss, and subsequent simulated under-removal in `POLISH`.
+The nominal VFD and utility-valve commands are already 1.0, their configured
+maxima. The remaining canonical CMP actions are reductions in contact
+pressure, head speed, or platen speed. Because the frozen Preston exponents
+are positive, those reductions cannot be represented as a defensible repair
+for the primary under-removal mechanism. Unvalidated upward recipe
+compensation is not introduced merely to make control appear effective.
+
+The primary action set is therefore
+
+\[
+\mathcal A_P=\{\mathrm{NO\_ACTION},\mathrm{ADVISORY\_WARNING},
+\mathrm{SAFE\_HOLD},\mathrm{CONTROLLED\_RESUME}\}.
+\]
+
+VFD, valve, downforce, head-speed, and platen-speed actions remain in the
+canonical vocabulary and have independent synthetic bounds, but are disabled
+for the primary controller. The physical intervention hypothesis is early
+hold, observed utility recovery, restoration and completion of the interrupted
+conditioning phase, then controlled resume. It remains a hypothesis until
+WP17--WP18 closed-loop evaluation.
+
+### Predictor binding, gates, and state
+
+The controller is bound to the frozen WP12 logistic artifact for
+`SIM_ACTIVE_POLISH_MRR_TRAJECTORY_V1`, the declared
+`DRESSING_WATER_SUPPORT` topology, a 3.0 s horizon, and a 0.10 s decision
+period. Model, metadata, feature schema, target, configuration, and topology
+identities must all match. WP12/WP13 seeds are prohibited from the controller
+TEST role.
+
+For calibrated probability (p_k), conformal set (S_k), valid uncertainty
+(u_k), and applicable configuration (a_k), the positive hold gate is
+
+\[
+g_k^+=\mathbf 1[p_k\ge0.50]\mathbf 1[S_k=\{1\}]
+       \mathbf 1[u_k=\mathrm{valid}]
+       \mathbf 1[a_k=\mathrm{applicable}].
+\]
+
+In `RUNNING`, (g_k^+=1) proposes hold; (p_k\ge0.30) below that gate
+produces only an advisory. Resume may be proposed only when
+(p_k\le0.20), (S_k=\{0\}), and the independent release contract passes.
+Attribution remains advisory and `UNKNOWN` is never interpreted as normal.
+
+Controller state is
+
+\[
+z_k\in\{\mathrm{RUNNING},\mathrm{HOLDING},\mathrm{RECOVERING},
+\mathrm{COMPLETE}\}.
+\]
+
+Wall time and recipe progress are separated:
+
+\[
+\dot\tau_{recipe}(t)=
+\begin{cases}
+1,&z(t)=\mathrm{RUNNING},\\
+0,&z(t)\in\{\mathrm{HOLDING},\mathrm{RECOVERING}\}.
+\end{cases}
+\]
+
+An interrupted dressing phase is restored through the existing valid route
+`HOLD -> RECOVER -> PREPARE -> DRESS`; the routing `PREPARE` step is not
+credited as completed recipe work. Recovery invalidity returns to hold and
+resets its dwell. This prevents a wall-clock hold from silently skipping the
+conditioning work it was meant to preserve.
+
+### Bounded objective and anti-gaming coordinates
+
+The policy uses hard probability/safety gates plus a finite-action,
+lexicographic tie break. Its dimensionless development score is
+
+\[
+J_k(a)=8p_kr(a)
++\frac{\Delta T_{phase}(a)}{3.0\ \mathrm{s}}
++\frac{\Delta T_{hold}(a)}{3.0\ \mathrm{s}}
++0.1\mathbf 1[a\ne a_{k-1}],
+\]
+
+where (r=1) for continued exposure and (r=0) for the immediate exposure
+suppressed by hold. At the frozen hold gate, continued running scores 4.0 and
+projected hold 2.1; at the release gate, resume scores 1.7 and another full
+horizon of hold 2.0. These synthetic weights are subject to WP18 sensitivity
+and are not an optimal-control claim.
+
+Each controller completes the same recipe scope or is recorded as a failed
+completion at the 10 s extension limit. Metrics align at active-polish
+progress (	au), not wall time:
+
+\[
+E_{IAE,c}=\int_0^{\tau_f}|R_c(\tau)-R_{ref}(\tau)|\,d\tau,
+\qquad
+E_{peak,c}=\max_{0\le\tau\le\tau_f}|R_c(\tau)-R_{ref}(\tau)|,
+\]
+
+\[
+E_{rem,c}=|D_c(\tau_f)-D_{ref}(\tau_f)|,
+\qquad D_c(\tau_f)=\int_0^{\tau_f}R_c(\tau)\,d\tau.
+\]
+
+Hold and recovery durations, cycle extension, and action effort are always
+reported. Zero removal during a hold cannot shorten the comparison horizon or
+be scored as successful in-envelope polish.
+
+### Required baselines and feasibility check
+
+The primary fixed-threshold comparator is an arrived synthetic-MRR hysteresis
+policy active only in `POLISH`: hold after 0.25 s outside [0.95, 1.05] of the
+event-disabled phase-progress reference and release inside [0.97, 1.03]. A
+stronger upstream utility comparator is mandatory: hold after 0.10 s below
+0.90 or above 1.10 of reference, or beyond 2 K; release requires [0.95, 1.05],
+1 K, and 1.0 s valid dwell. Neither may use warning probability, attribution,
+latent state, or event truth.
+
+A CMP-only limiting case used the actual WP08 equations with conditioning
+availability removed over 0--5.99 s and equal completed `DRESS` and `POLISH`:
+
+| Development case | Peak relative MRR deviation | Mean MRR ratio | Hold | Cycle extension |
+|---|---:|---:|---:|---:|
+| Disturbed no action | 5.526% | 0.944762 | 0.00 s | 0.00 s |
+| Warning-timed hold at 4.29 s | 3.895% | 0.961057 | 1.70 s | 2.20 s |
+| Immediate utility-threshold hold at 0.10 s | 0.087% | 0.999126 | 5.89 s | 6.39 s |
+
+The warning-timed mechanism has a feasible direction relative to no action,
+but the directly observed utility threshold is much better on MRR and much
+more expensive in hold time. This is deliberately retained as a mandatory
+comparator. The calculation is not a controller, sensor, safety-filter, or
+robustness result.
+
+## T-WP16 independent safety filter — frozen scientific contract
+
+The safety filter is stateful but structurally independent of controller
+implementations. It accepts one canonical proposal, arrived observations,
+uncertainty/applicability evidence, and a separately loaded constraint set. It
+must emit exactly one final action with one of six dispositions:
+`APPROVED`, `CLIPPED`, `REJECTED_OUT_OF_ENVELOPE`,
+`REJECTED_SENSOR_INVALID`, `REJECTED_HIGH_UNCERTAINTY`, or
+`REPLACED_WITH_HOLD`.
+
+For the latest arrived record (o_s^*) of required signal (s), freshness is
+
+\[
+\operatorname{fresh}_s(k)=
+\mathbf 1[o_s^*\ \mathrm{exists}]
+\mathbf 1[t_{arrival,s}\le t_k]
+\mathbf 1[0\le t_k-t_{source,s}\le A_s].
+\]
+
+Maximum ages are 0.20 s for electrical/drive/pump/pressure/flow, 0.50 s for
+temperature, and 0.10 s for automation status. Missing, dropped, stuck,
+biased, drifting, out-of-range, unresolved-unit, and invalid flags block
+numeric action and resume. Hold remains reachable when observations are
+invalid.
+
+The automatic continuation envelope applies in `PREPARE` and `POLISH`, not
+`DRESS`: utility ratios outside [0.90, 1.10] after 0.10 s or temperature more
+than 2 K from reference force hold. This preserves the scientific comparison
+of conditioning-quality interventions and is not a real-equipment safety
+rule. Release requires utility ratios in [0.95, 1.05], temperature within 1 K,
+valid sensors for 1.0 s, warning-clear evidence for 0.50 s, minimum hold of
+0.50 s, and a 0.50 s CMP recovery dwell.
+
+The synthetic battery reserve is
+
+\[
+E_{min}=1.25\frac{P_{load}}{\eta_{inv}}(H+\tau_{recover})
+=1.25\frac{2500\ \mathrm W}{0.95}(3.0+0.5)\ \mathrm s
+=11513.16\ \mathrm J.
+\]
+
+For each decision, the final-action invariant is
+
+\[
+\forall k:\quad a_k^F\in\mathcal A_{canonical}
+\land a_k^F\in\mathcal C_k
+\land t_{effective}(a_k^F)\ge t_{k+1}.
+\]
+
+No controller may self-approve. A proposal outside a hard physical/canonical
+bound is rejected; a unique projection from a soft supervisory magnitude or
+slew violation may be clipped. Indeterminate unit, timing, state, or
+constraint calculations fail closed to hold/no action. These are synthetic
+software constraints, not certified equipment limits.
+
+## Phase 3 comparison freeze and remaining evidence boundary
+
+Controller-development, primary-TEST, and robustness seeds begin at
+130000, 230000, and 330000. The primary families have at least eight whole
+runs each and reuse no WP12/WP13 TEST seed. Predictive benefit requires
+positive median improvements in both peak and integrated error versus no
+action with non-negative grouped-bootstrap lower bounds. Versus the primary
+process-MRR threshold, one metric must improve at least 5% while the other and
+cumulative-removal error worsen no more than 5%. At least 80% of hold-required
+runs must be non-worse than no action on both MRR metrics; normal/healthy-sag
+hold rate must be at most 5%; final constraint violations must be zero.
+
+Phase 3 has frozen these tests and shown internal contract consistency plus
+one CMP limiting-case direction. WP14--WP18 implementation, closed-loop
+latency, independent-filter enforcement, robustness, and controller efficacy
+remain Phase 4 work. A failed gate will be reported without retuning the
+thresholds, weights, or TEST seeds.
 
 ## Evidence protocol
 

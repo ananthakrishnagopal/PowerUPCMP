@@ -1,5 +1,5 @@
-manifest_version: "1.0.0"
-last_updated: "2026-07-13T15:10:18+05:30"
+manifest_version: "1.1.0"
+last_updated: "2026-07-13T17:47:16+05:30"
 workflow: single_agent_phase_gated
 allowed_states:
   - PLANNED
@@ -765,9 +765,16 @@ tasks:
       - orchestration/reports/wp10_literature_review.md
       - orchestration/reports/wp10_coupling_validation.md
       - orchestration/reports/wp12_early_warning_validation.md
+      - orchestration/reports/wp13_attribution_validation.md
+      - orchestration/decisions/wp15_predictive_supervisory_control.md
+      - orchestration/decisions/wp16_independent_safety_filter.md
+      - orchestration/reports/phase3_control_contract_validation.md
       - reports/figures/communication_figure_manifest.json
       - reports/virtual_metrology/wp09_validation.json
       - reports/early_warning/wp12_validation.json
+      - reports/attribution/wp13_validation.json
+      - reports/control/phase3_control_contract_validation.json
+      - reports/control/phase3_hold_feasibility.json
     outputs:
       - paper/main.tex
       - paper/references.bib
@@ -790,7 +797,8 @@ tasks:
       - Implementation opened at 2026-07-12T13:20:28+05:30 after T-COMMS-DEMO completed and the user authorized continuation.
       - WP12 final evidence was integrated after the frozen revision-1.4 validation report completed.
       - WP09 public-data methods, results, failed gates, figures, and limitations are integrated and the revised PDF passed build, log, and representative visual review.
-      - Conditional synthetic WP13 methods, results, figures, limitations, and provenance are integrated; WP14-WP18 remain visibly pending.
+      - Conditional synthetic WP13 methods, results, figures, limitations, and provenance are integrated.
+      - WP15/WP16 authority, equations, phase clock, comparators, safety constraints, paired gates, and CMP-only feasibility are integrated; WP14 implementations and WP15-WP18 runtime results remain visibly pending.
       - Root Makefile target `paper` delegates to the manuscript build without adding a Python dependency.
       - Task closed COMPLETE on 2026-07-13 after build, log, traceability, and representative visual review.
     validation_evidence:
@@ -814,6 +822,12 @@ tasks:
       - "paper/evidence_map.md traces WP09, WP08, WP10, bounded WP12, and conditional synthetic WP13 numerical statements to governing artifacts"
       - "WP13-closeout governance: 17 YAML, zero duplicate keys, 29-task acyclic DAG, 25 assumptions, 126 Markdown files, 134 valid links, zero missing links"
       - "WP13-closeout complete suite: 211 passed in 60.24 s with warnings treated as errors in devkki"
+      - "Phase 3 integrated output: 18-page A4 PDF; SHA-256 293a72f08fd3f2b1164215acdb4cd8bc092c77e0a4604810010e61b11f9b18c1"
+      - "Phase 3 LaTeX log: no overfull box, undefined-reference, undefined-citation, label-change, or rerun warning"
+      - "Phase 3 representative visual review: pages 1, 12-14, and 18 render the evidence boundary, control equations, feasibility table, paired protocol, discussion, conclusion, and references legibly"
+      - "Phase 3 pre-checkpoint governance: 20 YAML, zero duplicate keys, 31-task acyclic DAG, 28 assumptions, 135 Markdown files, 140 valid links, zero missing links"
+      - "Phase 3 final governance: 20 YAML, zero duplicate keys, 31-task acyclic DAG, 28 assumptions, 137 Markdown files, 140 valid links, zero missing links"
+      - "Phase 3 complete suite: 224 passed in 66.01 s with warnings treated as errors in devkki"
 
   - id: T-WP11
     title: WP11 deterministic declarative scenario engine
@@ -956,7 +970,7 @@ tasks:
       - Compound abstention is 0.8333 with truth-set recall at two of 1.0. Delay and dropout reduce diagnostic availability without producing false known-cause substitutions; pressure-sensor-fault recall is 0.3333.
       - All frozen interpretation gates pass. The result supports conditional synthetic diagnostic classification only; feature contributions and rule chains are not causal proof.
       - Validation JSON SHA-256 is f075e513bb2c836ea2ca1b20c281f21929ab3ad7fa01f8eea4bf79d5a613fefc; deterministic payload SHA-256 is b1f7080dc0d091caa003793ec7eed98a92dd3b9a509c33a7f77e86a5dae74f99; prediction CSV SHA-256 is 8108f514930f6f2bfaf77bab5597e35432d6dded3c7290bfa34a294820f494eb.
-      - The running paper, modeling notes, evidence map, and 17-page journal PDF include the WP13 methods, results, figures, limitations, and provenance.
+      - The running paper, modeling notes, evidence map, and current 18-page journal PDF include the WP13 methods, results, figures, limitations, and provenance.
     validation_evidence:
       - orchestration/reports/wp13_attribution_validation.md
       - reports/attribution/wp13_validation.json
@@ -969,9 +983,9 @@ tasks:
   - id: T-WP14
     title: WP14 baseline controllers
     phase: 4
-    state: PLANNED
+    state: READY
     priority: HIGH
-    dependencies: [T-WP01, T-WP02, T-WP11]
+    dependencies: [T-WP01, T-WP02, T-WP11, T-WP15]
     inputs:
       - Controller_v1
       - frozen_threshold_hold_and_resume_constraints
@@ -989,21 +1003,79 @@ tasks:
       - hysteresis_prevents_threshold_chatter
       - safe_hold_and_controlled_resume_are_stateful
       - proposed_actions_do_not_mutate_plant
-    assumptions: [A-011, A-017]
-    blockers:
-      - Phase_3_threshold_hold_and_resume_constraints_not_frozen
+    assumptions: [A-011, A-017, A-026, A-028]
+    blockers: []
+    notes:
+      - Phase 3 freezes no action, the primary arrived-MRR process threshold, the mandatory upstream utility-threshold comparator, hysteresis, equal phase completion, hold, and controlled resume in configs/controllers/baselines.yaml.
 
   - id: T-WP15
-    title: WP15 predictive supervisory controller
+    title: WP15 predictive supervisory scientific contract
     phase: 3
-    state: READY
+    state: COMPLETE
     priority: CRITICAL
-    dependencies: [T-WP08, T-WP12]
+    dependencies: [T-WP08, T-WP12, T-WP13]
     inputs:
-      - frozen_controller_objective_and_horizon
+      - validated_CMP_and_coupling_mechanism
+      - frozen_WP12_warning_target_and_artifact
+      - bounded_WP13_attribution_evidence
       - Predictor_v1
       - Controller_v1
-      - frozen_action_bounds
+    outputs:
+      - orchestration/decisions/wp15_predictive_supervisory_control.md
+      - configs/controllers/predictive.yaml
+      - configs/controllers/baselines.yaml
+      - src/semifab_poc/control/contracts.py
+      - tests/unit/test_control_contracts.py
+      - scripts/validate_phase3_control_contracts.py
+      - scripts/analyze_phase3_hold_feasibility.py
+      - reports/control/phase3_control_contract_validation.json
+      - reports/control/phase3_hold_feasibility.json
+      - orchestration/reports/phase3_control_contract_validation.md
+    files_owned:
+      - orchestration/decisions/wp15_predictive_supervisory_control.md
+      - configs/controllers/predictive.yaml
+      - configs/controllers/baselines.yaml
+      - src/semifab_poc/control/contracts.py
+      - tests/unit/test_control_contracts.py
+      - scripts/validate_phase3_control_contracts.py
+      - scripts/analyze_phase3_hold_feasibility.py
+      - reports/control/phase3_control_contract_validation.json
+      - reports/control/phase3_hold_feasibility.json
+      - orchestration/reports/phase3_control_contract_validation.md
+    acceptance_tests:
+      - predictor_target_horizon_artifact_and_topology_exactly_bound
+      - primary_action_set_is_no_action_advisory_hold_and_resume_only
+      - unsupported_numeric_compensation_disabled
+      - bounded_search_objective_includes_MRR_removal_hold_recovery_cycle_and_effort
+      - reinforcement_learning_absent
+      - equal_recipe_completion_and_phase_progress_metrics_prevent_hold_gaming
+      - process_threshold_and_utility_threshold_comparators_both_frozen
+      - controller_TEST_seeds_and_success_tolerances_preregistered
+      - CMP_limiting_case_shows_feasible_direction_without_claiming_efficacy
+    assumptions: [A-012, A-015, A-017, A-025, A-026, A-027, A-028]
+    blockers: []
+    notes:
+      - The primary mechanism is conditioning-memory under-removal; saturated VFD/valve commands and reduction-only CMP setpoints do not provide defensible compensation and are disabled.
+      - A CMP-only development case reduces peak relative MRR deviation from 5.526% with no action to 3.895% with a warning-timed hold, but a 0.10 s utility threshold reaches 0.087% at the cost of 5.89 s hold. The upstream comparator is therefore mandatory and predictive dominance is not assumed.
+      - Thirteen focused contract tests pass. The deterministic machine-readable contract audit passes 21 checks.
+      - Predictive, baseline, safety, contract-validation, and feasibility artifact hashes are recorded in orchestration/reports/phase3_control_contract_validation.md.
+    validation_evidence:
+      - orchestration/reports/phase3_control_contract_validation.md
+      - reports/control/phase3_control_contract_validation.json
+      - reports/control/phase3_hold_feasibility.json
+      - "2026-07-13: 13/13 focused Phase 3 control-contract tests passed with warnings treated as errors"
+      - "2026-07-13: both generated JSON artifacts reproduced byte-for-byte and 224/224 complete repository tests passed in 66.01 s with warnings treated as errors"
+
+  - id: T-WP15-IMPL
+    title: WP15 predictive supervisory controller implementation
+    phase: 4
+    state: READY
+    priority: CRITICAL
+    dependencies: [T-WP15]
+    inputs:
+      - frozen_predictive_controller_contract
+      - Predictor_v1
+      - Controller_v1
     outputs:
       - src/semifab_poc/control/predictive.py
       - tests/unit/test_predictive_controller.py
@@ -1013,22 +1085,55 @@ tasks:
       - tests/unit/test_predictive_controller.py
       - tests/property/test_predictive_action_bounds.py
     acceptance_tests:
-      - bounded_search_or_short_horizon_MPC_only
-      - reinforcement_learning_absent
-      - objective_includes_MRR_action_hold_and_recovery_tradeoffs
-      - action_magnitude_and_slew_proposals_bounded
-      - latency_budget_measured
-    assumptions: [A-012, A-015, A-017]
+      - only_frozen_primary_actions_proposed
+      - controller_uses_arrived_observations_and_bound_prediction_only
+      - controller_never_self_approves_or_mutates_plant
+      - phase_clock_and_interrupted_phase_contract_implemented
+      - deterministic_reset_and_replay
+      - controller_latency_budget_measured
+    assumptions: [A-012, A-015, A-017, A-025, A-026]
     blockers: []
-    notes:
-      - Phase 3 scientific decision work becomes READY after bounded WP12 warning and WP13 attribution closure; implementation must not start until the objective, horizon, action semantics, fallback, and comparison gates are frozen.
 
   - id: T-WP16
-    title: WP16 independent safety filter
+    title: WP16 independent safety-filter scientific contract
     phase: 3
-    state: PLANNED
+    state: COMPLETE
     priority: CRITICAL
     dependencies: [T-WP02, T-WP15]
+    inputs:
+      - SafetyFilter_v1
+      - frozen_safety_constraints
+      - sensor_validity_and_uncertainty_contracts
+    outputs:
+      - orchestration/decisions/wp16_independent_safety_filter.md
+      - configs/controllers/safety.yaml
+      - reports/control/phase3_control_contract_validation.json
+    files_owned:
+      - orchestration/decisions/wp16_independent_safety_filter.md
+      - configs/controllers/safety.yaml
+    acceptance_tests:
+      - all_six_required_outcomes_match_canonical_vocabulary
+      - magnitude_slew_sensor_uncertainty_applicability_and_restart_contracts_frozen
+      - controller_imports_forbidden
+      - every_decision_requires_final_action_and_constraint_evidence
+      - hold_recovery_phase_restore_and_battery_reserve_defined
+      - safety_utility_hold_does_not_preempt_DRESS_comparison
+    assumptions: [A-016, A-026, A-027]
+    blockers: []
+    notes:
+      - WP16 remains a simulation software constraint contract, not functional-safety or equipment certification evidence.
+      - Runtime reachability, clipping/rejection paths, controller independence, and zero final-action violations remain Phase 4 implementation tests.
+    validation_evidence:
+      - orchestration/decisions/wp16_independent_safety_filter.md
+      - configs/controllers/safety.yaml
+      - reports/control/phase3_control_contract_validation.json
+
+  - id: T-WP16-IMPL
+    title: WP16 independent safety-filter implementation
+    phase: 4
+    state: READY
+    priority: CRITICAL
+    dependencies: [T-WP16]
     inputs:
       - SafetyFilter_v1
       - frozen_safety_constraints
@@ -1047,16 +1152,17 @@ tasks:
       - independent_of_controller_implementation
       - every_decision_has_final_action_and_constraint_evidence
       - approved_or_clipped_actions_remain_within_limits
-    assumptions: [A-016]
-    blockers:
-      - Phase_3_safety_envelope_and_restart_conditions_not_frozen
+      - property_sweep_has_zero_final_constraint_violations
+      - safety_filter_latency_budget_measured
+    assumptions: [A-016, A-026]
+    blockers: []
 
   - id: T-WP17
     title: WP17 integrated runtime
     phase: 4
     state: PLANNED
     priority: CRITICAL
-    dependencies: [T-WP04, T-WP05, T-WP06, T-WP07, T-WP08, T-WP11, T-WP13, T-WP14, T-WP16]
+    dependencies: [T-WP04, T-WP05, T-WP06, T-WP07, T-WP08, T-WP11, T-WP13, T-WP14, T-WP15-IMPL, T-WP16-IMPL]
     inputs:
       - all_component_interfaces_v1
       - runtime_update_order
@@ -1109,9 +1215,8 @@ tasks:
       - all_required_robustness_dimensions_evaluated
       - public_and_simulator_results_separate
       - zero_configured_final_action_violations
-    assumptions: [A-007, A-012, A-016, A-017, A-019]
-    blockers:
-      - Phase_3_success_tolerances_not_preregistered
+    assumptions: [A-007, A-012, A-016, A-017, A-019, A-025, A-026, A-028]
+    blockers: []
 
   - id: T-WP19
     title: WP19 read-only results dashboard

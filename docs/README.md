@@ -15,9 +15,10 @@ Documentation map:
 
 Phase 2 implementation documentation is retained as historical evidence. The
 Phase 1/2 scientific audit, Phase 3 redesign, validated standalone WP08 CMP,
-WP10 coupling, WP12 early-warning, WP09 public-data, and WP13 attribution work
-are reflected in the current architecture, mathematical-model,
-modelling-ledger, validation-report, and running-paper files.
+WP10 coupling, WP12 early-warning, WP09 public-data, WP13 attribution, and the
+frozen WP15/WP16 controller/safety scientific contracts are reflected in the
+current architecture, mathematical-model, modelling-ledger, validation-report,
+and running-paper files. Runtime control and efficacy remain Phase 4 work.
 Documents still marked as planned are created only with their work packages.
 All future documents must distinguish measured output, simulated state,
 process excursion, quality-risk proxy, physical defect, and yield outcome.

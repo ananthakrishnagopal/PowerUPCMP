@@ -1,0 +1,82 @@
+{
+  "artifact_id": "PHASE3_CMP_HOLD_FEASIBILITY_V1",
+  "checks": {
+    "all_cases_complete_equal_active_polish_progress": true,
+    "all_cases_complete_equal_dress_progress": true,
+    "disturbed_no_action_crosses_five_percent_peak": true,
+    "threshold_hold_uses_more_hold_time_than_warning_timed_hold": true,
+    "warning_timed_hold_completes_within_extension_bound": true,
+    "warning_timed_hold_improves_cumulative_removal_vs_no_action": true,
+    "warning_timed_hold_improves_integrated_error_vs_no_action": true,
+    "warning_timed_hold_improves_peak_vs_no_action": true
+  },
+  "claim_boundary": "The frozen hold/phase-restoration mechanism has a feasible direction in this single deterministic CMP limiting case. It does not establish integrated controller benefit, robustness, safety-filter behavior, or real-fab validity.",
+  "configuration": {
+    "disturbance_end_s": 5.99,
+    "disturbance_start_s": 0.0,
+    "dress_duration_s": 6.0,
+    "dt_s": 0.01,
+    "equal_recipe_completion": true,
+    "polish_duration_s": 9.0,
+    "prepare_duration_s": 1.0,
+    "threshold_hold_start_s": 0.1,
+    "warning_time_basis": "7.00 s excursion onset minus WP12 median 2.71 s lead",
+    "warning_timed_hold_start_s": 4.29
+  },
+  "evidence_plane": "SYNTHETIC_SIMULATOR",
+  "metrics": {
+    "DISTURBED_NO_ACTION": {
+      "cumulative_removal_error_m": 5.131725205716954e-10,
+      "cycle_extension_vs_reference_s": 0.0,
+      "end_dress_pad_activity": 0.50009,
+      "end_dress_pad_activity_relative_to_reference": 0.9072953468892274,
+      "end_dress_pad_remaining_life": 0.8999995000000001,
+      "hold_duration_s": 0.0,
+      "integrated_absolute_mrr_error_m": 5.13172520571685e-10,
+      "mean_mrr_ratio": 0.9447622113963388,
+      "peak_relative_mrr_deviation": 0.0552589392179832,
+      "recovery_duration_s": 0.0,
+      "wall_completion_s": 15.999999999999703
+    },
+    "DISTURBED_THRESHOLD_HOLD": {
+      "cumulative_removal_error_m": 8.116134619528369e-12,
+      "cycle_extension_vs_reference_s": 6.390000000000997,
+      "end_dress_pad_activity": 0.5503790945722891,
+      "end_dress_pad_activity_relative_to_reference": 0.9985330471126074,
+      "end_dress_pad_remaining_life": 0.8997050000000243,
+      "hold_duration_s": 5.889999999999919,
+      "integrated_absolute_mrr_error_m": 8.116134619507681e-12,
+      "mean_mrr_ratio": 0.9991263808750089,
+      "peak_relative_mrr_deviation": 0.0008739530024279114,
+      "recovery_duration_s": 0.49000000000000027,
+      "wall_completion_s": 22.3900000000007
+    },
+    "DISTURBED_WARNING_TIMED_HOLD": {
+      "cumulative_removal_error_m": 3.617936459697558e-10,
+      "cycle_extension_vs_reference_s": 2.200000000000342,
+      "end_dress_pad_activity": 0.5151566489509587,
+      "end_dress_pad_activity_relative_to_reference": 0.9346302275835389,
+      "end_dress_pad_remaining_life": 0.8999145000000071,
+      "hold_duration_s": 1.7000000000000013,
+      "integrated_absolute_mrr_error_m": 3.6179364596974773e-10,
+      "mean_mrr_ratio": 0.9610566035142307,
+      "peak_relative_mrr_deviation": 0.03895426234603323,
+      "recovery_duration_s": 0.49000000000000027,
+      "wall_completion_s": 18.200000000000045
+    },
+    "EVENT_DISABLED_REFERENCE": {
+      "cumulative_removal_error_m": 0.0,
+      "cycle_extension_vs_reference_s": 0.0,
+      "end_dress_pad_activity": 0.5511876609029458,
+      "end_dress_pad_activity_relative_to_reference": 1.0,
+      "end_dress_pad_remaining_life": 0.8997000000000247,
+      "hold_duration_s": 0.0,
+      "integrated_absolute_mrr_error_m": 0.0,
+      "mean_mrr_ratio": 1.0,
+      "peak_relative_mrr_deviation": 0.0,
+      "recovery_duration_s": 0.0,
+      "wall_completion_s": 15.999999999999703
+    }
+  },
+  "scope": "CMP-only limiting case using the frozen WP08 equations and an imposed conditioning-availability boundary; not WP17 closed-loop efficacy."
+}

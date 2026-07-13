@@ -99,17 +99,34 @@ events and severe shift failures; and attribution is conditional on a valid
 diagnostic warning with communication-driven availability limits. The
 withdrawn direct UPW-to-MRR modifier must not be restored.
 
-### Scientific decisions to freeze before implementation completion
+### Scientific decisions frozen at the Phase 3 gate
 
-1. Electrical, motor, hydraulic, thermal, and CMP equations with canonical units, integration method, stability bounds, and primary citations where claimed.
-2. Preston coefficient interpretation and modifier functional forms.
-3. Every utility-to-CMP coefficient's four-way provenance class, nominal value, bounds, sign, uncertainty, and sensitivity method.
-4. Average-MRR safe envelope, persistence, prediction horizon H, feature cutoff, label censoring, and event unit.
-5. Hybrid model training/isolation, uncertainty method, calibration set, and coverage target.
-6. Attribution policy for compound events and `UNKNOWN`.
-7. Predictive-controller objective, action grid/horizon, action/hold/recovery penalties, and latency budget.
-8. Independent safety envelope, action/slew limits, sensor validity, uncertainty rejection, fail-safe behavior, and restart dwell.
-9. Paired-comparison success thresholds and non-inferiority tolerance, fixed before final tests.
+1. Electrical, motor, hydraulic, thermal, and CMP equations have canonical
+   units, integration/stability checks, and bounded literature use.
+2. The Preston coefficient interpretation, modifier forms, phase gating,
+   cumulative removal, and consumable-memory states are frozen in WP08.
+3. Each utility-to-CMP coefficient has a four-way provenance class, nominal
+   value, bounds, sign, uncertainty treatment, and sensitivity evidence in
+   WP10.
+4. The average-MRR safe envelope, 0.25 s persistence, 3.0 s horizon, feature
+   cutoff, label censoring, and event unit are frozen in WP12.
+5. Public-data model isolation and uncertainty gates are complete in WP09;
+   the failed coverage and hybrid-improvement gates remain visible.
+6. Compound-cause and `UNKNOWN` attribution policy is frozen and conditionally
+   validated in WP13.
+7. The predictive controller uses a four-action hold/resume policy, explicit
+   recipe clock, lexicographic objective, fixed probability gates, synthetic
+   penalties, and 10/50 ms controller/end-to-end p95 budgets. Numerical
+   compensation actions are disabled because the current plant does not have
+   defensible authority for the primary under-removal mechanism.
+8. The independent safety contract freezes action/slew limits, sensor and
+   applicability rejection, fail-closed behavior, battery reserve, hold and
+   recovery state, and controlled-resume dwell.
+9. The required primary threshold is an arrived process-MRR hysteresis policy;
+   a direct upstream utility threshold is a mandatory fourth comparator. New
+   TEST seed ranges, equal-recipe completion, paired bootstrap gates, 5%
+   threshold tolerances, negative-control hold rate, and zero final constraint
+   violations are frozen before Phase 4 results.
 
 ### Scientific validation
 
@@ -120,18 +137,28 @@ withdrawn direct UPW-to-MRR modifier must not be restored.
 - Calibration/coverage and scenario-shift evaluation.
 - Safety feasibility and failure-mode analysis.
 
-At the phase gate, determine whether the remaining work is bounded routine implementation. If so, checkpoint and switch to the economical tier.
+All Phase 3 scientific contracts now pass their bounded acceptance gates. The
+remaining work is routine implementation and evaluation against frozen
+criteria; it does not authorize a controller-efficacy or real-safety claim.
 
 ## Phase 4 — Routine completion and testing
 
 Recommended execution tier: economical model, medium reasoning.
 
-Implement the frozen CMP model, hybrid VM wrappers, warning and attribution pipelines, baseline and predictive controllers, independent safety filter, integrated runtime, batch/Monte Carlo commands, metrics, scenario suites, preliminary reports, and dashboard components. Add unit, property, integration, regression, scientific, and performance tests. Generate only bounded preliminary evidence with the preregistered settings.
+Reuse the completed WP08, WP09, WP10, WP12, and WP13 implementations without
+retuning their frozen evidence. Begin only with tasks currently marked `READY`:
+T-WP14 baseline controllers, T-WP15-IMPL predictive controller, and
+T-WP16-IMPL independent safety filter. Their completion unlocks T-WP17
+integrated runtime, followed by T-WP18 paired/robustness evaluation, T-WP19
+dashboard, and T-WP20 documentation/report generation. Add the specified unit,
+property, integration, regression, scientific, and performance tests and
+generate only bounded evidence with the preregistered settings.
 
 Acceptance gate:
 
 - Full causal chain executes deterministically.
-- All three controllers run paired scenarios.
+- No action, process-threshold, and predictive control run paired scenarios,
+  with the mandatory utility-threshold comparator reported beside them.
 - Every final action has a safety disposition and remains within the frozen envelope.
 - Required metrics and distribution summaries are generated.
 - Synthetic/public provenance is visible in every artifact.

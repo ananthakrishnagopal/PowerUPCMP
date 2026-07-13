@@ -25,7 +25,8 @@
 \newcommand{\native}{\text{native PHM target unit}}
 
 \title{A Simulation-First Framework for Predictive Supervisory Control of CMP under Electrical and Ultrapure-Water Disturbances:\\
-Public Virtual Metrology, Physics, Coupling, Early Warning, and Attribution}
+Public Virtual Metrology, Physics, Coupling, Early Warning, Attribution, and
+Frozen Supervisory Design}
 
 \author{Living manuscript for the Semiconductor CMP Predictive-Control PoC\\
 \small Journal-neutral draft; author list and affiliations pending}
@@ -44,8 +45,9 @@ conditional synthetic root-cause classification. The PHM target unit is
 source-undeclared and the selected tree's primary intervals undercover. WP12
 has only three independent held-out events and fails under important shifts.
 WP13 uses a diagnostic positive-warning token, and delay/dropout collapse its
-availability. Controller efficacy and safety-filter outcomes remain
-unavailable. No
+availability. WP15/WP16 freeze a hold/resume controller and independent
+synthetic safety contract, but implementation and efficacy remain unavailable.
+No
 real-fab, physical-defect, yield, equipment-protection, or production-control
 conclusion is made.}}
 \end{center}
@@ -102,7 +104,18 @@ unknown recall and selective accuracy, and 0.8500 known-cause coverage; all
 nine errors are abstentions. Rule only scores higher at 0.9242, but is not
 substituted after TEST access. Severe delay and dropout collapse diagnostic
 availability toward unknown. This is simulator-conditional classification,
-not experimental causal proof or permission to act.
+not experimental causal proof or permission to act. A controller-authority
+audit finds that already-maximal utility commands and reduction-only CMP
+actions cannot defensibly correct the primary under-removal mechanism. The
+frozen predictive action set is therefore advisory, safe hold, and controlled
+resume with explicit recipe-phase restoration. A separate safety contract
+checks arrived-sensor validity, uncertainty/applicability, magnitude, slew,
+hold, and restart conditions. In a CMP-only development limiting case,
+warning-timed hold reduces peak relative MRR deviation from 5.526% to 3.895%
+versus no action, while an upstream utility threshold reaches 0.087% with a
+substantially longer hold. This establishes a feasible intervention direction
+and a strong mandatory comparator, not integrated controller efficacy or
+equipment safety.
 \end{abstract}
 
 \noindent\textbf{Keywords:} chemical mechanical planarization; material
@@ -136,8 +149,10 @@ a leakage-safe PHM average-MRR comparison, a scientifically bounded synthetic
 plant, a declared utility-to-CMP connection with null controls and sensitivity,
 an open-loop early-warning experiment with disjoint run-level
 fitting/calibration roles, and conditional synthetic root-cause attribution
-with mandatory abstention. Predictive control, safety filtering, and the
-integrated comparison remain protocols until their acceptance evidence exists.
+with mandatory abstention. The predictive-controller objective, action
+authority, phase clock, baselines, independent safety constraints, and paired
+success gates are now frozen. Their Phase 4 implementation and the integrated
+comparison remain protocols until acceptance evidence exists.
 
 The present contributions are:
 \begin{enumerate}
@@ -1167,54 +1182,181 @@ substitutions. Hybrid local inference has median/95th-percentile times of
 
 \subsection{WP14--WP16: baselines, predictive supervision, and safety}
 
-\pending{}: baselines will include no action, fixed threshold with hysteresis,
-safe hold, and controlled resume. The first predictive supervisor will use
-bounded action search or short-horizon model-predictive control, not
-reinforcement learning. Candidate actions are no action, bounded VFD or valve
-adjustment, bounded downforce/head/platen-speed reduction, advisory warning,
-safe hold, and controlled resume.
+\textbf{Frozen protocol; runtime result pending.} The authority audit narrows
+the first predictive policy. The primary disturbance removes conditioning
+support during \textsc{dress}, stores a pad-activity deficit, and causes later
+under-removal. VFD and valve commands are already at their maxima. The
+remaining canonical CMP actions are reductions, which cannot be represented as
+a validated correction for under-removal under positive Preston exponents.
+The primary action set is therefore
+\[
+\begin{aligned}
+\mathcal A_P=\{&\textsc{no action},\ \textsc{advisory},\\
+               &\textsc{safe hold},\ \textsc{controlled resume}\}.
+\end{aligned}
+\]
+Numerical actions retain independent bounds but are disabled. Unvalidated
+upward compensation is not introduced to make control appear effective.
 
-The optimization objective must jointly penalize predicted active-polish MRR
-deviation, cumulative-removal error, action effort and slew, hold duration,
-recovery time, and throughput cost. Coefficients, horizon, terminal treatment,
-and infeasibility behavior remain to be frozen. Cumulative removal and active
-time from Eq.~\eqref{eq:cumulative-removal} prevent a hold-only policy from
-gaming instantaneous-MRR error.
+The controller binds to the frozen WP12 logistic artifact, exact
+feature/configuration identities, the \textsc{dressing-water-support}
+topology, a 3.0 s horizon, and a 0.10 s decision period. For calibrated risk
+$p_k$, conformal set $S_k$, valid uncertainty $u_k$, and applicable
+configuration $a_k$, hold requires
+\begin{equation}
+\begin{aligned}
+g_k^+={}&\mathbf 1[p_k\ge0.50]\mathbf 1[S_k=\{1\}]\\
+        &{}\times\mathbf 1[u_k=\mathrm{valid}]
+        \mathbf 1[a_k=\mathrm{applicable}]=1.
+\end{aligned}
+\label{eq:control-gate}
+\end{equation}
+An otherwise valid $p_k\ge0.30$ emits an advisory only. Resume requires
+$p_k\le0.20$, $S_k=\{0\}$, and the independent release contract. Attribution
+is explanatory only and \textsc{unknown} is never interpreted as normal.
 
-An independent safety filter will evaluate the controller proposal after the
-controller acts. It will check action magnitude, slew rate, sensor validity,
-prediction uncertainty, approved simulation envelope, and restart conditions.
-Its auditable outcomes are \textsc{approved}, \textsc{clipped},
-\textsc{rejected-out-of-envelope}, \textsc{rejected-sensor-invalid},
-\textsc{rejected-high-uncertainty}, and \textsc{replaced-with-hold}. A claim
-that final simulated actions remain within configured limits requires
-exhaustive rejection-path and property tests with zero final-action violations.
-It would be a software/simulation property, not equipment certification.
+The controller states are \textsc{running}, \textsc{holding},
+\textsc{recovering}, and \textsc{complete}. Wall time and recipe time are
+separate:
+\begin{equation}
+\dot\tau_{\mathrm{recipe}}=
+\begin{cases}
+1,&z=\textsc{running},\\
+0,&z\in\{\textsc{holding},\textsc{recovering}\}.
+\end{cases}
+\label{eq:recipe-clock}
+\end{equation}
+An interrupted \textsc{dress} is restored through
+\textsc{hold}$\rightarrow$\textsc{recover}$\rightarrow$\textsc{prepare}
+$\rightarrow$\textsc{dress} and completes its remaining work. A bounded
+lexicographic tie break uses
+\begin{equation}
+J_k(a)=8p_kr(a)+\frac{\Delta T_{\mathrm{phase}}}{3.0\ \mathrm{s}}
++\frac{\Delta T_{\mathrm{hold}}}{3.0\ \mathrm{s}}
++0.1\mathbf 1[a\ne a_{k-1}],
+\label{eq:control-score}
+\end{equation}
+subject to hard probability and safety gates. These synthetic weights are not
+an optimal-control result.
+
+Every paired run completes the same recipe scope or is a failed completion at
+the frozen 10 s extension. Comparisons align by active-polish progress $\tau$:
+\begin{align}
+E_{\mathrm{IAE},c}&=\int_0^{\tau_f}
+|R_c(\tau)-R_{\mathrm{ref}}(\tau)|\,d\tau,\\
+E_{\mathrm{peak},c}&=\max_{\tau\in[0,\tau_f]}
+|R_c(\tau)-R_{\mathrm{ref}}(\tau)|.\label{eq:control-errors}
+\end{align}
+Cumulative-removal error, hold, recovery, cycle delay, and action effort are
+mandatory. Thus stopping the recipe cannot shorten the evaluation scope.
+
+The primary fixed threshold consumes arrived simulated MRR in
+\textsc{polish}, holds after 0.25 s outside $[0.95,1.05]$ of the paired
+phase-progress reference, and releases inside $[0.97,1.03]$. A stronger,
+mandatory upstream utility comparator holds after 0.10 s outside
+$[0.90,1.10]$ or a 2 K thermal band and releases after 1.0 s inside
+$[0.95,1.05]$ and 1 K. Neither comparator sees predictions, attribution,
+latent state, or event truth.
+
+Table~\ref{tab:hold-feasibility} reports a pre-implementation limiting case
+using the WP08 CMP equations, imposed conditioning loss over 0--5.99 s, and
+equal completed \textsc{dress}/\textsc{polish}. The warning time is the 7.00 s
+excursion onset minus WP12's 2.71 s median lead.
+
+\begin{table*}[t]
+\centering
+\caption{CMP-only hold feasibility. No streaming predictor, controller,
+sensor, safety filter, or robustness runtime is included.}
+\label{tab:hold-feasibility}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Development case & Peak relative MRR error & Mean MRR ratio & Hold (s) &
+Cycle extension (s)\\
+\midrule
+Disturbed no action & 5.526\% & 0.944762 & 0.00 & 0.00\\
+Warning-timed hold, 4.29 s & 3.895\% & 0.961057 & 1.70 & 2.20\\
+Utility-threshold hold, 0.10 s & 0.087\% & 0.999126 & 5.89 & 6.39\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Warning-timed hold has a feasible direction versus no action, but direct
+utility thresholding is far stronger on MRR and more expensive in hold time.
+The latter must remain visible even if it defeats a predictive-benefit claim.
+
+The WP16 filter is separately loaded and forbidden from importing a
+controller. For the latest arrived required observation $o_s^*$,
+\begin{equation}
+\begin{aligned}
+\operatorname{fresh}_s(k)={}&
+\mathbf 1[o_s^*\ \mathrm{exists}]
+\mathbf 1[t_{\mathrm{arrival},s}\le t_k]\\
+&{}\times\mathbf 1[0\le t_k-t_{\mathrm{source},s}\le A_s].
+\end{aligned}
+\label{eq:safety-freshness}
+\end{equation}
+It checks schema/timing, blocking quality flags, signal consistency, model and
+topology binding, uncertainty/applicability, mode, magnitude, slew, hold, and
+restart. Exactly one final action receives \textsc{approved},
+\textsc{clipped}, \textsc{rejected-out-of-envelope},
+\textsc{rejected-sensor-invalid}, \textsc{rejected-high-uncertainty}, or
+\textsc{replaced-with-hold}. Invalid sensing never authorizes actuation or
+resume; hold remains reachable.
+
+Automatic utility holds apply only in \textsc{prepare}/\textsc{polish}.
+Conditioning loss during \textsc{dress} is a simulated quality-risk mechanism,
+not a validated equipment hazard. Release requires valid utilities in
+$[0.95,1.05]$, temperature within 1 K for 1.0 s, warning clear for 0.50 s,
+minimum hold 0.50 s, recovery dwell 0.50 s, and synthetic battery reserve
+\[
+E_{\min}=1.25\frac{2500\ \mathrm{W}}{0.95}(3.0+0.5)\ \mathrm{s}
+=11513.16\ \mathrm{J}.
+\]
+For constraint set $\mathcal C_k$, the final software invariant is
+\begin{equation}
+\forall k:\quad a_k^F\in\mathcal A_{\mathrm{canonical}}
+\land a_k^F\in\mathcal C_k
+\land t_{\mathrm{effective}}(a_k^F)\ge t_{k+1}.
+\label{eq:final-action}
+\end{equation}
+The 21-check machine-readable audit and 13 focused tests validate the frozen
+contracts, not runtime enforcement, functional safety, or equipment limits.
 
 \subsection{WP17--WP18: integrated paired evaluation}
 
-\pending{}: no action, threshold control, and predictive control will be run
-on identical scenarios, initial states, parameter draws, seed maps, and sensor
-corruptions. A manifest equality assertion will differ only in controller
-identity and the trajectories subsequently caused by its actions. The final
-comparison will include normal, mild and severe electrical disturbances, UPS
-transfer, pump trip, valve restriction, demand spike, temperature event,
-sensor bias/dropout, recoverable and hold-required disturbances, slow drift,
-and compound unseen cases.
+\pending{}: no action, process-MRR threshold, and predictive control will be
+run on identical scenarios, initial states, parameter draws, seed maps, and
+sensor corruptions; the mandatory utility-threshold comparator is reported
+beside them. A manifest equality assertion will differ only in controller
+identity and the trajectories subsequently caused by its actions. Controller
+development, primary TEST, and robustness seed ranges begin at 130000, 230000,
+and 330000, and no WP12/WP13 seed may enter controller TEST. The final
+comparison will include normal and healthy-sag negative controls, hold-required
+grid interruption, pump trip, valve restriction, demand spike, temperature
+event, sensor bias/dropout, slow drift, parameter mismatch, and compound unseen
+cases.
 
 Metrics will include peak and integrated active-polish MRR deviation,
 cumulative-removal error, pressure/flow violation duration, warning time,
 false alarms, missed events, hold and recovery duration, action magnitude,
-safety-filter rejections, attribution accuracy, prediction/controller latency,
-and simulation throughput. Summaries will report mean, median, standard
-deviation, 5th and 95th percentiles, and worst case. A controller-benefit claim
-also requires preregistered paired success and non-inferiority criteria; no such
-claim is made here.
+safety-filter rejections, attribution accuracy, prediction/controller/filter
+latency, and simulation throughput. Summaries will report mean, median,
+standard deviation, 5th and 95th percentiles, and worst case. A predictive-
+benefit claim requires positive median peak and integrated MRR-error improvement
+versus no action with non-negative run-bootstrap lower bounds. Versus the
+process-MRR threshold, one MRR metric must improve at least 5\% while the other
+and cumulative-removal error worsen no more than 5\%. At least 80\% of hold-
+required pairs must be non-worse than no action on both MRR metrics, negative-
+control hold rate must not exceed 5\%, equal recipe completion is required, and
+final constraint violations must be zero. The utility-threshold result remains
+visible regardless of outcome. No such efficacy claim is made here.
 
 \begin{table*}[t]
 \centering
-\caption{Manuscript evidence status at the WP09/WP12/WP13 freeze. ``Protocol'' means the
-method is described but no performance result is asserted.}
+\caption{Manuscript evidence status at the Phase 3 scientific freeze.
+``Protocol'' means the method is frozen but no runtime performance result is
+asserted.}
 \label{tab:status}
 \small
 \begin{tabular}{p{0.12\textwidth}p{0.19\textwidth}p{0.14\textwidth}p{0.43\textwidth}}
@@ -1230,7 +1372,8 @@ WP12 & Early warning & Synthetic result & Frozen target, causal features,
 disjoint calibration, primary and shift results\\
 WP13 & Attribution & Synthetic result & Arrived-only evidence, abstention,
 whole-run class and robustness results\\
-WP14--WP16 & Control and safety filter & Protocol & Bounded actions, objectives, independent validation plan\\
+WP14 & Baseline controllers & Protocol & No-action, process-MRR threshold, and mandatory utility-threshold specifications\\
+WP15--WP16 & Predictive control and safety & Frozen contract & Authority audit, hold/resume policy, recipe clock, independent constraints, and paired gates; no runtime result\\
 WP17--WP18 & Integrated comparison & Protocol & Paired-run and robustness plan\\
 \bottomrule
 \end{tabular}
@@ -1309,12 +1452,23 @@ data semantics. A controller or safety filter therefore cannot treat the
 WP09 interval as an approved operating bound, nor can it assume the random
 whole-wafer split establishes future temporal performance.
 
+The control-authority audit also prevents a common modelling shortcut. Because
+the utility commands are already maximal and the allowed recipe changes are
+reductions, direct numerical compensation would either be ineffective for the
+under-removal pathway or require inventing unsupported authority. Hold and
+phase restoration are physically narrower and more auditable, but their cost
+is explicit cycle delay. The limiting case shows a feasible warning-timed
+direction versus no action while also showing that direct utility thresholding
+can dominate MRR protection at greater hold cost. The latter is a useful
+negative design result, not a comparator to suppress.
+
 Finally, the study treats supervisory safety as an independent software
 contract, not as a property inferred from predictive accuracy. An accurate
 warning model can still propose an infeasible action, act on an invalid sensor,
 or resume too early. Keeping the safety filter separate enables explicit
-rejection, clipping, hold fallback, and restart tests. Those results remain
-future work.
+rejection, clipping, hold fallback, and restart tests. Its constraints, battery
+reserve, and dwell times are synthetic study assumptions rather than certified
+tool limits. Runtime enforcement and controller efficacy remain future work.
 
 \section{Limitations and threats to validity}
 
@@ -1376,6 +1530,15 @@ future work.
   forces all diagnoses to \textsc{unknown}, and 10\% packet loss reduces
   known-cause coverage to 0.15. Diagnostic unavailability must not be treated
   as a confirmed normal state.
+  \item The primary predictive policy has hold/resume authority only. Numeric
+  utility and CMP actions are disabled because they cannot defensibly correct
+  the validated under-removal mechanism under the current plant constraints.
+  \item The hold-feasibility result imposes a median-lead-derived action time
+  and bypasses streaming prediction, sensor delivery, controller state, and
+  safety filtering. It is not a closed-loop efficacy result.
+  \item The independent constraint values, battery reserve, validity ages,
+  dwell times, and latency budgets are synthetic software-study assumptions,
+  not equipment ratings or a functional-safety assessment.
   \item Public-data virtual metrology is an offline source-native result only.
   Controller, safety-filter, integrated-runtime, and controller-robustness
   results are unavailable at this evidence freeze.
@@ -1414,6 +1577,15 @@ prediction CSV hashes are \texttt{f075e513\ldots 13fefc},
 \texttt{07db0b4d\ldots 2b57ad} and
 \texttt{add6b0cf\ldots 11615}. The persistent marker prevents a silent second
 holdout execution.
+
+WP15/WP16 scientific-contract verification passes 13 focused unit tests and
+all 21 machine-readable cross-contract checks. Predictive, baseline, and
+safety configuration hashes are \texttt{219849ca\ldots 0f265},
+\texttt{d527490e\ldots 794ec}, and
+\texttt{032bb745\ldots 707c}. Contract-validation and CMP-only feasibility
+JSON hashes are \texttt{86e3ab72\ldots 3d7a} and
+\texttt{170687de\ldots 136}. These artifacts freeze design and limiting-case
+evidence only; they contain no controller TEST outcome.
 
 WP09 was opened from clean Git checkpoint
 \texttt{01c59a6172\ldots e4358805463c}. Its target-blind split payload hash is
@@ -1471,9 +1643,15 @@ well on retained whole-wafer holdouts, but interval undercoverage, a failed
 hybrid claim, and chronological tail fragility prevent stronger reliability or
 physical-model conclusions. The mitigation and safety half remains open until
 bounded control, independent safety filtering, and paired robust evaluation are
-complete. Supported conclusions remain limited to the retained PHM roles and
-to the tested synthetic equations, declared topology, and named WP12/WP13
-ensembles.
+complete. Its scientific protocol is now explicit: hold/resume is the only
+defensible primary authority, recipe progress freezes during hold/recovery,
+the process-MRR threshold is the primary comparator, the upstream utility
+threshold is mandatory, and every proposal passes an independent fail-closed
+constraint contract. One limiting case supports a feasible direction versus
+no action but also shows the utility threshold can be stronger. Supported
+conclusions remain limited to the retained PHM roles, the tested synthetic
+equations and declared topology, the named WP12/WP13 ensembles, and internal
+consistency of the frozen WP15/WP16 design.
 
 \section*{Data, code, and manuscript status}
 

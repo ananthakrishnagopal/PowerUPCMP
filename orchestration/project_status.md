@@ -1,9 +1,9 @@
 # Project status
 
-Last updated: 2026-07-13 16:16 IST<br>
+Last updated: 2026-07-13 17:47 IST<br>
 Current phase: Phase 3 — scientific modelling and coupling<br>
-Phase state: WP08, WP09, WP10, WP12, and WP13 COMPLETE within bounded claims<br>
-Active task: T-WP15 predictive-supervisory objective and action-policy freeze
+Phase state: scientific contracts COMPLETE through WP15/WP16 within bounded claims<br>
+Active task: Phase 3 reproducibility audit, checkpoint, and local Git closure
 
 ## Review outcome
 
@@ -34,6 +34,13 @@ tree achieves 3.185/3.395 test/validation MAE on precedence-retained whole
 wafers. Its interval coverage misses the frozen minimum, the hybrid does not
 improve on the tree, and consumable ablation is model-dependent; those failed
 interpretation gates remain explicit.
+T-WP13 closes conditional synthetic attribution with mandatory abstention and
+communication-availability limits. T-WP15 and T-WP16 now freeze the predictive
+supervisor and independent safety-filter scientific contracts. The authority
+audit enables hold/resume only for the primary policy, preserves the direct
+upstream utility threshold as a mandatory comparator, freezes recipe-clock and
+equal-completion rules, and preregisters all Phase 4 seeds and paired gates.
+This is design/feasibility evidence, not an integrated controller result.
 
 Detailed evidence:
 
@@ -55,6 +62,11 @@ Detailed evidence:
 - `orchestration/decisions/wp12_secondary_model_selection_correction.md`
 - `orchestration/reports/wp12_revision_1_1_method_audit.md`
 - `orchestration/reports/wp12_early_warning_validation.md`
+- `orchestration/decisions/wp13_root_cause_attribution.md`
+- `orchestration/reports/wp13_attribution_validation.md`
+- `orchestration/decisions/wp15_predictive_supervisory_control.md`
+- `orchestration/decisions/wp16_independent_safety_filter.md`
+- `orchestration/reports/phase3_control_contract_validation.md`
 - `orchestration/decisions/20260711_phase_3_cmp_and_utility_model.md`
 - `orchestration/decisions/phase_1_2_remediation.md`
 
@@ -181,6 +193,18 @@ efficacy.
   specificity falls to 0.0657 and tree PR-AUC to 0.5283. The observed-signal
   models therefore require topology/applicability checking and an independent
   WP16 safety filter.
+- Attribution: the frozen WP13 hybrid attains 0.8636 accuracy/macro recall,
+  1.0 UNKNOWN recall and selective accuracy, and 0.85 known-cause coverage on
+  66 whole TEST runs. Rule only is stronger at 0.9242. All hybrid errors
+  abstain; 0.20 s delay and 10% dropout reduce known-cause coverage to zero and
+  0.15. This is conditional synthetic classification, not causal proof.
+- Control/safety scientific contracts: 13 focused tests and 21 cross-contract
+  checks pass. Configuration hashes are
+  `219849ca3aa0abdaccd48db22f81f6ecc4c94ccc3851b757e701cc23a140f265`,
+  `d527490e53bc4d665f833a4c78eb6403c4db60fa16aee2d7932b7eafcc9794ec`,
+  and
+  `032bb745401e1b4b8203f5466c213662b61b79fd591c673122ee11612400707c`.
+  They validate explicit design consistency, not controller or filter runtime.
 - R1/R2 verification: the historical R2 gate passed 13 focused, 6 real-data,
   and 82 complete tests. The R2.1 correction passed 16 focused tests, then the
   complete repository passed 173/173 in 49.71 s with warnings treated as errors
@@ -227,18 +251,22 @@ efficacy.
   and
   `5191cbdcbf36c8709d92ed0de9662104c3ba6adfdd030ac45a661020ea17fdd0`;
   R4 hashes and the WP08 trace hash also reproduce exactly.
-- The passing suite validates corrective gates R1--R4, standalone synthetic
-  CMP invariants, declared synthetic coupling mechanics, and the frozen WP12
-  simulation-only early-warning experiment. The separately hashed WP09 result
-  artifact supports its bounded public-data point-prediction claim; test count
-  alone does not. Neither source validates attribution, safety, controller
-  efficacy, actual CMP plumbing, or a real-fab causal effect.
+- The passing suites validate corrective gates R1--R4, standalone synthetic CMP
+  invariants, declared synthetic coupling mechanics, and frozen software
+  contracts. Separately hashed WP09, WP12, and WP13 result artifacts support
+  only their bounded point-prediction, warning, and conditional-attribution
+  statements; test count alone does not. The WP15/WP16 contract artifacts
+  support design consistency only. No source yet validates safety-filter
+  runtime, controller efficacy, actual CMP plumbing, or a real-fab causal
+  effect.
 - Supported implementation claims: C-001 for bounded offline public-data point
   prediction; C-002 and C-011 at the explicitly limited simulation level; and
-  C-003 only for the frozen in-distribution synthetic WP12 experiment. C-003
-  fails to generalize safely across all audited shifts. C-008 and the
-  cross-model C-009 gate are rejected on public data. Supported real-fab,
-  physical-defect, yield, or control-efficacy claims: none.
+  C-003 only for the frozen in-distribution synthetic WP12 experiment. C-007
+  is limited to conditional synthetic attribution after a valid diagnostic
+  warning. C-003 fails to generalize safely across all audited shifts. C-008
+  and the cross-model C-009 gate are rejected on public data. C-004--C-006
+  remain planned. Supported real-fab, physical-defect, yield, or control-
+  efficacy claims: none.
 - Dataset network transfer: none; the archive was supplied locally.
 - Agent/subagent actions: one user-authorized bounded manuscript agent created
   the journal-format LaTeX draft; all scientific modelling, WP12 execution,
@@ -262,16 +290,17 @@ efficacy.
 - The committed interim deck predates WP12 and therefore still marks public-data
   modelling, early warning, attribution, controllers, safety filtering, and
   paired efficacy evaluation as pending. Its scientific claims remain valid,
-  but a later presentation revision should add the frozen WP09, WP12, and WP13
-  evidence.
+  but a later presentation revision should add the frozen WP09, WP12, WP13,
+  and WP15/WP16 design evidence.
 - T-PAPER-DRAFT is COMPLETE. The journal-neutral two-column LaTeX source builds
-  a visually reviewed 17-page A4 PDF containing public-data WP09 methods,
-  results, failed gates and figures alongside bounded WP08/WP10/WP12 and
-  conditional synthetic WP13 evidence, while retaining visible pending markers
-  for control and safety work. The PDF SHA-256 is
-  `9437f7912372aed4579e0ad650cb73ae9edbbe06d741e102d5a48c4e6b1d420b`;
-  the final LaTeX log has no overfull box, undefined-reference,
-  undefined-citation, or rerun warning.
+  a visually reviewed 18-page A4 PDF containing public-data WP09 methods,
+  results, failed gates and figures; bounded WP08/WP10/WP12 and conditional
+  WP13 evidence; and the frozen WP15/WP16 protocol and limiting case. Runtime
+  control and safety results remain visibly pending. The PDF SHA-256 is
+  `293a72f08fd3f2b1164215acdb4cd8bc092c77e0a4604810010e61b11f9b18c1`;
+  the final LaTeX log has no overfull box, undefined-reference, undefined-
+  citation, label-change, or rerun warning. Pages 1, 12--14, and 18 passed
+  representative visual review.
 
 ## WP09 controlled execution
 
@@ -283,23 +312,41 @@ authorized target access. The complete result and interpretation gates are in
 `orchestration/reports/wp09_virtual_metrology_validation.md`. The guard now
 refuses a silent rerun, preserving the one-shot audit trail.
 
-## Next Phase 3 work
+## Phase 3 control/safety closure and Phase 4 handoff
 
-T-WP08, T-WP09, T-WP10, T-WP12, and T-WP13 are scientifically closed within
-their stated claim boundaries. Remaining Phase 3 decision work is:
+T-WP08, T-WP09, T-WP10, T-WP12, T-WP13, T-WP15, and T-WP16 are scientifically
+closed within their stated claim boundaries. The Phase 3 controller review
+found that the nominal VFD and valve commands are already maximal, while the
+allowed CMP numerical actions are reductions under positive Preston
+exponents. Those actions cannot defensibly compensate the primary synthetic
+under-removal pathway. The frozen predictive policy therefore enables only
+`NO_ACTION`, `ADVISORY_WARNING`, `SAFE_HOLD`, and `CONTROLLED_RESUME`.
 
-1. T-WP15 — freeze the predictive supervisory objective, action set, horizon,
-   penalties, and fallback policy; and
-2. T-WP16 — freeze independent safety limits, applicability checks, sensor and
-   uncertainty rejection rules, hold replacement, and controlled-resume
-   criteria.
+Hold/recovery freezes recipe progress, controlled resume restores the
+interrupted phase, and every controller must complete equal recipe scope.
+The primary fixed threshold uses arrived MRR after a persistent process-band
+crossing. An upstream utility threshold remains a mandatory fourth comparator
+so a direct early interlock is never hidden. The independent safety contract
+freezes sensor validity, warning/applicability checks, action magnitude/slew,
+fail-closed behavior, battery reserve, hold, recovery, and restart dwell.
 
-No controller-efficacy comparison or WP17 integrated closed-loop runtime is
-authorized by this status; those remain downstream work.
+Thirteen focused tests and all 21 machine-readable contract checks pass. A
+single CMP-only limiting case changes peak relative MRR deviation from 5.526%
+with no action to 3.895% with warning-timed hold, at 1.70 s hold and 2.20 s
+cycle extension. Immediate utility-threshold hold reaches 0.087% at 5.89 s
+hold and 6.39 s extension. This establishes a feasible direction and a strong
+mandatory comparator, not integrated controller efficacy.
 
-Current governance evidence: 17 YAML files parse with zero duplicate keys; all
-29 tasks form an acyclic dependency graph and reference 25 valid assumptions;
-126 Markdown files contain 134 valid local links and zero missing local links.
+Phase 4 begins only with tasks marked `READY`: T-WP14, T-WP15-IMPL, and
+T-WP16-IMPL. Their completion unlocks T-WP17 and then T-WP18--T-WP20. No
+controller-efficacy comparison, independent-filter runtime claim, or closed-
+loop latency result is authorized by this status.
+
+Phase 3 closeout reruns both generated control artifacts byte-for-byte, passes
+224/224 repository tests in 66.01 s with warnings treated as errors, and passes
+final governance: 20 YAML files have no duplicate keys; all 31 tasks form an
+acyclic graph and reference 28 assumptions; 137 Markdown files contain 140
+valid local links and zero missing links.
 
 ## WP13 controlled execution and result
 
@@ -344,6 +391,6 @@ Validation JSON, deterministic payload, and prediction CSV SHA-256 values are
 and `8108f514930f6f2bfaf77bab5597e35432d6dded3c7290bfa34a294820f494eb`.
 The full interpretation is in
 `orchestration/reports/wp13_attribution_validation.md`. The running paper,
-modeling notes, evidence map, and reviewed 17-page journal PDF include WP13;
+modeling notes, evidence map, and reviewed 18-page journal PDF include WP13;
 the PDF SHA-256 is
-`9437f7912372aed4579e0ad650cb73ae9edbbe06d741e102d5a48c4e6b1d420b`.
+`293a72f08fd3f2b1164215acdb4cd8bc092c77e0a4604810010e61b11f9b18c1`.

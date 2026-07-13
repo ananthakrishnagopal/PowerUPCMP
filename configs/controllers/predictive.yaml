@@ -1,0 +1,89 @@
+schema_version: "1.0.0"
+policy_id: PREDICTIVE_HOLD_SUPERVISOR_V1
+evidence_plane: SYNTHETIC_SIMULATOR
+decision_period_s: 0.10
+predictor:
+  target_id: SIM_ACTIVE_POLISH_MRR_TRAJECTORY_V1
+  model_kind: LOGISTIC
+  horizon_s: 3.0
+  artifact_path: reports/early_warning/models/logistic.pkl
+  artifact_sha256: c95b460397487760a33f64b04bca876b9e51c0108438730f85b0b298c26e7078
+  metadata_path: reports/early_warning/models/logistic.pkl.json
+  metadata_sha256: 1677b275263da25a9c2444902289c14212589e7bf91cbc2b620d3a396c9f5c9f
+  model_config_path: configs/models/early_warning.yaml
+  model_config_sha256: b53730011cb4f3c26173c727ba9fc562e9677a24a422f558a1c3330ab2df1e05
+  required_topology: DRESSING_WATER_SUPPORT
+risk_policy:
+  advisory_probability: 0.30
+  hold_probability: 0.50
+  resume_maximum_probability: 0.20
+  require_positive_singleton_for_hold: true
+  require_negative_singleton_for_resume: true
+  maximum_prediction_age_s: 0.20
+action_policy:
+  enabled_actions:
+    - NO_ACTION
+    - ADVISORY_WARNING
+    - SAFE_HOLD
+    - CONTROLLED_RESUME
+  disabled_actions:
+    VFD_COMMAND_ADJUSTMENT: nominal VFD command is already at its maximum and cannot overcome voltage derating
+    VALVE_ADJUSTMENT: nominal utility valve is already fully open
+    CMP_DOWNFORCE_REDUCTION: a reduction cannot defensibly correct the primary under-removal mechanism
+    HEAD_SPEED_REDUCTION: a reduction cannot defensibly correct the primary under-removal mechanism
+    PLATEN_SPEED_REDUCTION: a reduction cannot defensibly correct the primary under-removal mechanism
+  states: [RUNNING, HOLDING, RECOVERING, COMPLETE]
+  attribution_is_advisory_only: true
+  reinforcement_learning_allowed: false
+phase_clock:
+  freeze_states: [HOLDING, RECOVERING]
+  restore_interrupted_phase: true
+  equal_recipe_completion_required: true
+  maximum_extension_s: 10.0
+  interrupted_dress_route: [HOLD, RECOVER, PREPARE, DRESS]
+objective:
+  method: LEXICOGRAPHIC_BOUNDED_ACTION_SEARCH
+  expected_excursion_weight: 8.0
+  phase_delay_weight: 1.0
+  hold_duration_weight: 1.0
+  action_transition_weight: 0.10
+  primary_order:
+    - SAFETY_FEASIBILITY
+    - PREDICTED_EXCURSION_RISK
+    - RECIPE_COMPLETION_AND_CUMULATIVE_REMOVAL
+    - HOLD_RECOVERY_AND_CYCLE_DELAY
+    - ACTION_TRANSITIONS
+  evaluation_metrics:
+    - ACTIVE_POLISH_PEAK_MRR_DEVIATION
+    - ACTIVE_POLISH_INTEGRATED_ABSOLUTE_MRR_ERROR
+    - COMPLETED_RECIPE_CUMULATIVE_REMOVAL_ERROR
+    - HOLD_DURATION
+    - RECOVERY_DURATION
+    - CYCLE_TIME_EXTENSION
+    - ACTION_EFFORT
+latency_budget:
+  controller_p95_s: 0.010
+  end_to_end_p95_s: 0.050
+  missed_budget_fallback: SAFE_HOLD
+evaluation:
+  controller_development_seed_start: 130000
+  primary_test_seed_start: 230000
+  robustness_seed_start: 330000
+  minimum_runs_per_primary_family: 8
+  primary_threshold_controller_id: PROCESS_MRR_THRESHOLD_HYSTERESIS_V1
+  required_secondary_comparator: UTILITY_THRESHOLD_HYSTERESIS_V1
+  negative_control_families: [NORMAL, HEALTHY_SAG]
+  hold_required_families:
+    - GRID_INTERRUPTION
+    - PUMP_TRIP
+    - VALVE_RESTRICTION
+    - TOOL_DEMAND_SPIKE
+  minimum_threshold_relative_improvement: 0.05
+  maximum_threshold_relative_worsening: 0.05
+  minimum_hold_required_nonworse_fraction: 0.80
+  maximum_negative_control_hold_rate: 0.05
+  bootstrap_confidence: 0.95
+  require_nonnegative_no_action_bootstrap_lower_bound: true
+  maximum_cycle_extension_s: 10.0
+  require_zero_final_constraint_violations: true
+  prohibit_wp12_wp13_seeds_in_primary_test: true

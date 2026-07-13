@@ -20,6 +20,9 @@ bounded synthetic WP08/WP10 evidence, and the frozen WP12 simulation-only
 early-warning experiment. It reports WP09's failed uncertainty and hybrid
 gates alongside its point performance and the conditional synthetic WP13
 attribution result, including the stronger rule-only comparator and
-communication-driven abstention. Predictive control, safety filtering, and
-paired controller results remain visibly pending. A target journal class and
-final author affiliations will be selected only before submission.
+communication-driven abstention. It also records the frozen WP15/WP16
+hold/resume, recipe-clock, comparator, independent-constraint, and paired-test
+protocols plus a clearly bounded CMP-only feasibility calculation. Controller
+implementation, safety-filter enforcement, and paired controller results
+remain visibly pending. A target journal class and final author affiliations
+will be selected only before submission.

@@ -1,7 +1,7 @@
 # Manuscript evidence map
 
 Status: working traceability record for the journal-neutral manuscript<br>
-Evidence freeze: public-data WP09, synthetic WP08/WP10, bounded synthetic WP12, and conditional synthetic WP13 complete; control and safety results pending
+Evidence freeze: Phase 3 scientific contracts complete through WP15/WP16; controller implementation, safety enforcement, and paired efficacy pending
 
 ## Claim boundary
 
@@ -16,8 +16,11 @@ cross-model C-009 gate fail on public data. C-007 is supported only as
 conditional synthetic simulator-label classification after a valid diagnostic
 warning, with explicit abstention and communication-availability failures.
 The manuscript must not represent attribution as experimental causal proof or
-represent controller efficacy, safety filtering, physical defects, yield,
-real equipment, or production control as completed.
+represent controller efficacy, runtime safety enforcement, physical defects,
+yield, real equipment, or production control as completed. It may describe the
+WP15/WP16 controller/safety design as frozen and internally validated and the
+CMP-only hold analysis as development feasibility, provided neither is called
+an integrated closed-loop result.
 
 Primary governance source: [`claims_matrix.md`](../orchestration/claims_matrix.md).
 
@@ -46,6 +49,9 @@ Primary governance source: [`claims_matrix.md`](../orchestration/claims_matrix.m
 | WP13 compound: 5/6 abstentions and 6/6 truth-set recall at two | [`wp13_attribution_validation.md`](../orchestration/reports/wp13_attribution_validation.md) | Ordered simulator truth is offline only and does not inflate single-cause accuracy |
 | WP13 communication robustness: 0 known-cause coverage at 0.20 s delay and 0.15 at 10% dropout | [`wp13_attribution_validation.md`](../orchestration/reports/wp13_attribution_validation.md) | Demonstrates diagnostic unavailability rather than false known-cause substitution |
 | Pre-WP13 holdout suite: 23/23 focused and 211/211 complete tests with warnings treated as errors | [`wp13_attribution_validation.md`](../orchestration/reports/wp13_attribution_validation.md) | Supports frozen software contracts and guarded opening; performance comes from separately hashed TEST artifacts |
+| WP15/WP16 contract audit: 13/13 focused tests and 21/21 cross-contract checks | [`phase3_control_contract_validation.md`](../orchestration/reports/phase3_control_contract_validation.md), [`phase3_control_contract_validation.json`](../reports/control/phase3_control_contract_validation.json) | Freezes authority, predictor binding, recipe clock, comparators, synthetic constraints, restart, latency, seed, and paired-evaluation contracts; no controller runtime |
+| CMP-only warning-timed hold: peak relative MRR deviation 3.895% versus 5.526% for disturbed no action; 1.70 s hold and 2.20 s cycle extension | [`phase3_hold_feasibility.json`](../reports/control/phase3_hold_feasibility.json) | Single WP08 limiting case with imposed action timing; no streaming prediction, sensors, controller, filter, or robustness |
+| CMP-only upstream utility threshold: peak relative MRR deviation 0.087%, 5.89 s hold, 6.39 s cycle extension | [`phase3_hold_feasibility.json`](../reports/control/phase3_hold_feasibility.json) | Stronger MRR protection at higher hold cost; mandatory comparator, not evidence of predictive dominance |
 | Pre-WP09 holdout suite: 192/192 with warnings treated as errors | [`wp09_virtual_metrology_validation.md`](../orchestration/reports/wp09_virtual_metrology_validation.md) | Supports frozen code/contracts and guarded target access; public-data performance comes from the separately hashed result artifact, not test count |
 
 ## Figure provenance
@@ -78,15 +84,16 @@ controller-efficacy, causal-proof, or equipment claim.
 
 ## Reviewed manuscript artifact
 
-`reports/paper/semifab_cmp_poc_draft.pdf` is a 17-page A4 PDF with SHA-256
-`9437f7912372aed4579e0ad650cb73ae9edbbe06d741e102d5a48c4e6b1d420b`.
+`reports/paper/semifab_cmp_poc_draft.pdf` is an 18-page A4 PDF with SHA-256
+`293a72f08fd3f2b1164215acdb4cd8bc092c77e0a4604810010e61b11f9b18c1`.
 It was rebuilt from the repository root with
 `conda run -n devkki make paper`. Title/evidence boundary, WP09 equations,
 primary model table, three WP09 figures, WP12 results, WP13 equations,
-comparator table, confusion/recall figures, evidence-status table, discussion,
-limitations, and references passed representative visual review. The final
-LaTeX log contains no overfull box, undefined-reference, undefined-citation,
-or rerun warning.
+comparator table, confusion/recall figures, WP15/WP16 equations, hold-
+feasibility table, evidence-status table, discussion, limitations, and
+references passed representative visual review on pages 1, 12--14, and 18.
+The final LaTeX log contains no overfull box, undefined-reference, undefined-
+citation, label-change, or rerun warning.
 
 ## Literature-use boundary
 
@@ -99,12 +106,16 @@ support transfer of material-specific numerical effects.
 
 ## Pending manuscript results
 
-The following remain protocols rather than results:
+The following remain implementations or runtime results rather than completed
+evidence:
 
-- WP14 no-action and fixed-threshold baselines;
-- WP15 bounded predictive supervisory controller;
-- WP16 independent safety filter;
+- WP14 no-action, process-MRR-threshold, and utility-threshold controller code;
+- WP15 bounded predictive-supervisor state-machine implementation;
+- WP16 independent safety-filter enforcement and rejection-path evidence;
 - WP17--WP18 paired integrated controller evaluation.
+
+The WP15/WP16 scientific contracts themselves are frozen and traceable above;
+they must not be relabelled as runtime results.
 
 When any pending item is completed, update the running paper, this evidence
 map, the LaTeX manuscript, the claims matrix, the task manifest, and the project

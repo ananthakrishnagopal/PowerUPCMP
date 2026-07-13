@@ -22,10 +22,12 @@ source-role construction, and a conservative whole-wafer precedence split are
 verified. The source partitions reuse wafer IDs across opposite stages; the
 retained training/test/validation roles contain 1,981/311/275 mutually
 wafer-disjoint rows. A physical-machine holdout is impossible because only
-machine ID 2 is present. Virtual-metrology model
-fitting, uncertainty calibration, and official holdout evaluation remain
-pending, so no PHM predictive-performance claim is supported.
-Simulator-control results remain a separate SI evidence plane.
+machine ID 2 is present. The frozen tree supports bounded offline average-MRR
+point prediction on these retained roles, with test/validation MAE 3.185/3.395
+in the source-native undeclared target scale. Its uncertainty-coverage gate
+fails, the physics-plus-residual hybrid does not improve on the tree, and no
+SI-unit or control bridge is supported. Simulator-control results remain a
+separate SI evidence plane.
 
 ## Causal hypothesis under test
 
@@ -91,17 +93,31 @@ A simulated state is not a measurement. An excursion is not a defect. A risk pro
 The PoC is successful only if all of the following are demonstrated reproducibly:
 
 1. The integrated simulator deterministically propagates at least the reference 25% voltage sag for 400 ms through the complete declared causal chain.
-2. No-action, threshold, and predictive control use identical scenario definitions, initial conditions, seeds, sensor corruptions, and model parameters within each comparison.
+2. No-action, arrived process-MRR threshold, predictive control, and the
+   mandatory upstream utility-threshold comparator use identical scenario
+   definitions, initial conditions, seeds, sensor corruptions, and model
+   parameters within each comparison.
 3. Predictive control reduces both peak MRR deviation and integrated absolute MRR error relative to no action for the predefined primary scenario set.
-4. Predictive control improves at least one of peak MRR deviation or integrated absolute MRR error relative to threshold control without worsening the other beyond a preregistered tolerance.
+4. Relative to the primary arrived process-MRR threshold, predictive control
+   improves at least one of peak MRR deviation or integrated absolute MRR
+   error by the preregistered amount without worsening the other or cumulative
+   removal beyond the preregistered tolerance. Results against the upstream
+   utility threshold are always reported separately.
 5. No final action violates configured magnitude, slew-rate, sensor-validity, uncertainty, process-envelope, hold, or restart constraints.
 6. Early-warning results include precision, recall, PR-AUC, false alarms per simulated hour, missed-event rate, median warning time, and uncertainty/coverage evidence.
 7. Root-cause accuracy is evaluated against simulator truth and never presented as causal proof for real equipment.
 8. All coupling coefficients and model parameters have a provenance class, units, bounds, and sensitivity result.
 9. All public-data results, if any, use leakage-safe grouped or temporal splits and are reported separately from simulator results.
-10. Installation, tests, reference runs, reports, and the dashboard reproduce from documented commands.
+10. Every controller completes the same recipe scope, or is explicitly marked
+    as a failed completion at the frozen extension limit; comparisons align by
+    active-polish progress and report hold, recovery, and cycle-time costs.
+11. Installation, tests, reference runs, reports, and the dashboard reproduce
+    from documented commands.
 
-Numerical acceptance thresholds for model comparison and the safe operating envelope must be preregistered in Phase 3 before final experiments are run; they must not be chosen after observing test results.
+The Phase 3 controller and safety decisions preregister the numerical model-
+comparison gates, seed ranges, synthetic operating envelopes, hold/restart
+conditions, and latency budgets. They must not be changed after Phase 4 TEST
+access to obtain a favorable result.
 
 ## Deliverables
 

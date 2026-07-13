@@ -1,0 +1,145 @@
+schema_version: "1.0.0"
+constraint_set_id: SYNTHETIC_SUPERVISORY_SAFETY_V1
+evidence_plane: SYNTHETIC_SIMULATOR
+decision_period_s: 0.10
+outcomes:
+  - APPROVED
+  - CLIPPED
+  - REJECTED_OUT_OF_ENVELOPE
+  - REJECTED_SENSOR_INVALID
+  - REJECTED_HIGH_UNCERTAINTY
+  - REPLACED_WITH_HOLD
+observation_validity:
+  blocking_quality_flags:
+    - MISSING
+    - DROPPED
+    - STUCK
+    - BIASED
+    - DRIFTING
+    - OUT_OF_RANGE
+    - UNIT_UNRESOLVED
+    - INVALID
+  conditionally_allowed_quality_flags: [DELAYED, QUANTISED, TIMESTAMP_JITTERED]
+  maximum_age_s_by_signal:
+    electrical.ups_output_voltage: 0.20
+    electrical.ups_battery_energy: 0.20
+    drive.vfd_available_output: 0.20
+    drive.vfd_trip_state: 0.20
+    drive.motor_angular_speed: 0.20
+    pump.volumetric_flow: 0.20
+    upw.supply_pressure: 0.20
+    upw.tool_flow: 0.20
+    upw.temperature: 0.50
+    cmp.process_mode: 0.10
+  required_for_non_hold_actuation:
+    - electrical.ups_output_voltage
+    - electrical.ups_battery_energy
+    - drive.vfd_available_output
+    - drive.vfd_trip_state
+    - drive.motor_angular_speed
+    - pump.volumetric_flow
+    - upw.supply_pressure
+    - upw.tool_flow
+    - upw.temperature
+    - cmp.process_mode
+  hold_allowed_when_observations_invalid: true
+uncertainty_and_applicability:
+  predictor_target_id: SIM_ACTIVE_POLISH_MRR_TRAJECTORY_V1
+  predictor_artifact_sha256: c95b460397487760a33f64b04bca876b9e51c0108438730f85b0b298c26e7078
+  predictor_metadata_sha256: 1677b275263da25a9c2444902289c14212589e7bf91cbc2b620d3a396c9f5c9f
+  predictor_config_sha256: b53730011cb4f3c26173c727ba9fc562e9677a24a422f558a1c3330ab2df1e05
+  required_topology: DRESSING_WATER_SUPPORT
+  maximum_prediction_age_s: 0.20
+  hold_probability: 0.50
+  resume_maximum_probability: 0.20
+  positive_hold_set: [1]
+  negative_resume_set: [0]
+  feature_cutoff_must_not_exceed_decision: true
+  topology_config_and_feature_schema_must_match: true
+references:
+  electrical.ups_output_voltage: {value: 1.0, unit: pu}
+  drive.motor_angular_speed: {value: 188.5, unit: rad/s}
+  pump.volumetric_flow: {value: 2.0e-4, unit: m^3/s}
+  upw.supply_pressure: {value: 300000.0, unit: Pa}
+  upw.tool_flow: {value: 1.0e-4, unit: m^3/s}
+  upw.temperature: {value: 293.15, unit: K}
+continuation_envelope:
+  hold_persistence_s: 0.10
+  low_ratio: 0.90
+  high_ratio: 1.10
+  maximum_temperature_deviation_k: 2.0
+  automatic_hold_modes: [PREPARE, POLISH]
+release_envelope:
+  continuous_valid_dwell_s: 1.00
+  lower_ratio: 0.95
+  upper_ratio: 1.05
+  maximum_temperature_deviation_k: 1.0
+  require_vfd_not_tripped: true
+  battery_reserve_factor: 1.25
+  prediction_clear_dwell_s: 0.50
+state_machine:
+  states: [RUNNING, HOLD, RECOVER, COMPLETE]
+  minimum_hold_s: 0.50
+  recovery_dwell_s: 0.50
+  freeze_recipe_clock_in: [HOLD, RECOVER]
+  restore_interrupted_phase: true
+  invalid_recovery_returns_to_hold: true
+  terminal_complete: true
+action_envelopes:
+  VFD_COMMAND_ADJUSTMENT:
+    target: drive.vfd_command
+    unit: pu
+    minimum: 0.90
+    maximum: 1.00
+    maximum_step_change: 0.01
+    maximum_slew_per_s: 0.10
+    allowed_modes: [PREPARE, POLISH]
+    primary_enabled: false
+  VALVE_ADJUSTMENT:
+    target: upw.valve_position
+    unit: "1"
+    minimum: 0.90
+    maximum: 1.00
+    maximum_step_change: 0.01
+    maximum_slew_per_s: 0.10
+    allowed_modes: [PREPARE, POLISH]
+    primary_enabled: false
+  CMP_DOWNFORCE_REDUCTION:
+    target: cmp.contact_pressure_command
+    unit: Pa
+    minimum: 24000.0
+    maximum: 30000.0
+    maximum_step_change: 300.0
+    maximum_slew_per_s: 3000.0
+    allowed_modes: [PREPARE, POLISH]
+    primary_enabled: false
+  HEAD_SPEED_REDUCTION:
+    target: cmp.head_angular_speed
+    unit: rad/s
+    minimum: 4.8
+    maximum: 6.0
+    maximum_step_change: 0.06
+    maximum_slew_per_s: 0.60
+    allowed_modes: [PREPARE, POLISH]
+    primary_enabled: false
+  PLATEN_SPEED_REDUCTION:
+    target: cmp.platen_angular_speed
+    unit: rad/s
+    minimum: 6.4
+    maximum: 8.0
+    maximum_step_change: 0.08
+    maximum_slew_per_s: 0.80
+    allowed_modes: [PREPARE, POLISH]
+    primary_enabled: false
+non_numeric_actions:
+  NO_ACTION: {target: supervisory.none, unit: "1", allowed_modes: [IDLE, PREPARE, POLISH, DRESS, HOLD, RECOVER, COMPLETE]}
+  ADVISORY_WARNING: {target: supervisory.advisory, unit: "1", allowed_modes: [IDLE, PREPARE, POLISH, DRESS, HOLD, RECOVER]}
+  SAFE_HOLD: {target: cmp.process_mode, unit: "1", allowed_modes: [IDLE, PREPARE, POLISH, DRESS, HOLD, RECOVER]}
+  CONTROLLED_RESUME: {target: cmp.process_mode, unit: "1", allowed_modes: [HOLD]}
+fallbacks:
+  active_recipe_sensor_invalid: SAFE_HOLD
+  active_recipe_high_uncertainty: SAFE_HOLD
+  inactive_or_complete_invalid: NO_ACTION
+  latency_budget_missed: SAFE_HOLD
+final_action_required: true
+controller_imports_forbidden: true

@@ -1,0 +1,78 @@
+{
+  "artifact_id": "PHASE3_CONTROL_SAFETY_CONTRACT_VALIDATION_V1",
+  "bound_predictor": {
+    "artifact_sha256": "c95b460397487760a33f64b04bca876b9e51c0108438730f85b0b298c26e7078",
+    "horizon_s": 3.0,
+    "metadata_sha256": "1677b275263da25a9c2444902289c14212589e7bf91cbc2b620d3a396c9f5c9f",
+    "model_config_sha256": "b53730011cb4f3c26173c727ba9fc562e9677a24a422f558a1c3330ab2df1e05",
+    "model_kind": "LOGISTIC",
+    "required_topology": "DRESSING_WATER_SUPPORT",
+    "target_id": "SIM_ACTIVE_POLISH_MRR_TRAJECTORY_V1"
+  },
+  "checks": {
+    "all_numeric_actions_disabled_in_primary": true,
+    "all_numeric_envelopes_inside_plant_authority": true,
+    "battery_reserve_positive_and_feasible": true,
+    "canonical_action_and_safety_vocabularies_match": true,
+    "controller_budget_inside_decision_period": true,
+    "controller_independence_required": true,
+    "controller_seed_ranges_are_new": true,
+    "equal_recipe_completion_required": true,
+    "hold_and_recovery_freeze_recipe_clock": true,
+    "hold_score_below_run_score_at_frozen_hold_gate": true,
+    "interrupted_phase_restoration_required": true,
+    "paired_comparison_tolerances_frozen": true,
+    "predictor_artifact_binding_verified": true,
+    "primary_action_set_is_exactly_four": true,
+    "primary_threshold_uses_observed_process_mrr": true,
+    "reinforcement_learning_absent": true,
+    "resume_score_below_continued_hold_at_frozen_release_gate": true,
+    "safety_utility_hold_does_not_preempt_dress_comparison": true,
+    "strict_cross_contract_validation": true,
+    "upstream_utility_threshold_is_mandatory_secondary_comparator": true,
+    "zero_final_constraint_violations_required": true
+  },
+  "claim_boundary": "The frozen contracts are internally consistent and bounded by the current synthetic plant. This does not show controller benefit, closed-loop safety, equipment protection, or real production readiness.",
+  "comparators": {
+    "required_primary": "PROCESS_MRR_THRESHOLD_HYSTERESIS_V1",
+    "required_secondary": "UTILITY_THRESHOLD_HYSTERESIS_V1"
+  },
+  "contract_files": {
+    "configs/controllers/baselines.yaml": "d527490e53bc4d665f833a4c78eb6403c4db60fa16aee2d7932b7eafcc9794ec",
+    "configs/controllers/predictive.yaml": "219849ca3aa0abdaccd48db22f81f6ecc4c94ccc3851b757e701cc23a140f265",
+    "configs/controllers/safety.yaml": "032bb745401e1b4b8203f5466c213662b61b79fd591c673122ee11612400707c"
+  },
+  "derived_values": {
+    "battery_release_reserve_j": 11513.157894736842,
+    "controller_p95_budget_s": 0.01,
+    "decision_period_s": 0.1,
+    "end_to_end_p95_budget_s": 0.05,
+    "projected_continue_hold_score": 2.0,
+    "projected_hold_score": 2.1,
+    "resume_score_at_release_threshold": 1.7000000000000002,
+    "run_score_at_hold_threshold": 4.0
+  },
+  "evidence_plane": "SYNTHETIC_SIMULATOR",
+  "plant_bound_checks": {
+    "downforce_action_is_reduction_only": true,
+    "head_action_is_reduction_only": true,
+    "platen_action_is_reduction_only": true,
+    "preston_exponents_are_positive": true,
+    "valve_supervisory_max_not_above_full_open": true,
+    "vfd_supervisory_max_not_above_command_max": true
+  },
+  "primary_disabled_numeric_actions": [
+    "CMP_DOWNFORCE_REDUCTION",
+    "HEAD_SPEED_REDUCTION",
+    "PLATEN_SPEED_REDUCTION",
+    "VALVE_ADJUSTMENT",
+    "VFD_COMMAND_ADJUSTMENT"
+  ],
+  "primary_enabled_actions": [
+    "ADVISORY_WARNING",
+    "CONTROLLED_RESUME",
+    "NO_ACTION",
+    "SAFE_HOLD"
+  ],
+  "scope": "Scientific configuration/contract validation only; no controller runtime or efficacy result."
+}

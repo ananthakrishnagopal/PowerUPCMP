@@ -1,0 +1,52 @@
+schema_version: "1.0.0"
+evidence_plane: SYNTHETIC_SIMULATOR
+decision_period_s: 0.10
+no_action:
+  controller_id: NO_ACTION_V1
+  preserve_nominal_commands: true
+  request_mode_change: false
+process_threshold:
+  controller_id: PROCESS_MRR_THRESHOLD_HYSTERESIS_V1
+  target_signal_id: cmp.mrr
+  reference_policy: PAIRED_EVENT_DISABLED_PHASE_PROGRESS_TRAJECTORY
+  lower_relative_fraction: 0.95
+  upper_relative_fraction: 1.05
+  persistence_s: 0.25
+  release_lower_relative_fraction: 0.97
+  release_upper_relative_fraction: 1.03
+  maximum_observation_age_s: 0.20
+  active_modes: [POLISH]
+  use_arrived_observations_only: true
+  warning_probability_visible: false
+  attribution_visible: false
+utility_threshold_comparator:
+  controller_id: UTILITY_THRESHOLD_HYSTERESIS_V1
+  hold_persistence_s: 0.10
+  release_dwell_s: 1.00
+  low_hold_ratio: 0.90
+  high_hold_ratio: 1.10
+  release_lower_ratio: 0.95
+  release_upper_ratio: 1.05
+  hold_temperature_deviation_k: 2.0
+  release_temperature_deviation_k: 1.0
+  low_ratio_signal_ids:
+    - electrical.ups_output_voltage
+    - drive.motor_angular_speed
+    - pump.volumetric_flow
+    - upw.supply_pressure
+    - upw.tool_flow
+  high_ratio_signal_ids:
+    - upw.supply_pressure
+    - upw.tool_flow
+  temperature_signal_id: upw.temperature
+  use_arrived_observations_only: true
+  warning_probability_visible: false
+  attribution_visible: false
+references:
+  electrical.ups_output_voltage: {value: 1.0, unit: pu}
+  drive.motor_angular_speed: {value: 188.5, unit: rad/s}
+  pump.volumetric_flow: {value: 2.0e-4, unit: m^3/s}
+  upw.supply_pressure: {value: 300000.0, unit: Pa}
+  upw.tool_flow: {value: 1.0e-4, unit: m^3/s}
+  upw.temperature: {value: 293.15, unit: K}
+resume_uses_independent_safety_contract: true

@@ -38,14 +38,21 @@ flowchart TD
     L --> M
     M --> N[WP13 Attribution]
     J --> N
-    B --> O[WP14 Baseline controllers]
-    M --> P[WP15 Predictive controller]
+    M --> P[WP15 Predictive control contract]
     I --> P
-    B --> Q[WP16 Safety filter]
+    N --> P
+    P --> O[WP14 Baseline controllers]
+    B --> O
+    C --> O
+    L --> O
+    P --> PI[WP15 Predictive controller implementation]
+    C --> Q[WP16 Safety contract]
     P --> Q
+    Q --> QI[WP16 Safety filter implementation]
     O --> R[WP17 Integrated runtime]
+    PI --> R
     N --> R
-    Q --> R
+    QI --> R
     E --> R
     F --> R
     G --> R
@@ -53,7 +60,6 @@ flowchart TD
     I --> R
     L --> R
     R --> S[WP18 Evaluation and robustness]
-    K --> S
     S --> T[WP19 Dashboard]
     S --> U[WP20 Documentation and report]
     T --> U
@@ -68,14 +74,14 @@ The arrows indicate acceptance dependencies, not necessarily Python imports. The
 | G1 Planning freeze | Repository assessment, charter, claims, architecture, schema, interfaces, assumptions, risks, DAG, manifest, plan, validation checkpoint | Phase 2 foundation |
 | G2 Routine foundation | Historical Phase 2 implementation and its original 60-test suite | Retrospective scientific audit only; this gate is provisional |
 | G2R Corrective scientific gate | R1 contracts/configuration, R2 PHM semantics, R3 conserved plant physics, and R4 causal online/scenario timing all validated | T-WP08, T-WP09, and T-WP10 implementation |
-| G3 Scientific freeze | Equations/units reviewed, coupling provenance and sensitivity plan, MRR target and horizon frozen, uncertainty method frozen, objective and safety envelope frozen | Phase 4 bounded completion |
+| G3 Scientific freeze | Equations/units reviewed, coupling provenance/sensitivity validated, MRR target/horizon and uncertainty frozen, attribution bounded, controller objective/actions/baselines and independent safety envelope frozen with feasibility and comparison gates | Phase 4 baseline, controller, safety, runtime, evaluation, and communication implementation |
 | G4 Integrated candidate | Full runtime, three controllers, robustness scenarios, dashboard/report generators, standard tests | Phase 5 audit |
 | G5 Final audit | Clean install, full tests, reproducibility, claim/data/safety audits, final report | PoC completion |
 
 ## Critical path
 
 ```text
-WP00 → WP01 → WP02 → Phase 1/2 audit → R1–R4 remediation → WP08 → WP10 → WP12 → WP15 → WP16 → WP17 → WP18 → WP20
+WP00 → WP01 → WP02 → Phase 1/2 audit → R1–R4 remediation → WP08 → WP10 → WP12 → WP13 → WP15 contract → WP16 contract → WP15/WP16 implementation → WP17 → WP18 → WP20
 ```
 
 WP03 and WP09 form a separate public-data evidence path. The PHM archive is
@@ -83,11 +89,12 @@ locally present; raw integrity/schema, native-unit handling, source-order
 phase-aware time weighting, anomaly-policy materialization, source-role
 construction, R2.1 whole-wafer precedence, and inner grouped splits pass R2.
 The source partitions themselves reuse wafer IDs, so only the retained
-1,981/311/275 roles support independent-wafer evaluation. A physical-machine holdout is not
-possible because only machine ID 2 is present. Public virtual-metrology model
-fitting and evaluation have not begun, so claims C-001, the public-data part of
-C-008, and the “primary validated target” demonstration remain blocked. None
-of those data calibrates the SI simulator-control path.
+1,981/311/275 roles support independent-wafer evaluation. A physical-machine
+holdout is not possible because only machine ID 2 is present. WP09 public
+virtual metrology is complete on the retained roles: C-001 is narrowly
+supported for offline point prediction, whereas public-data C-008 and the
+model-family-independent C-009 gate are rejected. None of those data calibrates
+the SI simulator-control path.
 
 ## Data dependencies
 

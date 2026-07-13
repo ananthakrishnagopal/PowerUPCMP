@@ -1,0 +1,1039 @@
+{
+  "calibration_metrics_are_not_holdout_metrics": true,
+  "claim_boundary": "CALIBRATION-ONLY SYNTHETIC DIAGNOSTIC EVIDENCE; NO CAUSAL PROOF OR REAL-FAB VALIDATION",
+  "diagnostic_warning_policy": "NEUTRAL_VALID_POSITIVE_SINGLETON",
+  "evidence_plane": "SYNTHETIC_SIMULATOR_ONLY",
+  "experiment_revision": "1.0-preregistered",
+  "holdout_generated": false,
+  "results": {
+    "ALWAYS_UNKNOWN": {
+      "accuracy": 0.09090909090909091,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      ],
+      "correct_attribution_run_count": 0,
+      "evaluation_unit": "FINAL_WINDOW_PER_WHOLE_RUN",
+      "expected_calibration_error": 0.9090909090909091,
+      "grouped_bootstrap_accuracy": {
+        "mean": 0.0942272727272727,
+        "p05": 0.022727272727272728,
+        "p95": 0.1590909090909091,
+        "repetitions": 1000
+      },
+      "known_cause_coverage": 0.0,
+      "labels": [
+        "GRID_VOLTAGE_SAG",
+        "GRID_VOLTAGE_SWELL",
+        "GRID_INTERRUPTION",
+        "GRID_FREQUENCY_DEVIATION",
+        "PUMP_TRIP",
+        "VALVE_RESTRICTION",
+        "TOOL_DEMAND_SPIKE",
+        "THERMAL_EXCURSION",
+        "PRESSURE_SENSOR_FAULT",
+        "FLOW_SENSOR_FAULT",
+        "UNKNOWN"
+      ],
+      "latency_s": {
+        "maximum": 0.0030481229987344705,
+        "mean": 0.002312909749861953,
+        "median": 0.002269378997880267,
+        "p95": 0.00261375800055248
+      },
+      "macro_f1": 0.01515151515151515,
+      "macro_precision": 0.008264462809917356,
+      "macro_recall": 0.09090909090909091,
+      "median_earliest_correct_attribution_delay_s": null,
+      "multiclass_brier_score": 1.8181818181818181,
+      "multiclass_log_loss": 18.839332579042193,
+      "normal_false_attribution_rate": 0.0,
+      "per_class": {
+        "FLOW_SENSOR_FAULT": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "GRID_FREQUENCY_DEVIATION": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "GRID_INTERRUPTION": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "GRID_VOLTAGE_SAG": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "GRID_VOLTAGE_SWELL": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "PRESSURE_SENSOR_FAULT": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "PUMP_TRIP": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "THERMAL_EXCURSION": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "TOOL_DEMAND_SPIKE": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "UNKNOWN": {
+          "f1": 0.16666666666666666,
+          "precision": 0.09090909090909091,
+          "recall": 1.0,
+          "support": 4
+        },
+        "VALVE_RESTRICTION": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        }
+      },
+      "row_count": 132,
+      "run_count": 44,
+      "selective_accuracy": null,
+      "top_two_accuracy": 0.18181818181818182,
+      "unknown_recall": 1.0
+    },
+    "HYBRID": {
+      "accuracy": 0.8181818181818182,
+      "confusion_matrix": [
+        [
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      ],
+      "correct_attribution_run_count": 35,
+      "evaluation_unit": "FINAL_WINDOW_PER_WHOLE_RUN",
+      "expected_calibration_error": 0.17846833604424522,
+      "grouped_bootstrap_accuracy": {
+        "mean": 0.8183863636363636,
+        "p05": 0.7272727272727273,
+        "p95": 0.9090909090909091,
+        "repetitions": 1000
+      },
+      "known_cause_coverage": 0.8,
+      "labels": [
+        "GRID_VOLTAGE_SAG",
+        "GRID_VOLTAGE_SWELL",
+        "GRID_INTERRUPTION",
+        "GRID_FREQUENCY_DEVIATION",
+        "PUMP_TRIP",
+        "VALVE_RESTRICTION",
+        "TOOL_DEMAND_SPIKE",
+        "THERMAL_EXCURSION",
+        "PRESSURE_SENSOR_FAULT",
+        "FLOW_SENSOR_FAULT",
+        "UNKNOWN"
+      ],
+      "latency_s": {
+        "maximum": 0.0037115339982847217,
+        "mean": 0.003355106431930229,
+        "median": 0.0033533320001879474,
+        "p95": 0.0036277223985962336
+      },
+      "macro_f1": 0.8073593073593074,
+      "macro_precision": 0.8484848484848485,
+      "macro_recall": 0.8181818181818182,
+      "median_earliest_correct_attribution_delay_s": 1.0,
+      "multiclass_brier_score": 0.28514062624068326,
+      "multiclass_log_loss": 0.5311782648745509,
+      "normal_false_attribution_rate": 0.0,
+      "per_class": {
+        "FLOW_SENSOR_FAULT": {
+          "f1": 0.8571428571428571,
+          "precision": 1.0,
+          "recall": 0.75,
+          "support": 4
+        },
+        "GRID_FREQUENCY_DEVIATION": {
+          "f1": 0.6666666666666666,
+          "precision": 1.0,
+          "recall": 0.5,
+          "support": 4
+        },
+        "GRID_INTERRUPTION": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "GRID_VOLTAGE_SAG": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "GRID_VOLTAGE_SWELL": {
+          "f1": 0.8571428571428571,
+          "precision": 1.0,
+          "recall": 0.75,
+          "support": 4
+        },
+        "PRESSURE_SENSOR_FAULT": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "PUMP_TRIP": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "THERMAL_EXCURSION": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "TOOL_DEMAND_SPIKE": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "UNKNOWN": {
+          "f1": 0.5,
+          "precision": 0.3333333333333333,
+          "recall": 1.0,
+          "support": 4
+        },
+        "VALVE_RESTRICTION": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        }
+      },
+      "row_count": 132,
+      "run_count": 44,
+      "selective_accuracy": 1.0,
+      "top_two_accuracy": 0.9772727272727273,
+      "unknown_recall": 1.0
+    },
+    "LOGISTIC": {
+      "accuracy": 0.7727272727272727,
+      "confusion_matrix": [
+        [
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          3
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      ],
+      "correct_attribution_run_count": 30,
+      "evaluation_unit": "FINAL_WINDOW_PER_WHOLE_RUN",
+      "expected_calibration_error": 0.1704472116700701,
+      "grouped_bootstrap_accuracy": {
+        "mean": 0.7714545454545455,
+        "p05": 0.6590909090909091,
+        "p95": 0.8636363636363636,
+        "repetitions": 1000
+      },
+      "known_cause_coverage": 0.775,
+      "labels": [
+        "GRID_VOLTAGE_SAG",
+        "GRID_VOLTAGE_SWELL",
+        "GRID_INTERRUPTION",
+        "GRID_FREQUENCY_DEVIATION",
+        "PUMP_TRIP",
+        "VALVE_RESTRICTION",
+        "TOOL_DEMAND_SPIKE",
+        "THERMAL_EXCURSION",
+        "PRESSURE_SENSOR_FAULT",
+        "FLOW_SENSOR_FAULT",
+        "UNKNOWN"
+      ],
+      "latency_s": {
+        "maximum": 0.0040909379968070425,
+        "mean": 0.0033291810680042763,
+        "median": 0.0033260034997510957,
+        "p95": 0.003595492600106809
+      },
+      "macro_f1": 0.7570664629488157,
+      "macro_precision": 0.8006993006993007,
+      "macro_recall": 0.7727272727272727,
+      "median_earliest_correct_attribution_delay_s": 1.0,
+      "multiclass_brier_score": 0.3763568377002542,
+      "multiclass_log_loss": 0.9519287685280452,
+      "normal_false_attribution_rate": 0.0,
+      "per_class": {
+        "FLOW_SENSOR_FAULT": {
+          "f1": 0.3333333333333333,
+          "precision": 0.5,
+          "recall": 0.25,
+          "support": 4
+        },
+        "GRID_FREQUENCY_DEVIATION": {
+          "f1": 0.6666666666666666,
+          "precision": 1.0,
+          "recall": 0.5,
+          "support": 4
+        },
+        "GRID_INTERRUPTION": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "GRID_VOLTAGE_SAG": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "GRID_VOLTAGE_SWELL": {
+          "f1": 0.8571428571428571,
+          "precision": 1.0,
+          "recall": 0.75,
+          "support": 4
+        },
+        "PRESSURE_SENSOR_FAULT": {
+          "f1": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 4
+        },
+        "PUMP_TRIP": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "THERMAL_EXCURSION": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "TOOL_DEMAND_SPIKE": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "UNKNOWN": {
+          "f1": 0.47058823529411764,
+          "precision": 0.3076923076923077,
+          "recall": 1.0,
+          "support": 4
+        },
+        "VALVE_RESTRICTION": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        }
+      },
+      "row_count": 132,
+      "run_count": 44,
+      "selective_accuracy": 0.967741935483871,
+      "top_two_accuracy": 0.8636363636363636,
+      "unknown_recall": 1.0
+    },
+    "RULE_ONLY": {
+      "accuracy": 0.8863636363636364,
+      "confusion_matrix": [
+        [
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      ],
+      "correct_attribution_run_count": 35,
+      "evaluation_unit": "FINAL_WINDOW_PER_WHOLE_RUN",
+      "expected_calibration_error": 0.1651117932884831,
+      "grouped_bootstrap_accuracy": {
+        "mean": 0.8876136363636362,
+        "p05": 0.8170454545454546,
+        "p95": 0.9545454545454546,
+        "repetitions": 1000
+      },
+      "known_cause_coverage": 0.875,
+      "labels": [
+        "GRID_VOLTAGE_SAG",
+        "GRID_VOLTAGE_SWELL",
+        "GRID_INTERRUPTION",
+        "GRID_FREQUENCY_DEVIATION",
+        "PUMP_TRIP",
+        "VALVE_RESTRICTION",
+        "TOOL_DEMAND_SPIKE",
+        "THERMAL_EXCURSION",
+        "PRESSURE_SENSOR_FAULT",
+        "FLOW_SENSOR_FAULT",
+        "UNKNOWN"
+      ],
+      "latency_s": {
+        "maximum": 0.002978328997414792,
+        "mean": 0.0023061055149865392,
+        "median": 0.0022955724998610094,
+        "p95": 0.0025079390021346625
+      },
+      "macro_f1": 0.8957708957708956,
+      "macro_precision": 0.9494949494949495,
+      "macro_recall": 0.8863636363636364,
+      "median_earliest_correct_attribution_delay_s": 1.0,
+      "multiclass_brier_score": 0.17318387363509788,
+      "multiclass_log_loss": 0.3220827641599073,
+      "normal_false_attribution_rate": 0.0,
+      "per_class": {
+        "FLOW_SENSOR_FAULT": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "GRID_FREQUENCY_DEVIATION": {
+          "f1": 0.8571428571428571,
+          "precision": 1.0,
+          "recall": 0.75,
+          "support": 4
+        },
+        "GRID_INTERRUPTION": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "GRID_VOLTAGE_SAG": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "GRID_VOLTAGE_SWELL": {
+          "f1": 0.8571428571428571,
+          "precision": 1.0,
+          "recall": 0.75,
+          "support": 4
+        },
+        "PRESSURE_SENSOR_FAULT": {
+          "f1": 0.6666666666666666,
+          "precision": 1.0,
+          "recall": 0.5,
+          "support": 4
+        },
+        "PUMP_TRIP": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "THERMAL_EXCURSION": {
+          "f1": 0.8571428571428571,
+          "precision": 1.0,
+          "recall": 0.75,
+          "support": 4
+        },
+        "TOOL_DEMAND_SPIKE": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        },
+        "UNKNOWN": {
+          "f1": 0.6153846153846154,
+          "precision": 0.4444444444444444,
+          "recall": 1.0,
+          "support": 4
+        },
+        "VALVE_RESTRICTION": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 4
+        }
+      },
+      "row_count": 132,
+      "run_count": 44,
+      "selective_accuracy": 1.0,
+      "top_two_accuracy": 1.0,
+      "unknown_recall": 1.0
+    }
+  },
+  "schema_version": "1.0.0"
+}

@@ -298,6 +298,9 @@ required_contract_tests:
   - test_cmp_process_discrepancy_is_never_online_visible
   - test_coupling_rejects_invalid_configuration_and_boundary
   - test_coupling_null_topology_and_zero_link_are_exactly_neutral
+  - test_root_cause_estimator_rejects_future_and_forbidden_observations
+  - test_root_cause_estimator_supports_unknown_and_never_asserts_causal_proof
+  - test_root_cause_estimator_treats_ups_and_vfd_states_as_propagation_evidence
   - test_coupling_support_is_bounded_and_monotone
   - test_coupling_parameter_provenance_is_complete
   - test_coupling_water_quality_proxy_has_no_effect

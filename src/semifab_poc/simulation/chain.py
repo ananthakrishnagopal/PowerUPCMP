@@ -32,10 +32,16 @@ class ChainRunnerError(ValueError):
 class ChainEventKind(str, Enum):
     NORMAL = "NORMAL"
     HEALTHY_SAG = "HEALTHY_SAG"
+    GRID_VOLTAGE_SAG = "GRID_VOLTAGE_SAG"
+    GRID_VOLTAGE_SWELL = "GRID_VOLTAGE_SWELL"
     GRID_INTERRUPTION = "GRID_INTERRUPTION"
+    GRID_FREQUENCY_DEVIATION = "GRID_FREQUENCY_DEVIATION"
     PUMP_TRIP = "PUMP_TRIP"
     VALVE_RESTRICTION = "VALVE_RESTRICTION"
     TOOL_DEMAND_SPIKE = "TOOL_DEMAND_SPIKE"
+    THERMAL_EXCURSION = "THERMAL_EXCURSION"
+    PRESSURE_SENSOR_FAULT = "PRESSURE_SENSOR_FAULT"
+    FLOW_SENSOR_FAULT = "FLOW_SENSOR_FAULT"
     COMPOUND_INTERRUPTION_DEMAND = "COMPOUND_INTERRUPTION_DEMAND"
 
 
@@ -47,10 +53,14 @@ class ChainScenario:
     event_start_s: float
     event_duration_s: float
     grid_voltage_pu: float = 1.0
+    grid_frequency_hz: float = 50.0
     battery_capacity_j: float = 3_600_000.0
     ups_load_power_w: float = 2_500.0
     valve_position: float = 1.0
     tool_demand_m3_s: float = 1.0e-4
+    inlet_temperature_k: float = 293.15
+    pressure_sensor_bias_pa: float = 0.0
+    flow_sensor_bias_m3_s: float = 0.0
 
     def validate(self, runtime: RuntimeConfig, duration_s: float) -> None:
         if not self.run_id or self.seed < 0:
@@ -59,10 +69,14 @@ class ChainScenario:
             self.event_start_s,
             self.event_duration_s,
             self.grid_voltage_pu,
+            self.grid_frequency_hz,
             self.battery_capacity_j,
             self.ups_load_power_w,
             self.valve_position,
             self.tool_demand_m3_s,
+            self.inlet_temperature_k,
+            self.pressure_sensor_bias_pa,
+            self.flow_sensor_bias_m3_s,
         )
         if any(not math.isfinite(value) for value in numeric):
             raise ChainRunnerError("scenario numerical values must be finite")
@@ -70,14 +84,34 @@ class ChainScenario:
             raise ChainRunnerError("scenario event time and duration must be non-negative")
         if self.event_start_s + self.event_duration_s > duration_s + 1.0e-12:
             raise ChainRunnerError("scenario event exceeds run duration")
-        if not runtime.electrical.voltage_min_pu <= self.grid_voltage_pu <= 1.0:
+        if not (
+            runtime.electrical.voltage_min_pu
+            <= self.grid_voltage_pu
+            <= runtime.electrical.voltage_max_pu
+        ):
             raise ChainRunnerError("scenario grid voltage is outside the configured range")
+        if not (
+            runtime.electrical.frequency_min_hz
+            <= self.grid_frequency_hz
+            <= runtime.electrical.frequency_max_hz
+        ):
+            raise ChainRunnerError("scenario grid frequency is outside the configured range")
         if self.battery_capacity_j <= 0.0 or self.ups_load_power_w < 0.0:
             raise ChainRunnerError("scenario battery/load values are invalid")
         if not 0.0 <= self.valve_position <= 1.0:
             raise ChainRunnerError("scenario valve position must be within [0, 1]")
         if not 0.0 <= self.tool_demand_m3_s <= runtime.upw.maximum_flow_m3_s:
             raise ChainRunnerError("scenario tool demand is outside the UPW envelope")
+        if not (
+            runtime.upw.minimum_temperature_k
+            <= self.inlet_temperature_k
+            <= runtime.upw.maximum_temperature_k
+        ):
+            raise ChainRunnerError("scenario inlet temperature is outside the UPW envelope")
+        if abs(self.pressure_sensor_bias_pa) > runtime.upw.maximum_supply_pressure_pa:
+            raise ChainRunnerError("scenario pressure-sensor bias exceeds the sensor envelope")
+        if abs(self.flow_sensor_bias_m3_s) > runtime.upw.maximum_flow_m3_s:
+            raise ChainRunnerError("scenario flow-sensor bias exceeds the sensor envelope")
 
 
 @dataclass(frozen=True)
@@ -167,9 +201,21 @@ class SyntheticChainRunner:
         signals = (
             ("electrical.grid_voltage", electrical_state.grid_voltage_pu, "pu", "electrical"),
             (
+                "electrical.grid_frequency",
+                electrical_state.grid_frequency_hz,
+                "Hz",
+                "electrical",
+            ),
+            (
                 "electrical.ups_output_voltage",
                 electrical_state.ups_output_voltage_pu,
                 "pu",
+                "electrical",
+            ),
+            (
+                "electrical.ups_output_frequency",
+                electrical_state.ups_output_frequency_hz,
+                "Hz",
                 "electrical",
             ),
             (
@@ -178,10 +224,19 @@ class SyntheticChainRunner:
                 "J",
                 "electrical",
             ),
+            (
+                "drive.vfd_available_output",
+                drive_state.vfd_available_output_pu,
+                "pu",
+                "drive",
+            ),
+            ("drive.vfd_trip_state", drive_state.tripped, "1", "drive"),
             ("drive.motor_angular_speed", drive_state.motor_speed_rad_s, "rad/s", "drive"),
             ("pump.volumetric_flow", pump_state.volumetric_flow_m3_s, "m^3/s", "pump"),
             ("upw.supply_pressure", upw_state.supply_pressure_pa, "Pa", "upw"),
             ("upw.tool_flow", upw_state.tool_flow_m3_s, "m^3/s", "upw"),
+            ("upw.valve_position", upw_state.valve_position, "1", "upw"),
+            ("upw.tool_demand", upw_state.tool_demand_m3_s, "m^3/s", "upw"),
             ("upw.temperature", upw_state.temperature_k, "K", "upw"),
         )
         return tuple(
@@ -197,6 +252,59 @@ class SyntheticChainRunner:
             )
             for signal_id, value, unit, subsystem in signals
         )
+
+    def _apply_observation_faults(
+        self,
+        records: tuple[ObservationRecord, ...],
+        scenario: ChainScenario,
+    ) -> tuple[ObservationRecord, ...]:
+        """Inject unannounced event-scoped faults after physical sensing.
+
+        The returned observations may be biased, but the latent UPW state and
+        the simulator truth rows remain unchanged. No `BIASED` quality flag is
+        added because that synthetic flag would reveal the offline fault label
+        to an online estimator.
+        """
+
+        changed: list[ObservationRecord] = []
+        for record in records:
+            source_timestamp_s = record.source_timestamp_s
+            if source_timestamp_s is None:
+                changed.append(record)
+                continue
+            source_time_s = max(0.0, source_timestamp_s - self.schedule.dt_s)
+            fault_active = (
+                scenario.event_start_s
+                <= source_time_s
+                < scenario.event_start_s + scenario.event_duration_s
+            )
+            if not fault_active or not isinstance(record.value, (int, float)):
+                changed.append(record)
+                continue
+            value = float(record.value)
+            if (
+                scenario.family is ChainEventKind.PRESSURE_SENSOR_FAULT
+                and record.signal_id == "upw.supply_pressure"
+            ):
+                value = min(
+                    self.runtime.upw.maximum_supply_pressure_pa,
+                    max(0.0, value + scenario.pressure_sensor_bias_pa),
+                )
+            elif (
+                scenario.family is ChainEventKind.FLOW_SENSOR_FAULT
+                and record.signal_id == "upw.tool_flow"
+            ):
+                value = min(
+                    self.runtime.upw.maximum_flow_m3_s,
+                    max(0.0, value + scenario.flow_sensor_bias_m3_s),
+                )
+            else:
+                changed.append(record)
+                continue
+            payload = record.model_dump()
+            payload["value"] = value
+            changed.append(ObservationRecord.model_validate(payload))
+        return tuple(changed)
 
     def run(self, scenario: ChainScenario) -> ChainTrace:
         scenario.validate(self.runtime, self.schedule.duration_s)
@@ -269,19 +377,27 @@ class SyntheticChainRunner:
             )
             electrical_disturbance: dict[str, float | bool] = {
                 "grid_voltage_pu": 1.0,
+                "grid_frequency_hz": self.runtime.electrical.nominal_frequency_hz,
                 "ups_load_power_w": scenario.ups_load_power_w,
             }
             drive_disturbance: dict[str, float | bool] = {}
             upw_action: dict[str, float] = {"valve_position": 1.0}
             upw_disturbance: dict[str, float] = {}
             if event_active:
-                if scenario.family is ChainEventKind.HEALTHY_SAG:
+                if scenario.family in {
+                    ChainEventKind.HEALTHY_SAG,
+                    ChainEventKind.GRID_VOLTAGE_SAG,
+                }:
+                    electrical_disturbance["grid_voltage_pu"] = scenario.grid_voltage_pu
+                elif scenario.family is ChainEventKind.GRID_VOLTAGE_SWELL:
                     electrical_disturbance["grid_voltage_pu"] = scenario.grid_voltage_pu
                 elif scenario.family in {
                     ChainEventKind.GRID_INTERRUPTION,
                     ChainEventKind.COMPOUND_INTERRUPTION_DEMAND,
                 }:
                     electrical_disturbance["force_interruption"] = True
+                if scenario.family is ChainEventKind.GRID_FREQUENCY_DEVIATION:
+                    electrical_disturbance["grid_frequency_hz"] = scenario.grid_frequency_hz
                 if scenario.family is ChainEventKind.PUMP_TRIP:
                     drive_disturbance["force_trip"] = True
                 if scenario.family is ChainEventKind.VALVE_RESTRICTION:
@@ -291,6 +407,8 @@ class SyntheticChainRunner:
                     ChainEventKind.COMPOUND_INTERRUPTION_DEMAND,
                 }:
                     upw_disturbance["tool_demand_m3_s"] = scenario.tool_demand_m3_s
+                if scenario.family is ChainEventKind.THERMAL_EXCURSION:
+                    upw_disturbance["inlet_temperature_k"] = scenario.inlet_temperature_k
 
             electrical_state = electrical.step(
                 electrical_state,
@@ -331,18 +449,21 @@ class SyntheticChainRunner:
                 self.schedule.dt_s,
             )
             observations.extend(
-                sensor.sample(
-                    self._latent_records(
-                        scenario.run_id,
+                self._apply_observation_faults(
+                    sensor.sample(
+                        self._latent_records(
+                            scenario.run_id,
+                            step_index,
+                            timestamp_s,
+                            electrical_state,
+                            drive_state,
+                            pump_state,
+                            upw_state,
+                        ),
                         step_index,
                         timestamp_s,
-                        electrical_state,
-                        drive_state,
-                        pump_state,
-                        upw_state,
                     ),
-                    step_index,
-                    timestamp_s,
+                    scenario,
                 )
             )
             truth_rows.append(
@@ -354,12 +475,18 @@ class SyntheticChainRunner:
                     "timestamp_s": timestamp_s,
                     "event_active": event_active,
                     "grid_voltage_pu": electrical_state.grid_voltage_pu,
+                    "grid_frequency_hz": electrical_state.grid_frequency_hz,
                     "ups_output_voltage_pu": electrical_state.ups_output_voltage_pu,
+                    "ups_output_frequency_hz": electrical_state.ups_output_frequency_hz,
                     "battery_energy_j": electrical_state.battery_energy_j,
+                    "vfd_available_output_pu": drive_state.vfd_available_output_pu,
+                    "vfd_tripped": drive_state.tripped,
                     "motor_speed_rad_s": drive_state.motor_speed_rad_s,
                     "pump_flow_m3_s": pump_state.volumetric_flow_m3_s,
                     "upw_supply_pressure_pa": upw_state.supply_pressure_pa,
                     "upw_tool_flow_m3_s": upw_state.tool_flow_m3_s,
+                    "upw_valve_position": upw_state.valve_position,
+                    "upw_tool_demand_m3_s": upw_state.tool_demand_m3_s,
                     "upw_temperature_k": upw_state.temperature_k,
                     "effective_availability": coupling.effective_availability,
                     "cmp_mode": cmp_state.mode.value,

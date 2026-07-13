@@ -1,9 +1,9 @@
 # Project status
 
-Last updated: 2026-07-13 14:02 IST<br>
+Last updated: 2026-07-13 14:53 IST<br>
 Current phase: Phase 3 — scientific modelling and coupling<br>
 Phase state: WP08, WP09, WP10, and WP12 COMPLETE within bounded claims<br>
-Active task: none; next scientific decision task is T-WP13
+Active task: T-WP13 root-cause attribution — frozen design, implementation in progress
 
 ## Review outcome
 
@@ -286,9 +286,9 @@ refuses a silent rerun, preserving the one-shot audit trail.
 T-WP08, T-WP09, T-WP10, and T-WP12 are scientifically closed within their
 stated claim boundaries. Remaining Phase 3 decision work is:
 
-1. T-WP13 — freeze attribution scoring, residual-chain logic, and the
-   mandatory `UNKNOWN` outcome, with feature attribution explicitly excluded
-   as causal proof;
+1. T-WP13 — implement and validate the now-frozen attribution scoring,
+   residual-chain logic, and mandatory `UNKNOWN` policy without opening TEST
+   until implementation and calibration-only checks pass;
 2. T-WP15 — freeze the predictive supervisory objective, action set, horizon,
    penalties, and fallback policy; and
 3. T-WP16 — freeze independent safety limits, applicability checks, sensor and
@@ -298,6 +298,26 @@ stated claim boundaries. Remaining Phase 3 decision work is:
 No controller-efficacy comparison or WP17 integrated closed-loop runtime is
 authorized by this status; those remain downstream work.
 
-Current governance evidence: 16 YAML files parse with zero duplicate keys; all
+Current governance evidence: 17 YAML files parse with zero duplicate keys; all
 29 tasks form an acyclic dependency graph and reference 25 valid assumptions;
-116 Markdown files contain 122 valid local links and zero missing local links.
+118 Markdown files contain 122 valid local links and zero missing local links.
+
+## WP13 pre-holdout state
+
+The root-cause-attribution policy is frozen in
+`orchestration/decisions/wp13_root_cause_attribution.md`. It separates ten
+initiating classes from UPS/VFD propagation evidence, uses arrived observations
+only, compares always-UNKNOWN, residual-rule, multinomial-logistic, and hybrid
+estimators, and mandates UNKNOWN for invalid, weak, conflicting, OOD, or
+compound evidence. Coefficient contributions and rule chains are explicitly
+not causal proof.
+
+TRAIN has 264 decision rows and CALIBRATION has 132 across disjoint opaque whole
+runs. No TEST, compound, or robustness scenario has been generated. The
+target-blind preparation payload SHA-256 is
+`e8b47b67a37972addedd5dc230005979bcb3d20f3bea76aa1ec07a5d186d3ab9`.
+Calibration-only hybrid accuracy/macro recall are 0.8182/0.8182, UNKNOWN recall
+is 1.0, known-cause coverage is 0.80, and selective accuracy is 1.0. Hybrid
+pressure-sensor-fault recall is zero on CALIBRATION; this risk will be reported
+without threshold or model retuning. Twenty-two focused tests and the complete
+210-test suite pass with warnings treated as errors.

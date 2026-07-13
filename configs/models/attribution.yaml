@@ -1,0 +1,185 @@
+schema_version: "1.0.0"
+experiment_revision: "1.0-preregistered"
+estimator:
+  estimator_id: HYBRID_ROOT_CAUSE_V1
+  primary_method: HYBRID
+  primary_initiating_causes:
+    - GRID_VOLTAGE_SAG
+    - GRID_VOLTAGE_SWELL
+    - GRID_INTERRUPTION
+    - GRID_FREQUENCY_DEVIATION
+    - PUMP_TRIP
+    - VALVE_RESTRICTION
+    - TOOL_DEMAND_SPIKE
+    - THERMAL_EXCURSION
+    - PRESSURE_SENSOR_FAULT
+    - FLOW_SENSOR_FAULT
+  propagation_evidence_causes:
+    - UPS_TRANSFER
+    - VFD_DERATING
+  unknown_cause: UNKNOWN
+  causal_proof: false
+  require_positive_warning: true
+  require_singleton_positive_conformal_set: true
+features:
+  window_s: 0.75
+  maximum_observation_age_s: 0.25
+  sensor_sample_period_s: 0.05
+  statistics: [latest, short_mean, short_slope, missing_fraction]
+  allowed_signal_ids:
+    - electrical.grid_voltage
+    - electrical.grid_frequency
+    - electrical.ups_output_voltage
+    - electrical.ups_output_frequency
+    - electrical.ups_battery_energy
+    - drive.vfd_available_output
+    - drive.vfd_trip_state
+    - drive.motor_angular_speed
+    - pump.volumetric_flow
+    - upw.supply_pressure
+    - upw.tool_flow
+    - upw.valve_position
+    - upw.tool_demand
+    - upw.temperature
+  critical_signal_ids:
+    - electrical.grid_voltage
+    - drive.motor_angular_speed
+    - pump.volumetric_flow
+    - upw.supply_pressure
+    - upw.tool_flow
+    - upw.temperature
+  forbidden_signal_ids:
+    - cmp.mrr
+    - cmp.pad_surface_activity
+    - coupling.effective_availability
+  normalization_by_signal:
+    electrical.grid_voltage: [1.0, 0.10]
+    electrical.grid_frequency: [50.0, 1.0]
+    electrical.ups_output_voltage: [1.0, 0.10]
+    electrical.ups_output_frequency: [50.0, 1.0]
+    electrical.ups_battery_energy: [3600000.0, 360000.0]
+    drive.vfd_available_output: [1.0, 0.20]
+    drive.vfd_trip_state: [0.0, 1.0]
+    drive.motor_angular_speed: [188.5, 20.0]
+    pump.volumetric_flow: [0.0002, 0.00005]
+    upw.supply_pressure: [300000.0, 50000.0]
+    upw.tool_flow: [0.0001, 0.000025]
+    upw.valve_position: [1.0, 0.20]
+    upw.tool_demand: [0.0001, 0.00005]
+    upw.temperature: [293.15, 1.0]
+sensors:
+  delay_s: 0.05
+  packet_loss_probability: 0.01
+  timestamp_jitter_std_s: 0.005
+  noise_by_signal:
+    electrical.grid_voltage: 0.002
+    electrical.grid_frequency: 0.01
+    electrical.ups_output_voltage: 0.002
+    electrical.ups_output_frequency: 0.01
+    electrical.ups_battery_energy: 2.0
+    drive.vfd_available_output: 0.002
+    drive.vfd_trip_state: 0.0
+    drive.motor_angular_speed: 0.5
+    pump.volumetric_flow: 0.000001
+    upw.supply_pressure: 250.0
+    upw.tool_flow: 0.0000005
+    upw.valve_position: 0.002
+    upw.tool_demand: 0.0000005
+    upw.temperature: 0.02
+residuals:
+  nominal_return_pressure_pa: 100000.0
+  nominal_supply_pressure_pa: 300000.0
+  nominal_pump_flow_m3_s: 0.0002
+  nominal_tool_flow_m3_s: 0.0001
+  tool_resistance_pa_s_m3: 1000000000.0
+rules:
+  grid_sag_start_fraction: 0.03
+  grid_sag_full_fraction: 0.12
+  grid_swell_start_fraction: 0.03
+  grid_swell_full_fraction: 0.12
+  interruption_start_voltage_pu: 0.40
+  interruption_full_voltage_pu: 0.10
+  frequency_start_hz: 0.20
+  frequency_full_hz: 1.00
+  motor_loss_start_fraction: 0.10
+  motor_loss_full_fraction: 0.50
+  valve_loss_start_fraction: 0.05
+  valve_loss_full_fraction: 0.40
+  demand_gain_start_fraction: 0.10
+  demand_gain_full_fraction: 1.00
+  temperature_start_k: 0.20
+  temperature_full_k: 2.00
+  pressure_residual_start_fraction: 0.08
+  pressure_residual_full_fraction: 0.20
+  flow_residual_start_fraction: 0.10
+  flow_residual_full_fraction: 0.35
+  physical_quiet_max_score: 0.45
+  propagation_start_fraction: 0.05
+  propagation_full_fraction: 0.40
+  rule_softmax_temperature: 0.20
+model:
+  random_seed: 20260713
+  logistic_c: 1.0
+  max_iter: 2000
+  class_weight: balanced
+  calibration_temperature_grid: [0.50, 0.75, 1.00, 1.25, 1.50, 2.00]
+fusion:
+  logistic_weight: 0.50
+  probability_clip: 0.000000001
+  maximum_propagation_probability_mass: 0.10
+unknown_policy:
+  minimum_top_probability: 0.55
+  minimum_top_two_margin: 0.10
+  maximum_aggregate_missing_fraction: 0.35
+  maximum_standardized_feature_abs: 8.0
+  maximum_rule_model_js_divergence: 0.35
+  disagreement_minimum_confidence: 0.60
+  compound_minimum_rule_score: 0.70
+  forced_unknown_probability: 0.80
+simulation:
+  dt_s: 0.01
+  duration_s: 8.0
+  plant_warmup_s: 3.0
+  dress_end_s: 6.0
+  polish_start_s: 7.0
+  topology: DRESSING_WATER_SUPPORT
+  event_start_s: 2.0
+  event_duration_s: 4.0
+  decision_offsets_s: [1.0, 2.0, 3.0]
+  scenario_ranges:
+    grid_voltage_sag_pu: [0.60, 0.82]
+    grid_voltage_swell_pu: [1.06, 1.20]
+    grid_frequency_deviation_abs_hz: [0.50, 2.00]
+    valve_position: [0.20, 0.70]
+    tool_demand_m3_s: [0.00015, 0.00035]
+    inlet_temperature_k: [296.15, 303.15]
+    pressure_sensor_bias_pa: [40000.0, 100000.0]
+    flow_sensor_bias_m3_s: [0.00004, 0.00012]
+splits:
+  train_seed_start: 73000
+  calibration_seed_start: 83000
+  test_seed_start: 93000
+  compound_seed_start: 103000
+  robustness_seed_start: 113000
+  runs_per_cause:
+    training: 8
+    calibration: 4
+    test: 6
+    compound: 6
+    robustness: 2
+evaluation:
+  calibration_bins: 10
+  grouped_bootstrap_repetitions: 1000
+  grouped_bootstrap_seed: 20260713
+  minimum_accuracy: 0.70
+  minimum_macro_recall: 0.65
+  minimum_accuracy_improvement_over_unknown: 0.40
+  minimum_unknown_recall: 0.80
+  maximum_normal_false_attribution_rate: 0.20
+  minimum_selective_accuracy: 0.75
+  minimum_known_cause_coverage: 0.60
+  minimum_compound_abstention_rate: 0.75
+robustness:
+  noise_scale: 2.0
+  delay_s: 0.20
+  packet_loss_probability: 0.10

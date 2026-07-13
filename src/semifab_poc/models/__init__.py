@@ -1,5 +1,22 @@
 """Predictive models for virtual metrology and synthetic early warning."""
 
+from .attribution import (
+    ALL_CAUSES,
+    MODEL_CAUSES,
+    PRIMARY_INITIATING_CAUSES,
+    PROPAGATION_EVIDENCE_CAUSES,
+    Attribution,
+    AttributionConfig,
+    AttributionDataset,
+    AttributionError,
+    AttributionFeatureExtractor,
+    AttributionFeatureVector,
+    AttributionMethod,
+    AttributionObservationWindow,
+    ResidualRuleEngine,
+    RootCauseEstimator,
+    load_attribution_config,
+)
 from .early_warning import (
     CensorReason,
     EarlyWarningConfig,
@@ -33,6 +50,18 @@ from .virtual_metrology import (
 )
 
 __all__ = [
+    "ALL_CAUSES",
+    "MODEL_CAUSES",
+    "PRIMARY_INITIATING_CAUSES",
+    "PROPAGATION_EVIDENCE_CAUSES",
+    "Attribution",
+    "AttributionConfig",
+    "AttributionDataset",
+    "AttributionError",
+    "AttributionFeatureExtractor",
+    "AttributionFeatureVector",
+    "AttributionMethod",
+    "AttributionObservationWindow",
     "CensorReason",
     "EarlyWarningConfig",
     "EarlyWarningError",
@@ -42,6 +71,8 @@ __all__ = [
     "LabelingResult",
     "ModelKind",
     "Prediction",
+    "ResidualRuleEngine",
+    "RootCauseEstimator",
     "StreamingFeatureExtractor",
     "WarningDataset",
     "WarningObservationWindow",
@@ -57,6 +88,7 @@ __all__ = [
     "evaluate_predictions",
     "generate_excursion_labels",
     "load_early_warning_config",
+    "load_attribution_config",
     "load_virtual_metrology_config",
     "prepare_feature_only_roles",
     "run_virtual_metrology_experiment",

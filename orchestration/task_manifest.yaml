@@ -790,7 +790,7 @@ tasks:
       - Implementation opened at 2026-07-12T13:20:28+05:30 after T-COMMS-DEMO completed and the user authorized continuation.
       - WP12 final evidence was integrated after the frozen revision-1.4 validation report completed.
       - WP09 public-data methods, results, failed gates, figures, and limitations are integrated and the revised PDF passed build, log, and representative visual review.
-      - WP13 and WP14-WP18 remain visibly pending.
+      - Conditional synthetic WP13 methods, results, figures, limitations, and provenance are integrated; WP14-WP18 remain visibly pending.
       - Root Makefile target `paper` delegates to the manuscript build without adding a Python dependency.
       - Task closed COMPLETE on 2026-07-13 after build, log, traceability, and representative visual review.
     validation_evidence:
@@ -808,6 +808,12 @@ tasks:
       - "paper/evidence_map.md traces WP09, WP08, WP10, and bounded WP12 numerical statements to governing artifacts"
       - "WP09-closeout governance: 16 YAML, zero duplicate keys, 29-task acyclic DAG, 25 assumptions, 116 Markdown files, 122 valid links, zero missing links"
       - "WP09-closeout complete suite: 192 passed in 51.13 s with warnings treated as errors in devkki"
+      - "WP13-integrated output: 17-page A4 PDF; SHA-256 9437f7912372aed4579e0ad650cb73ae9edbbe06d741e102d5a48c4e6b1d420b"
+      - "WP13-integrated LaTeX log: no overfull box, undefined-reference, undefined-citation, or rerun warning"
+      - "WP13 representative visual review: title/evidence boundary, equations, comparator table, confusion/recall figures, evidence-status table, discussion, limitations, and references legible"
+      - "paper/evidence_map.md traces WP09, WP08, WP10, bounded WP12, and conditional synthetic WP13 numerical statements to governing artifacts"
+      - "WP13-closeout governance: 17 YAML, zero duplicate keys, 29-task acyclic DAG, 25 assumptions, 126 Markdown files, 134 valid links, zero missing links"
+      - "WP13-closeout complete suite: 211 passed in 60.24 s with warnings treated as errors in devkki"
 
   - id: T-WP11
     title: WP11 deterministic declarative scenario engine
@@ -912,7 +918,7 @@ tasks:
   - id: T-WP13
     title: WP13 root-cause attribution
     phase: 3
-    state: IN_PROGRESS
+    state: COMPLETE
     priority: HIGH
     dependencies: [T-WP10, T-WP12]
     inputs:
@@ -944,6 +950,21 @@ tasks:
       - Twenty-two focused WP13 tests and the complete 210-test repository suite pass in conda environment devkki with warnings treated as errors before TEST opening.
       - The frozen pre-holdout implementation is committed at 7489bf1d14add57033c685998ced4f75b8b7fc98; the checkpoint is recorded in orchestration/reports/wp13_preholdout_checkpoint.md.
       - The first one-shot invocation stopped before TEST because JSON arrays reloaded as lists while the replay used equivalent tuples; canonical hashes matched. The authorized guard-only correction has 23 focused and 211 complete passing tests, with no opening marker written.
+      - The authorized one-shot opened TEST at Git commit ec7bc8b41afc9261f56673c92bf2744b15a9540c after the corrected guard replayed the exact target-blind payload and focused tests.
+      - TEST contains 198 decision rows from 66 whole runs. The hybrid attains 0.8636 accuracy and macro recall, 1.0 UNKNOWN recall, 0.85 known-cause coverage, 1.0 selective accuracy, and 1.0 top-two accuracy; all nine errors abstain to UNKNOWN.
+      - Rule only attains 0.9242 and outperforms the frozen primary hybrid. No TEST-driven model switch or retuning was performed.
+      - Compound abstention is 0.8333 with truth-set recall at two of 1.0. Delay and dropout reduce diagnostic availability without producing false known-cause substitutions; pressure-sensor-fault recall is 0.3333.
+      - All frozen interpretation gates pass. The result supports conditional synthetic diagnostic classification only; feature contributions and rule chains are not causal proof.
+      - Validation JSON SHA-256 is f075e513bb2c836ea2ca1b20c281f21929ab3ad7fa01f8eea4bf79d5a613fefc; deterministic payload SHA-256 is b1f7080dc0d091caa003793ec7eed98a92dd3b9a509c33a7f77e86a5dae74f99; prediction CSV SHA-256 is 8108f514930f6f2bfaf77bab5597e35432d6dded3c7290bfa34a294820f494eb.
+      - The running paper, modeling notes, evidence map, and 17-page journal PDF include the WP13 methods, results, figures, limitations, and provenance.
+    validation_evidence:
+      - orchestration/reports/wp13_attribution_validation.md
+      - reports/attribution/wp13_validation.json
+      - reports/attribution/wp13_predictions.csv
+      - reports/attribution/wp13_holdout_opening.json
+      - reports/attribution/figures/wp13_hybrid_confusion.png
+      - reports/attribution/figures/wp13_hybrid_recall.png
+      - "2026-07-13: 23/23 focused WP13 preflight tests and 211/211 complete repository tests passed with warnings treated as errors"
 
   - id: T-WP14
     title: WP14 baseline controllers
@@ -975,7 +996,7 @@ tasks:
   - id: T-WP15
     title: WP15 predictive supervisory controller
     phase: 3
-    state: PLANNED
+    state: READY
     priority: CRITICAL
     dependencies: [T-WP08, T-WP12]
     inputs:
@@ -998,8 +1019,9 @@ tasks:
       - action_magnitude_and_slew_proposals_bounded
       - latency_budget_measured
     assumptions: [A-012, A-015, A-017]
-    blockers:
-      - Phase_3_objective_horizon_and_actions_not_frozen
+    blockers: []
+    notes:
+      - Phase 3 scientific decision work becomes READY after bounded WP12 warning and WP13 attribution closure; implementation must not start until the objective, horizon, action semantics, fallback, and comparison gates are frozen.
 
   - id: T-WP16
     title: WP16 independent safety filter

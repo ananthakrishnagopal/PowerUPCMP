@@ -1,7 +1,7 @@
 # Predictive Supervisory Control of CMP Under Electrical and UPW Disturbances
 
 **Living research paper draft**<br>
-Status: corrective R1--R4, public-data WP09 virtual metrology, synthetic CMP WP08, declared-topology WP10 coupling, and synthetic WP12 early-warning validation complete; attribution, control, and safety results pending<br>
+Status: corrective R1--R4, public-data WP09 virtual metrology, synthetic CMP WP08, declared-topology WP10 coupling, synthetic WP12 early warning, and conditional synthetic WP13 attribution complete; control and safety results pending<br>
 Last updated: 2026-07-13
 
 > This document is maintained throughout implementation and will become the basis of the final technical paper. Every result must link to a reproducible artifact, configuration, code path, and provenance record. Missing evidence is recorded as pending rather than inferred.
@@ -52,8 +52,17 @@ events with 2.71 s median lead, and produced one false-alarm episode; a frozen
 gradient-boosted model also detected 3/3 events with PR-AUC 0.9130. These
 primary results do not generalize safely: both models alarm severely under an
 explicit no-connection topology, and high sensor noise degrades discrimination,
-specificity, and uncertainty coverage. No predictive-control efficacy,
-real-fab, defect, yield, equipment, or production-control claim is made.
+specificity, and uncertainty coverage. A separately frozen root-cause study
+then compared always-unknown, residual-rule, multinomial-logistic, and hybrid
+estimators across 66 held-out whole runs spanning ten initiating causes plus
+normal unknown cases. The preregistered hybrid attained 0.8636 accuracy and
+macro recall, 1.000 unknown recall and selective accuracy, and 0.850 known-
+cause coverage; all nine errors were conservative abstentions. Rule only
+scored higher at 0.9242, but was not substituted after TEST access. Delay and
+dropout collapsed diagnostic availability toward unknown. These are
+simulator-conditional classifications, not causal proof. No predictive-control
+efficacy, real-fab, defect, yield, equipment, or production-control claim is
+made.
 
 ## 1. Research question and scope
 
@@ -603,21 +612,95 @@ as topology-independent alarms. Complete equations, revisions, sensitivities,
 and artifacts are in
 [`wp12_early_warning_validation.md`](../orchestration/reports/wp12_early_warning_validation.md).
 
-### 6.5 Attribution, controllers, and safety (pending)
+### 6.5 WP13 conditional root-cause attribution
 
-WP13 attribution, WP14 baselines, the WP15 predictive supervisor, and the WP16
-independent safety filter remain pending. Planned controllers are no action,
-fixed threshold/hysteresis, safe hold, controlled resume, and bounded
-predictive supervisory control. Reinforcement learning is excluded from this
-PoC. The WP12 runner is open loop and proposes or applies no action.
+WP13 separates ten initiating classes from UPS transfer and VFD derating,
+which remain propagation evidence, and adds a required `UNKNOWN` output. At
+decision time \(t_d\), only arrived records are visible:
+
+\[
+\mathcal O(t_d)=\{o_i:t_{arrival,i}\le t_d\}.
+\]
+
+The estimator uses latest value, 0.75 s mean, least-squares slope, and missing
+fraction for 14 observed utility/automation signals. It excludes latent state,
+scenario metadata, future samples, CMP MRR, pad/coupling state, offline
+excursion labels, and simulator initiating labels. Pressure and flow
+consistency evidence is
+
+\[
+\widehat P=P_r+(P_0-P_r)(Q_p/Q_{p,0})^2,
+\qquad r_P=(P_{obs}-\widehat P)/P_0,
+\]
+
+\[
+\widehat Q_t=\min[D,v\max(P_{obs}-P_r,0)/R_t],
+\qquad r_Q=(Q_{obs}-\widehat Q_t)/Q_{t,0}.
+\]
+
+These are engineering diagnostic proxies, not independent hydraulic truth.
+Sensor-fault scenarios alter observations only and do not modify latent plant
+state. The bounded rule severity is
+
+\[
+\rho(d;a,b)=\operatorname{clip}\left(\frac{d-a}{b-a},0,1\right).
+\]
+
+A balanced multinomial logistic model uses TRAIN-only median imputation and
+standardization plus a temperature selected on disjoint CALIBRATION runs. The
+reported signed contribution \(a_{cj}=\beta_{cj}\widetilde x_j\) explains a
+classifier logit only. It is never interpreted as a causal effect. The frozen
+hybrid is the equal-weight geometric pool
+
+\[
+s_c=0.5\log(p_{ML,c}+10^{-9})
++0.5\log(p_{rule,c}+10^{-9}),
+\qquad p_{hybrid}=\operatorname{softmax}(s).
+\]
+
+Mandatory abstention covers a negative or uncertain warning, stale/missing
+observations, out-of-distribution transformed features, low confidence or
+margin, confident rule/model disagreement, and multiple strong initiating
+rules. The primary diagnostic experiment supplies a neutral valid-positive
+singleton warning token to isolate cause separability from WP12 warning
+recall; it is not an end-to-end operational rate.
+
+TEST contains 66 disjoint whole runs, six for each known cause and six normal
+`UNKNOWN` runs. The hybrid attains accuracy/macro recall 0.8636, `UNKNOWN`
+recall 1.0000, known-cause coverage 0.8500, selective accuracy 1.0000, and
+top-two accuracy 1.0000. Its grouped-bootstrap accuracy 5th--95th percentile
+is 0.7879--0.9242. Every one of nine errors abstains to `UNKNOWN`; pressure-
+sensor-fault recall is the weakest at 0.3333. The rule-only comparator scores
+0.9242, exceeding the primary hybrid, but TEST-derived method switching is
+forbidden.
+
+On six unseen interruption/demand compounds, abstention is 0.8333 and
+pre-abstention truth-set recall at two is 1.0000. Doubled noise and parameter
+mismatch retain 0.8636 aggregate accuracy. Conversely, 0.20 s communication
+delay forces all runs to `UNKNOWN`, and 10% dropout lowers known-cause coverage
+to 0.15 while retaining 1.0 selective accuracy. Thus the failure under severe
+communication corruption is availability loss, not false known-cause
+substitution. Detailed evidence is in
+[`wp13_attribution_validation.md`](../orchestration/reports/wp13_attribution_validation.md).
+
+### 6.6 Controllers and safety (pending)
+
+WP14 baselines, the WP15 predictive supervisor, and the WP16 independent safety
+filter remain pending. Planned controllers are no action, fixed threshold with
+hysteresis, safe hold, controlled resume, and bounded predictive supervisory
+control. Reinforcement learning is excluded from this PoC. WP12 and WP13 are
+open-loop diagnostic studies and propose or apply no action.
 
 ## 7. Evaluation status and remaining plan
 
 WP12 reports held-out row and event metrics, whole-run bootstrap intervals,
 target-definition sensitivities, named noise/delay/dropout corruptions, an
-unseen-compound diagnostic, and a structural no-connection diagnostic. These
-are open-loop warning evaluations; amortized vectorized prediction timing is
-not a controller or production-latency result.
+unseen-compound diagnostic, and a structural no-connection diagnostic. WP13
+reports final-window whole-run classification, grouped bootstrap accuracy,
+per-class precision/recall, `UNKNOWN` behavior, compound abstention, diagnostic
+robustness, and local inference timing. These are open-loop warning and
+diagnostic evaluations; their timings are not controller or production-latency
+results.
 
 WP09 reports source-native MRR MAE, RMSE, relative MAE, R², bias, grouped-
 bootstrap intervals, and prediction-interval coverage for the public-data
@@ -654,7 +737,7 @@ Results will report mean, median, standard deviation, 5th percentile, 95th perce
 | Public-data virtual-metrology accuracy | `orchestration/reports/wp09_virtual_metrology_validation.md`; `reports/virtual_metrology/wp09_validation.json` | Tree MAE 3.19 test and 3.40 validation in source-native MRR units; 83.9%/84.7% interval coverage missed the frozen 85% minimum; public-data virtual metrology only |
 | Electrical → UPW → CMP causal propagation | `reports/sensitivity/wp10_positive_chain_trace.csv` | Validated only for the declared synthetic degraded-UPS/DRESS topology; no causal claim for a real fab |
 | Early-warning performance | `reports/early_warning/wp12_validation.json`; TEST predictions and figures | Logistic PR-AUC 0.9904 and GBT 0.9130; both detect 3/3 synthetic events with 2.71 s median lead; no controller or real-fab claim |
-| Root-cause attribution | Future simulator-label evaluation | Pending |
+| Root-cause attribution | `orchestration/reports/wp13_attribution_validation.md`; `reports/attribution/wp13_validation.json` | Hybrid accuracy/macro recall 0.8636, unknown recall 1.0, known-cause coverage 0.85, selective accuracy 1.0; rule-only comparator 0.9242; all hybrid errors abstain; conditional synthetic diagnosis only |
 | Predictive-control improvement | Future paired controller report | Pending |
 | Safety-filter constraint compliance | Future runtime audit | Pending |
 
@@ -729,6 +812,22 @@ Results will report mean, median, standard deviation, 5th percentile, 95th perce
   experiment; real deployment would require independently audited availability
   and consistency. WP12 vectorized offline latency is not streaming-control
   latency.
+- WP13 uses a neutral valid-positive warning token for primary scoring. Its
+  accuracy is conditional on a warning being present and cannot be multiplied
+  into an end-to-end operational claim without WP17 evaluation.
+- Each WP13 class has only six held-out runs from a fixed synthetic severity
+  grid. The 66-run grouped bootstrap quantifies resampling uncertainty within
+  that grid but does not create new mechanisms or real-fab diversity.
+- The rule-only comparator outperforms the frozen hybrid on TEST, so the learned
+  fusion has not demonstrated incremental value. The hybrid is retained solely
+  because primary-method switching after TEST is prohibited.
+- Pressure-sensor-fault recall is 0.3333. Severe delay and dropout cause broad
+  abstention, reducing known-cause coverage to 0 and 0.15 respectively. A safe
+  runtime must distinguish diagnostic unavailability from a confirmed normal
+  state.
+- Simulator labels, rule chains, residual consistency, and logistic
+  contributions support internal classification analysis only. None is
+  experimental causal proof or a validated diagnosis of a real tool.
 - No physical defect, yield, equipment-damage, or production-control labels are available.
 - Temporal resolution and software latency must not be represented as production real-time guarantees.
 
@@ -781,6 +880,19 @@ Results will report mean, median, standard deviation, 5th percentile, 95th perce
   deterministic probability-payload hash:
   `5a4fb7011fd6688718455c9692689937caa679ea29c884cdca099835a9830ede`.
   The payload intentionally excludes measured latency and conformal sets.
+- WP13 preflight passed 23/23 focused tests and 211/211 complete repository
+  tests with warnings treated as errors. The one-shot opened from Git commit
+  `ec7bc8b41afc9261f56673c92bf2744b15a9540c`; the persistent opening-marker
+  hash is
+  `53139b8b65c1acc2307fa6bb7b7488e7921e14b191b5f3206e299de39b502a3d`.
+  TEST contains 198 decision rows from 66 whole runs and has payload hash
+  `395464f24f9e5b50230bdfe9a19d18333492f1489a470bdc83636f643fb24329`.
+  Validation JSON, deterministic payload, and prediction CSV hashes are
+  `f075e513bb2c836ea2ca1b20c281f21929ab3ad7fa01f8eea4bf79d5a613fefc`,
+  `b1f7080dc0d091caa003793ec7eed98a92dd3b9a509c33a7f77e86a5dae74f99`,
+  and
+  `8108f514930f6f2bfaf77bab5597e35432d6dded3c7290bfa34a294820f494eb`.
+  The opening marker prevents an unrecorded second holdout execution.
 - WP09 was frozen at Git checkpoint
   `01c59a6172f621ed7f81a01487a5e4358805463c` before target access. The
   one-shot guard replayed the target-blind manifest, required a clean worktree,
@@ -797,13 +909,16 @@ Results will report mean, median, standard deviation, 5th percentile, 95th perce
 - Dataset archive and extraction checksums: recorded above and in the extraction manifest.
 - Current source status: Git branch `main`; WP12 validation is committed at
   `25dd7ac`, the whole-wafer split correction at `de9ff10`, the WP09 protocol
-  at `0f9d55b`, and the frozen pre-holdout implementation at `01c59a6`.
-- WP09/WP12 reproduction and repository-audit commands:
+  at `0f9d55b`, the WP09 frozen implementation at `01c59a6`, the WP13 frozen
+  implementation at `7489bf1`, and its representation-only guard correction
+  at `ec7bc8b`.
+- WP09/WP12/WP13 audit and reproduction commands:
 
   ```text
   conda run -n devkki python -m pytest -q -W error
   conda run -n devkki python scripts/validate_wp09_virtual_metrology.py --help
   env MPLCONFIGDIR=/tmp/semifab-poc-matplotlib conda run -n devkki python scripts/validate_wp12_early_warning.py
+  conda run -n devkki python scripts/validate_wp13_attribution.py --help
   conda run -n devkki python scripts/validate_governance.py
   ```
 

@@ -2,3 +2,7 @@
 # frozen WP12 artifact bytes while treating CR as part of the line terminator
 # for Git whitespace validation.
 reports/early_warning/*.csv whitespace=cr-at-eol
+
+# Preserve the frozen WP13 attribution artifact bytes while recognizing its
+# standards-compliant CRLF records during Git whitespace validation.
+reports/attribution/*.csv whitespace=cr-at-eol

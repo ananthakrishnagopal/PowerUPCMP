@@ -29,9 +29,12 @@ compound-shift, and high-noise failures prohibit topology-independent use.
 WP09 now provides guarded, leakage-safe offline PHM average-MRR virtual
 metrology: the selected tree achieves 3.185/3.395 test/validation MAE in the
 source-native target scale, while its uncertainty coverage fails the frozen
-minimum and the hybrid-improvement claim is rejected. Root-cause attribution,
-controllers, the safety filter, dashboard, and any supported control-efficacy
-result remain pending.
+minimum and the hybrid-improvement claim is rejected. WP13 now provides
+conditional synthetic root-cause classification: the frozen hybrid attains
+0.8636 held-out accuracy/macro recall with all errors abstaining to UNKNOWN,
+while rule only is stronger at 0.9242. Delay and dropout sharply reduce
+diagnostic availability. Controllers, the safety filter, dashboard, and any
+supported control-efficacy result remain pending.
 See the current
 [`project status`](orchestration/project_status.md),
 the [Phase 1/2 audit](orchestration/reports/phase_1_2_scientific_audit.md),
@@ -49,6 +52,9 @@ and
 [coupling validation report](orchestration/reports/wp10_coupling_validation.md).
 WP12 methods, results, and limitations are in the
 [early-warning validation report](orchestration/reports/wp12_early_warning_validation.md).
+WP13 methods, held-out class metrics, abstention behavior, robustness, and
+artifact hashes are in the
+[attribution validation report](orchestration/reports/wp13_attribution_validation.md).
 WP09 methods, point performance, uncertainty failure, sensitivities, and
 artifact hashes are in the
 [virtual-metrology validation report](orchestration/reports/wp09_virtual_metrology_validation.md).
@@ -77,7 +83,15 @@ models predict the preregistered ±5%, 0.25 s persistent active-POLISH simulator
 event within 3 s on one named held-out dressing-support ensemble. TEST contains
 only three event-bearing runs, and the models fail important no-connection and
 sensor-noise diagnostics. This is process-excursion prediction in simulation,
-not attribution, safe intervention, or real-fab validation.
+not safe intervention or real-fab validation.
+
+The supported WP13 claim is also conditional and synthetic. Given a neutral
+valid-positive warning, the hybrid classifies ten initiating simulator labels
+plus UNKNOWN on 66 held-out whole runs with 0.8636 accuracy and 0.85 known-
+cause coverage. Rule only performs better, pressure-sensor faults are weak,
+and severe communication corruption drives abstention. Feature contributions,
+residual agreement, and rule chains are not causal proof, and this is not an
+end-to-end diagnostic or real-tool result.
 
 This PoC will not claim validated prediction or prevention of scratches, dishing, erosion, corrosion, contamination, delamination, cracking, real yield loss, equipment damage, production control, or microsecond response. Any future spatial output must carry the label: “Simulated spatial-uniformity proxy; not experimentally validated WIWNU.”
 
@@ -94,6 +108,7 @@ conda run -n devkki python -m pytest
 conda run -n devkki python scripts/validate_wp08_cmp.py
 conda run -n devkki python scripts/validate_wp10_coupling.py
 conda run -n devkki python scripts/validate_wp12_early_warning.py
+conda run -n devkki python scripts/validate_wp13_attribution.py --help
 conda run -n devkki make paper
 conda run -n devkki python -m semifab_poc --help
 ```

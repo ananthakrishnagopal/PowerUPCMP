@@ -1,0 +1,9 @@
+{
+  "accessed_at_utc": "2026-07-13T09:43:00.403239+00:00",
+  "claim_boundary": "SYNTHETIC_SIMULATOR_ATTRIBUTION_ONLY",
+  "explicit_holdout_authorization": true,
+  "git_head": "ec7bc8b41afc9261f56673c92bf2744b15a9540c",
+  "preparation_payload_sha256": "e8b47b67a37972addedd5dc230005979bcb3d20f3bea76aa1ec07a5d186d3ab9",
+  "schema_version": "1.0.0",
+  "state": "OPENING_AUTHORIZATION_CONSUMED_RUN_STARTED"
+}

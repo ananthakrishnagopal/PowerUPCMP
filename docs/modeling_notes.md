@@ -604,13 +604,140 @@ claim limits are in
 Every WP10 coefficient now carries one of the required provenance classes plus
 nominal value, units, bounds, sign, uncertainty, and sensitivity evidence.
 
+## T-WP12 early warning — validated conditional synthetic behavior
+
+WP12 defines a process excursion against an event-disabled paired reference,
+not against an unverified absolute production limit. For disturbed active-
+POLISH MRR \(R_k\), paired reference \(R_k^{ref}\), and a frozen relative band
+\(\delta=0.05\), the point indicator is
+
+\[
+v_k=\mathbb I[m_k=\mathrm{POLISH}]
+\mathbb I[R_k^{ref}>10^{-12}\ \mathrm{m/s}]
+\mathbb I[R_k<(1-\delta)R_k^{ref}\ \lor\
+R_k>(1+\delta)R_k^{ref}].
+\]
+
+An episode requires 25 consecutive 10 ms violating intervals, or 0.25 s. At
+eligible decision time \(t_d\), the frozen 3 s horizon target is
+
+\[
+y(t_d)=\mathbb I[t_d<t_e\le t_d+3\ \mathrm{s}],
+\]
+
+where \(t_e\) is the first interval of a subsequently persistent excursion.
+Rows without a complete horizon, a contiguous active-POLISH opportunity, or a
+pre-onset decision are censored rather than assigned negative labels.
+
+Only observations that have arrived by \(t_d\) and whose source step is no
+later than the decision step enter the 65-feature vector. The upstream deficit
+memory used for selected normalized signals is
+
+\[
+D_j(t_d)=\int_0^{t_d}\max(0,0.95-z_j(t))\,dt.
+\]
+
+Prevalence, logistic regression, and histogram gradient boosting are compared.
+Probability calibration and split-conformal uncertainty use separate whole-run
+roles. For calibrated probability \(\widetilde p_i\), binary label \(y_i\),
+and nonconformity score
+
+\[
+s_i=\begin{cases}1-\widetilde p_i,&y_i=1,\\
+\widetilde p_i,&y_i=0,
+\end{cases}
+\]
+
+the finite-sample quantile is selected without TEST access. Empty or
+non-singleton conformal sets are uncertainty/applicability evidence for WP16,
+not permission to act.
+
+On 24 primary TEST runs, with 1,932 eligible rows but only three independent
+event-bearing runs, logistic PR-AUC is 0.9904 and gradient-boosted PR-AUC is
+0.9130. Both detect 3/3 events at 2.71 s median lead. Structural-null,
+unseen-compound, and high-noise diagnostics fail materially, so the result is
+limited to the named dressing-support ensemble. Full evidence and the
+revision history are in
+`orchestration/reports/wp12_early_warning_validation.md`.
+
+## T-WP13 root-cause attribution — validated conditional synthetic behavior
+
+WP13 classifies ten simulator initiating causes plus `UNKNOWN` after a valid
+positive warning. UPS transfer and VFD derating remain propagation evidence.
+At decision time \(t_d\), the admissible record set is
+
+\[
+\mathcal O(t_d)=\{o_i:t_{arrival,i}\le t_d\}.
+\]
+
+The estimator receives no simulator labels, scenario identifiers, future
+observations, latent state, CMP MRR, pad state, or coupling state. Four
+statistics are computed over a 0.75 s arrived window for each of 14 observed
+signals: latest value, mean, least-squares slope, and missing fraction.
+
+Two redundancy checks distinguish plant signatures from observed sensor bias.
+With return pressure \(P_r\), nominal supply pressure \(P_0\), pump-flow ratio
+\(q_p=Q_p/Q_{p,0}\), tool demand \(D\), valve position \(v\), and tool
+resistance \(R_t\),
+
+\[
+\widehat P=P_r+(P_0-P_r)q_p^2,
+\qquad
+r_P=(P_{obs}-\widehat P)/P_0,
+\]
+
+\[
+\widehat Q_t=\min[D,v\max(P_{obs}-P_r,0)/R_t],
+\qquad
+r_Q=(Q_{obs}-\widehat Q_t)/Q_{t,0}.
+\]
+
+These proxies are engineering diagnostic approximations, not independent
+physical truth. Sensor faults are applied only to observations and do not
+change latent hydraulics.
+
+Rule scores use the bounded ramp
+
+\[
+\rho(d;a,b)=\operatorname{clip}\left(\frac{d-a}{b-a},0,1\right).
+\]
+
+A balanced multinomial logistic comparator uses TRAIN-only median imputation
+and standardization. Its local signed contribution
+\(a_{cj}=\beta_{cj}\widetilde x_j\) explains the fitted class score only and
+is not a causal effect. The frozen primary hybrid is the equal-weight geometric
+pool
+
+\[
+s_c=0.5\log(p_{ML,c}+10^{-9})
++0.5\log(p_{rule,c}+10^{-9}),
+\qquad p_{hybrid}=\operatorname{softmax}(s).
+\]
+
+Mandatory `UNKNOWN` gates cover negative/uncertain warnings, stale or missing
+signals, standardized feature magnitude above 8, top probability below 0.55,
+top-two margin below 0.10, confident rule/model Jensen--Shannon divergence
+above 0.35, and two strong initiating rules. A fired gate forces at least 0.80
+`UNKNOWN` probability before normalization.
+
+On 66 disjoint TEST runs, the hybrid attains 0.8636 accuracy and macro recall,
+1.000 `UNKNOWN` recall, 0.850 known-cause coverage, and 1.000 selective
+accuracy. All nine errors are abstentions, including four of six pressure-
+sensor faults. Rule only scores 0.9242 and outperforms the frozen primary, but
+TEST-derived method switching is prohibited. Under 0.20 s delay the hybrid
+abstains on every run; under 10% dropout known-cause coverage falls to 0.15.
+These are diagnostic-availability failures rather than false known-cause
+substitutions. Full metrics, robustness, hashes, and interpretation are in
+`orchestration/reports/wp13_attribution_validation.md`.
+
 ## Decisions still required before predictive control
 
-1. Safe MRR/utility envelope, persistence rule, and warning horizon.
-2. Uncertainty representation, calibration data, and coverage target.
-3. Compound-event attribution policy and `UNKNOWN` handling.
-4. Predictive action set, horizon, cost function, hold/recovery penalties, and latency budget.
-5. Independent safety limits, slew rates, invalid-sensor behavior, high-uncertainty behavior, and restart dwell.
+1. Predictive action set, horizon, cost function, hold/recovery penalties, and
+   latency budget.
+2. Independent action limits, slew rates, topology/applicability checks,
+   invalid-sensor behavior, high-uncertainty behavior, and restart dwell.
+3. Paired comparison gates that prevent a hold-heavy policy from appearing
+   beneficial solely by stopping processing.
 
 ## Evidence protocol
 

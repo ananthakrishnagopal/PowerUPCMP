@@ -90,17 +90,14 @@ evidence is recorded in `orchestration/reports/r2_phm_semantics_validation.md`;
 R3 evidence is recorded in
 `orchestration/reports/r3_plant_physics_validation.md`; R4 evidence is recorded
 in `orchestration/reports/r4_online_scenario_timing_validation.md`. These gates
-do not authorize a public-data model or controller-efficacy claim. T-WP08 is
-now COMPLETE under the frozen decision and validation report. Its standalone
-synthetic CMP plant passes process-mode, kinematic, generalized-Preston,
-consumable, slurry, thermal-energy, cumulative-removal, deterministic replay,
-and timestep-refinement checks. T-WP10 utility topology and sensitivity remain
-unfrozen and no electrical/UPW-to-CMP propagation claim exists yet.
-
-The replacement CMP proposal in
-`orchestration/reports/phase_3_cmp_model_redesign.md` must be approved before
-this corrective implementation changes frozen contracts. The withdrawn
-direct-modifier decision must not be implemented.
+do not authorize a controller-efficacy claim. T-WP08, T-WP09, T-WP10, T-WP12,
+and T-WP13 are COMPLETE within their recorded boundaries. The reduced-order
+CMP equations and declared utility topology pass their synthetic checks; the
+PHM tree supports bounded offline point prediction but not calibrated
+uncertainty or hybrid improvement; early warning is limited by three TEST
+events and severe shift failures; and attribution is conditional on a valid
+diagnostic warning with communication-driven availability limits. The
+withdrawn direct UPW-to-MRR modifier must not be restored.
 
 ### Scientific decisions to freeze before implementation completion
 

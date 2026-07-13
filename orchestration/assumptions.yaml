@@ -136,7 +136,7 @@ assumptions:
     basis: Synthetic assumption
     status: ACCEPTED_FOR_POC
     applies_to: [WP13]
-    validation: R4 freezes target-compatible initiating labels, forbids propagation states as scenario initiators, and enforces interval-aware MULTI_LABEL_ORDERED compound truth; held-out attribution confusion matrices including UNKNOWN remain required.
+    validation: WP13 preserves the R4 initiating/propagation distinction, hides simulator labels until post-decision scoring, and reports all ten single causes plus UNKNOWN on 66 disjoint TEST runs. Hybrid accuracy and macro recall are 0.8636, UNKNOWN recall is 1.0, and compound abstention is 0.8333 with truth-set recall at two of 1.0. These validate only internal simulator-label classification; the rule-only comparator is stronger, pressure-fault recall is weak, and communication corruption causes major abstention.
     consequence_if_false: Attribution becomes descriptive evidence only and accuracy claims are removed.
 
   - id: A-015

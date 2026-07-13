@@ -1,9 +1,9 @@
 # Project status
 
-Last updated: 2026-07-13 15:10 IST<br>
+Last updated: 2026-07-13 16:16 IST<br>
 Current phase: Phase 3 — scientific modelling and coupling<br>
-Phase state: WP08, WP09, WP10, and WP12 COMPLETE within bounded claims<br>
-Active task: T-WP13 root-cause attribution — frozen design, implementation in progress
+Phase state: WP08, WP09, WP10, WP12, and WP13 COMPLETE within bounded claims<br>
+Active task: T-WP15 predictive-supervisory objective and action-policy freeze
 
 ## Review outcome
 
@@ -262,12 +262,14 @@ efficacy.
 - The committed interim deck predates WP12 and therefore still marks public-data
   modelling, early warning, attribution, controllers, safety filtering, and
   paired efficacy evaluation as pending. Its scientific claims remain valid,
-  but a later presentation revision should add the frozen WP12 evidence.
+  but a later presentation revision should add the frozen WP09, WP12, and WP13
+  evidence.
 - T-PAPER-DRAFT is COMPLETE. The journal-neutral two-column LaTeX source builds
-  a visually reviewed 15-page A4 PDF containing public-data WP09 methods,
-  results, failed gates and figures alongside bounded WP08/WP10/WP12 evidence,
-  while retaining visible pending markers for unexecuted work. The PDF SHA-256
-  is `34a8a4be5826f47ff4c67af7bfd700610ccc759f88129546f824606a51760138`;
+  a visually reviewed 17-page A4 PDF containing public-data WP09 methods,
+  results, failed gates and figures alongside bounded WP08/WP10/WP12 and
+  conditional synthetic WP13 evidence, while retaining visible pending markers
+  for control and safety work. The PDF SHA-256 is
+  `9437f7912372aed4579e0ad650cb73ae9edbbe06d741e102d5a48c4e6b1d420b`;
   the final LaTeX log has no overfull box, undefined-reference,
   undefined-citation, or rerun warning.
 
@@ -283,15 +285,12 @@ refuses a silent rerun, preserving the one-shot audit trail.
 
 ## Next Phase 3 work
 
-T-WP08, T-WP09, T-WP10, and T-WP12 are scientifically closed within their
-stated claim boundaries. Remaining Phase 3 decision work is:
+T-WP08, T-WP09, T-WP10, T-WP12, and T-WP13 are scientifically closed within
+their stated claim boundaries. Remaining Phase 3 decision work is:
 
-1. T-WP13 — implement and validate the now-frozen attribution scoring,
-   residual-chain logic, and mandatory `UNKNOWN` policy without opening TEST
-   until implementation and calibration-only checks pass;
-2. T-WP15 — freeze the predictive supervisory objective, action set, horizon,
+1. T-WP15 — freeze the predictive supervisory objective, action set, horizon,
    penalties, and fallback policy; and
-3. T-WP16 — freeze independent safety limits, applicability checks, sensor and
+2. T-WP16 — freeze independent safety limits, applicability checks, sensor and
    uncertainty rejection rules, hold replacement, and controlled-resume
    criteria.
 
@@ -300,9 +299,9 @@ authorized by this status; those remain downstream work.
 
 Current governance evidence: 17 YAML files parse with zero duplicate keys; all
 29 tasks form an acyclic dependency graph and reference 25 valid assumptions;
-120 Markdown files contain 122 valid local links and zero missing local links.
+126 Markdown files contain 134 valid local links and zero missing local links.
 
-## WP13 pre-holdout state
+## WP13 controlled execution and result
 
 The root-cause-attribution policy is frozen in
 `orchestration/decisions/wp13_root_cause_attribution.md`. It separates ten
@@ -313,21 +312,38 @@ compound evidence. Coefficient contributions and rule chains are explicitly
 not causal proof.
 
 TRAIN has 264 decision rows and CALIBRATION has 132 across disjoint opaque whole
-runs. No TEST, compound, or robustness scenario has been generated. The
-target-blind preparation payload SHA-256 is
+runs. Their target-blind payload SHA-256 is
 `e8b47b67a37972addedd5dc230005979bcb3d20f3bea76aa1ec07a5d186d3ab9`.
-Calibration-only hybrid accuracy/macro recall are 0.8182/0.8182, UNKNOWN recall
-is 1.0, known-cause coverage is 0.80, and selective accuracy is 1.0. Hybrid
-pressure-sensor-fault recall is zero on CALIBRATION; this risk will be reported
-without threshold or model retuning. Twenty-two focused tests and the complete
-210-test suite pass with warnings treated as errors. The exact committed
-pre-holdout evidence and opening conditions are in
-`orchestration/reports/wp13_preholdout_checkpoint.md`.
+The frozen implementation is committed at `7489bf1`; the representation-only
+guard correction is committed at `ec7bc8b`. The first guarded attempt stopped
+before TEST because raw equality treated JSON lists and replay tuples as
+different even though their canonical hashes matched. After explicit user
+authorization, the guard compares canonical payload hashes and rejects a
+changed-seed regression. Scientific configuration and model artifacts did not
+change. Preflight passed 23/23 focused and 211/211 complete tests with warnings
+treated as errors.
 
-The first guarded opening attempt stopped before TEST because raw Python
-equality treated JSON-loaded lists and equivalent replay tuples as different;
-their canonical hashes matched exactly. No opening marker was written. The
-user authorized the representation-only correction, which now compares
-canonical JSON digests and rejects a one-value regression fixture. The updated
-focused and complete suites pass 23/23 and 211/211 respectively. Scientific
-settings and frozen artifacts are unchanged.
+The authorized one-shot then opened 198 TEST decision rows from 66 disjoint
+whole runs. The frozen hybrid attains 0.8636 accuracy and macro recall, 1.0
+UNKNOWN recall, 0.85 known-cause coverage, 1.0 selective accuracy, and 1.0
+top-two accuracy. All nine errors abstain to UNKNOWN. Pressure-sensor-fault
+recall is 0.3333. Rule only attains 0.9242 and is the stronger held-out
+comparator, but no TEST-driven method switch or retuning was performed.
+
+On six unseen interruption/demand compounds, abstention is 0.8333 and
+truth-set recall at two is 1.0. Doubled noise and parameter mismatch retain
+0.8636 aggregate accuracy. A 0.20 s delay forces every run to UNKNOWN and 10%
+dropout lowers known-cause coverage to 0.15, exposing diagnostic availability
+rather than false known-cause substitution. All frozen interpretation gates
+pass. This supports only conditional synthetic simulator-label classification;
+feature contributions and rule chains are not causal proof.
+
+Validation JSON, deterministic payload, and prediction CSV SHA-256 values are
+`f075e513bb2c836ea2ca1b20c281f21929ab3ad7fa01f8eea4bf79d5a613fefc`,
+`b1f7080dc0d091caa003793ec7eed98a92dd3b9a509c33a7f77e86a5dae74f99`,
+and `8108f514930f6f2bfaf77bab5597e35432d6dded3c7290bfa34a294820f494eb`.
+The full interpretation is in
+`orchestration/reports/wp13_attribution_validation.md`. The running paper,
+modeling notes, evidence map, and reviewed 17-page journal PDF include WP13;
+the PDF SHA-256 is
+`9437f7912372aed4579e0ad650cb73ae9edbbe06d741e102d5a48c4e6b1d420b`.

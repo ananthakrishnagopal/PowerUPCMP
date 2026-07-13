@@ -983,7 +983,7 @@ tasks:
   - id: T-WP14
     title: WP14 baseline controllers
     phase: 4
-    state: READY
+    state: COMPLETE
     priority: HIGH
     dependencies: [T-WP01, T-WP02, T-WP11, T-WP15]
     inputs:
@@ -1069,7 +1069,7 @@ tasks:
   - id: T-WP15-IMPL
     title: WP15 predictive supervisory controller implementation
     phase: 4
-    state: READY
+    state: COMPLETE
     priority: CRITICAL
     dependencies: [T-WP15]
     inputs:
@@ -1131,7 +1131,7 @@ tasks:
   - id: T-WP16-IMPL
     title: WP16 independent safety-filter implementation
     phase: 4
-    state: READY
+    state: COMPLETE
     priority: CRITICAL
     dependencies: [T-WP16]
     inputs:

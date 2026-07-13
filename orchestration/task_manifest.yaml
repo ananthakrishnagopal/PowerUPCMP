@@ -1,5 +1,5 @@
 manifest_version: "1.0.0"
-last_updated: "2026-07-13T14:55:59+05:30"
+last_updated: "2026-07-13T15:10:18+05:30"
 workflow: single_agent_phase_gated
 allowed_states:
   - PLANNED
@@ -943,6 +943,7 @@ tasks:
       - Calibration-only hybrid accuracy and macro recall are both 0.8182, UNKNOWN recall is 1.0, known-cause coverage is 0.80, and selective accuracy is 1.0; pressure-sensor-fault recall is zero and remains an explicit frozen-policy risk.
       - Twenty-two focused WP13 tests and the complete 210-test repository suite pass in conda environment devkki with warnings treated as errors before TEST opening.
       - The frozen pre-holdout implementation is committed at 7489bf1d14add57033c685998ced4f75b8b7fc98; the checkpoint is recorded in orchestration/reports/wp13_preholdout_checkpoint.md.
+      - The first one-shot invocation stopped before TEST because JSON arrays reloaded as lists while the replay used equivalent tuples; canonical hashes matched. The authorized guard-only correction has 23 focused and 211 complete passing tests, with no opening marker written.
 
   - id: T-WP14
     title: WP14 baseline controllers

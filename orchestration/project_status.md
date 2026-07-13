@@ -1,6 +1,6 @@
 # Project status
 
-Last updated: 2026-07-13 14:55 IST<br>
+Last updated: 2026-07-13 15:10 IST<br>
 Current phase: Phase 3 — scientific modelling and coupling<br>
 Phase state: WP08, WP09, WP10, and WP12 COMPLETE within bounded claims<br>
 Active task: T-WP13 root-cause attribution — frozen design, implementation in progress
@@ -300,7 +300,7 @@ authorized by this status; those remain downstream work.
 
 Current governance evidence: 17 YAML files parse with zero duplicate keys; all
 29 tasks form an acyclic dependency graph and reference 25 valid assumptions;
-119 Markdown files contain 122 valid local links and zero missing local links.
+120 Markdown files contain 122 valid local links and zero missing local links.
 
 ## WP13 pre-holdout state
 
@@ -323,3 +323,11 @@ without threshold or model retuning. Twenty-two focused tests and the complete
 210-test suite pass with warnings treated as errors. The exact committed
 pre-holdout evidence and opening conditions are in
 `orchestration/reports/wp13_preholdout_checkpoint.md`.
+
+The first guarded opening attempt stopped before TEST because raw Python
+equality treated JSON-loaded lists and equivalent replay tuples as different;
+their canonical hashes matched exactly. No opening marker was written. The
+user authorized the representation-only correction, which now compares
+canonical JSON digests and rejects a one-value regression fixture. The updated
+focused and complete suites pass 23/23 and 211/211 respectively. Scientific
+settings and frozen artifacts are unchanged.

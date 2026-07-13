@@ -124,6 +124,12 @@ def canonical_sha256(value: object) -> str:
     return hashlib.sha256(serialized).hexdigest()
 
 
+def canonical_payloads_equal(first: object, second: object) -> bool:
+    """Compare JSON-domain content without tuple/list representation drift."""
+
+    return canonical_sha256(first) == canonical_sha256(second)
+
+
 def write_json_atomic(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -1049,7 +1055,10 @@ def run_one_shot(*, authorize_holdout_open: bool) -> dict[str, Any]:
     config = load_attribution_config(CONFIG_PATH)
     frozen_manifest = load_manifest()
     _, _, _, replayed_payload = build_preholdout_payload(config)
-    if replayed_payload != frozen_manifest["preparation_payload"]:
+    if not canonical_payloads_equal(
+        replayed_payload,
+        frozen_manifest["preparation_payload"],
+    ):
         raise ValueError("committed WP13 preholdout payload does not replay exactly")
     git_evidence = require_clean_committed_checkpoint()
     test_evidence = run_focused_tests()

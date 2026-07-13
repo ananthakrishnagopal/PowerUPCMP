@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from scripts.validate_wp13_attribution import (
     build_split,
+    canonical_payloads_equal,
     scenarios_for_split,
     sensor_configs,
 )
@@ -18,6 +20,18 @@ from semifab_poc.models.attribution import (
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = ROOT / "configs" / "models" / "attribution.yaml"
+
+
+def test_canonical_payload_comparison_accepts_json_round_trip_only() -> None:
+    original = {
+        "feature_names": ("grid", "pressure"),
+        "scenario_manifest": ({"seed": 11, "values": (0.8, 1.0)},),
+    }
+    round_tripped = json.loads(json.dumps(original))
+    assert canonical_payloads_equal(original, round_tripped)
+    changed = json.loads(json.dumps(original))
+    changed["scenario_manifest"][0]["seed"] = 12
+    assert not canonical_payloads_equal(original, changed)
 
 
 def test_wp13_scenario_roles_are_disjoint_opaque_and_validate() -> None:

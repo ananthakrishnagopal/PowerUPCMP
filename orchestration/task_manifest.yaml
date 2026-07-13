@@ -1246,7 +1246,7 @@ tasks:
   - id: T-WP20
     title: WP20 documentation, reproducibility, and technical report
     phase: 4
-    state: PLANNED
+    state: COMPLETE
     priority: HIGH
     dependencies: [T-WP18, T-WP19]
     inputs:

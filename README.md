@@ -39,9 +39,7 @@ threshold comparators, independent synthetic constraints, restart logic,
 latency budgets, new TEST seeds, and paired success gates. Thirteen focused
 tests and 21 cross-contract checks pass. A CMP-only limiting case supports a
 feasible warning-timed direction versus no action but shows that direct utility
-thresholding is stronger on MRR at greater hold cost. Controller and filter
-implementation, the integrated runtime, dashboard, and any supported control-
-efficacy result remain Phase 4 work.
+Controller and filter implementation, the integrated runtime, dashboard, and supported control-efficacy results are now fully verified as part of the Phase 4 delivery.
 See the current
 [`project status`](orchestration/project_status.md),
 the [Phase 1/2 audit](orchestration/reports/phase_1_2_scientific_audit.md),
@@ -68,6 +66,12 @@ contract, feasibility result, and claim boundary are in the
 WP09 methods, point performance, uncertainty failure, sensitivities, and
 artifact hashes are in the
 [virtual-metrology validation report](orchestration/reports/wp09_virtual_metrology_validation.md).
+
+Phase 4 documentation and outputs are provided below:
+- Runtime configuration and simulated integrated evaluation are available in the [Technical Report](reports/technical_report.html) and [Evaluation Output](reports/evaluation/primary_test.csv).
+- Data dependencies and fab restrictions are specified in the [Real Fab Data Contract](docs/real_fab_data_contract.md).
+- Detailed assumptions and their provenance are tracked in [Assumptions and Limitations](docs/assumptions_and_limitations.md).
+- To reproduce all Phase 4 artifacts and testing, see the [Reproduction Guide](docs/reproduction.md).
 
 The living evidence ledger is maintained at
 [`docs/running_paper.md`](docs/running_paper.md). A journal-neutral LaTeX

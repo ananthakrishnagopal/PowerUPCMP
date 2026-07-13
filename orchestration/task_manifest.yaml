@@ -1160,7 +1160,7 @@ tasks:
   - id: T-WP17
     title: WP17 integrated runtime
     phase: 4
-    state: PLANNED
+    state: COMPLETE
     priority: CRITICAL
     dependencies: [T-WP04, T-WP05, T-WP06, T-WP07, T-WP08, T-WP11, T-WP13, T-WP14, T-WP15-IMPL, T-WP16-IMPL]
     inputs:

@@ -17,6 +17,20 @@ from .early_warning import (
     generate_excursion_labels,
     load_early_warning_config,
 )
+from .virtual_metrology import (
+    FeatureRoleBundle,
+    LoadedTargetLabels,
+    ModelKind as VirtualMetrologyModelKind,
+    VMDataset,
+    VMObservationWindow,
+    VMPrediction,
+    VirtualMetrologyConfig,
+    VirtualMetrologyError,
+    VirtualMetrologyPredictor,
+    load_virtual_metrology_config,
+    prepare_feature_only_roles,
+    run_virtual_metrology_experiment,
+)
 
 __all__ = [
     "CensorReason",
@@ -31,7 +45,19 @@ __all__ = [
     "StreamingFeatureExtractor",
     "WarningDataset",
     "WarningObservationWindow",
+    "FeatureRoleBundle",
+    "LoadedTargetLabels",
+    "VMDataset",
+    "VMObservationWindow",
+    "VMPrediction",
+    "VirtualMetrologyConfig",
+    "VirtualMetrologyError",
+    "VirtualMetrologyModelKind",
+    "VirtualMetrologyPredictor",
     "evaluate_predictions",
     "generate_excursion_labels",
     "load_early_warning_config",
+    "load_virtual_metrology_config",
+    "prepare_feature_only_roles",
+    "run_virtual_metrology_experiment",
 ]

@@ -585,7 +585,7 @@ tasks:
   - id: T-WP09
     title: WP09 CMP virtual metrology comparison
     phase: 3
-    state: READY
+    state: IN_PROGRESS
     priority: HIGH
     dependencies: [T-WP03, T-PHASE12-REMEDIATION, T-WP08]
     inputs:
@@ -623,6 +623,11 @@ tasks:
       - Scientific protocol, six model families, native-scale Preston proxy, grouped roles, split-conformal intervals, metrics, sensitivities, and interpretation gates frozen on 2026-07-13 before official holdout target access.
       - R2.1 precedence-retained roles are 1981/311/275 rows from 1699/302/267 mutually disjoint wafers; full 424-row source holdouts are collision-contaminated diagnostics only.
       - Official test and validation MRR values remain unopened for WP09 model design and selection.
+      - Controlled implementation opened after preregistration commit 0f9d55b; synthetic fixtures and the feature-only split manifest must pass before holdout access.
+      - "2026-07-13: target-blind split manifest payload SHA-256 44c8851653b39832357e42fba29f5d797ab574dc2e64f3e073c88c686b0ba944; all pairwise role wafer overlaps are zero"
+      - "2026-07-13: WP09 focused suite passed 19/19 in 5.63 s and complete suite passed 192/192 in 52.40 s with warnings treated as errors"
+      - "2026-07-13: one-shot runner requires explicit authorization, clean committed protocol files, exact manifest replay, passing preflight tests, and an unused persistent opening marker"
+      - orchestration/reports/wp09_preholdout_checkpoint.md
 
   - id: T-WP10
     title: WP10 utility-to-CMP coupling and sensitivity

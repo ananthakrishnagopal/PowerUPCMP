@@ -1,9 +1,9 @@
 # Project status
 
-Last updated: 2026-07-13 11:45 IST<br>
+Last updated: 2026-07-13 12:24 IST<br>
 Current phase: Phase 3 — scientific modelling and coupling<br>
-Phase state: WP12 VALIDATED; R2.1 WHOLE-WAFER CORRECTION VALIDATED; WP09 READY<br>
-Active tasks: none; T-WP09 protocol is frozen and awaiting controlled implementation
+Phase state: WP12 VALIDATED; R2.1 WHOLE-WAFER CORRECTION VALIDATED; WP09 IN PROGRESS<br>
+Active tasks: T-WP09 pre-holdout checkpoint; official holdout MRR targets remain unopened
 
 ## Review outcome
 
@@ -142,6 +142,16 @@ efficacy.
   424 test, and 424 validation wafer/stage rows with 405 target-free predictor
   columns. R2.1 retains 1,981/311/275 mutually wafer-disjoint modelling rows;
   public virtual-metrology fitting has not begun.
+- WP09 pre-holdout implementation: all six frozen model families, common
+  fit-only preprocessing, native-scale physics proxy, grouped tuning,
+  split-conformal intervals, grouped bootstrap metrics, sensitivity runner,
+  artifact checksums, and one-shot Git/authorization guard are implemented.
+  The target-blind role manifest contains 1,396/299/286 training-role rows and
+  311/275 retained holdout rows with zero pairwise wafer overlap. Its
+  deterministic payload SHA-256 is
+  `44c8851653b39832357e42fba29f5d797ab574dc2e64f3e073c88c686b0ba944`.
+  Focused WP09 tests pass 19/19 and the complete suite passes 192/192 with
+  warnings treated as errors. No official holdout target has been opened.
 - Dataset licence: not separately stated; local research use is limited to
   the user's recorded authorization.
 - Synthetic simulator: corrected R3 utility-plant components pass equilibrium,
@@ -252,6 +262,16 @@ efficacy.
   the final LaTeX log has no overfull box, undefined-reference, or
   undefined-citation warning. The methods now include the R2.1 split correction.
 
+## WP09 pre-holdout checkpoint
+
+The frozen implementation and target-blind split evidence are documented in
+`orchestration/reports/wp09_preholdout_checkpoint.md`. The one-shot script
+requires an explicit holdout flag, exact manifest replay, a completely clean
+Git checkpoint containing all protocol files, and a fresh passing focused
+suite. It writes a persistent opening marker immediately before target access
+and refuses an unreviewed rerun. The pre-holdout code and manifest must be
+committed before the already authorized one-shot execution can begin.
+
 ## Next Phase 3 work
 
 T-WP08, T-WP10, and T-WP12 are scientifically closed within their stated
@@ -272,6 +292,6 @@ synthetic claim boundaries. Remaining Phase 3 decision work is:
 No controller-efficacy comparison or WP17 integrated closed-loop runtime is
 authorized by this status; those remain downstream work.
 
-Current governance evidence: 15 YAML files parse with zero duplicate keys; all
+Current governance evidence: 16 YAML files parse with zero duplicate keys; all
 29 tasks form an acyclic dependency graph and reference 25 valid assumptions;
-99 Markdown files contain 97 valid local links and zero missing local links.
+110 Markdown files contain 98 valid local links and zero missing local links.

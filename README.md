@@ -2,7 +2,7 @@
 
 This repository is a simulation-first proof of concept for predictive supervisory control of a semiconductor Chemical Mechanical Planarization (CMP) process under electrical and ultrapure-water (UPW) disturbances.
 
-The repository has reached the Phase 3 scientific freeze. Corrective gates R1--R4,
+The repository has reached the Phase 5 integration and audit freeze. Corrective gates R1--R4,
 standalone CMP task WP08, and declared-topology coupling task WP10 are
 validated: canonical schema is version 2.4.0, the runtime interface registry
 is 3.2.0, the DynamicSubsystem method contract

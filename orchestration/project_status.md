@@ -1,9 +1,9 @@
 # Project status
 
-Last updated: 2026-07-13 12:24 IST<br>
+Last updated: 2026-07-13 14:02 IST<br>
 Current phase: Phase 3 — scientific modelling and coupling<br>
-Phase state: WP12 VALIDATED; R2.1 WHOLE-WAFER CORRECTION VALIDATED; WP09 IN PROGRESS<br>
-Active tasks: T-WP09 pre-holdout checkpoint; official holdout MRR targets remain unopened
+Phase state: WP08, WP09, WP10, and WP12 COMPLETE within bounded claims<br>
+Active task: none; next scientific decision task is T-WP13
 
 ## Review outcome
 
@@ -29,6 +29,11 @@ early-warning implementation and validation gate. Its learned models detect
 all three independent TEST events, but the small event count and severe
 structural-null, compound-shift, and high-noise failures sharply limit the
 claim and require an independent applicability/safety gate before control use.
+T-WP09 also passes its guarded public-data point-prediction gate: the selected
+tree achieves 3.185/3.395 test/validation MAE on precedence-retained whole
+wafers. Its interval coverage misses the frozen minimum, the hybrid does not
+improve on the tree, and consumable ablation is model-dependent; those failed
+interpretation gates remain explicit.
 
 Detailed evidence:
 
@@ -40,6 +45,7 @@ Detailed evidence:
 - `orchestration/reports/r4_online_scenario_timing_validation.md`
 - `orchestration/decisions/wp08_cmp_physics.md`
 - `orchestration/reports/wp08_cmp_validation.md`
+- `orchestration/reports/wp09_virtual_metrology_validation.md`
 - `orchestration/decisions/wp10_utility_cmp_coupling.md`
 - `orchestration/reports/wp10_literature_review.md`
 - `orchestration/reports/wp10_coupling_validation.md`
@@ -140,18 +146,16 @@ efficacy.
   semantic preprocessing, anomaly-policy materialization, and split/fit-scope
   contracts are verified. The processed offline bundle contains 1,981 training,
   424 test, and 424 validation wafer/stage rows with 405 target-free predictor
-  columns. R2.1 retains 1,981/311/275 mutually wafer-disjoint modelling rows;
-  public virtual-metrology fitting has not begun.
-- WP09 pre-holdout implementation: all six frozen model families, common
-  fit-only preprocessing, native-scale physics proxy, grouped tuning,
-  split-conformal intervals, grouped bootstrap metrics, sensitivity runner,
-  artifact checksums, and one-shot Git/authorization guard are implemented.
-  The target-blind role manifest contains 1,396/299/286 training-role rows and
-  311/275 retained holdout rows with zero pairwise wafer overlap. Its
-  deterministic payload SHA-256 is
-  `44c8851653b39832357e42fba29f5d797ab574dc2e64f3e073c88c686b0ba944`.
-  Focused WP09 tests pass 19/19 and the complete suite passes 192/192 with
-  warnings treated as errors. No official holdout target has been opened.
+  columns. R2.1 retains 1,981/311/275 mutually wafer-disjoint modelling rows.
+- WP09 public virtual metrology is complete. The target-blind manifest assigns
+  1,396/299/286 training rows to fit/selection/calibration and preserves
+  311/275 retained holdout rows with zero pairwise wafer overlap. After the
+  frozen tree recommendation, the one-shot run opened targets and reported
+  test/validation MAE 3.185/3.395, RMSE 5.176/6.693, and R² 0.975/0.958 in the
+  source-native undeclared target scale. Coverage 0.839/0.847 fails the frozen
+  0.85 minimum; the hybrid-improvement and cross-model consumable gates also
+  fail. The validation JSON SHA-256 is
+  `52d25cf92c4eea24158e0821cd7b7dd60fabe2ec04967443e3417397313bd10c`.
 - Dataset licence: not separately stated; local research use is limited to
   the user's recorded authorization.
 - Synthetic simulator: corrected R3 utility-plant components pass equilibrium,
@@ -215,6 +219,9 @@ efficacy.
   `b53730011cb4f3c26173c727ba9fc562e9677a24a422f558a1c3330ab2df1e05`.
 - Post-manuscript verification reran the complete suite with warnings treated
   as errors: 170/170 tests passed in 51.32 s in `devkki`.
+- WP09 closeout verification passes 19/19 focused tests in 5.08 s and 192/192
+  complete repository tests in 51.13 s with warnings treated as errors in
+  `devkki`.
 - Historical reproduction: R3 validation JSON/trace hashes are restored to
   `02ba8166715c1022d54685d96ded8b85c196dbd0dbc6b29ea544dd4b085eddb7`
   and
@@ -222,14 +229,16 @@ efficacy.
   R4 hashes and the WP08 trace hash also reproduce exactly.
 - The passing suite validates corrective gates R1--R4, standalone synthetic
   CMP invariants, declared synthetic coupling mechanics, and the frozen WP12
-  simulation-only early-warning experiment. It does not validate public-data
-  virtual metrology, attribution, safety, controller efficacy, actual CMP
-  plumbing, or a real-fab causal effect.
-- Supported implementation claims: C-002 and C-011 at the explicitly limited
-  simulation level. C-003 is supported only for the frozen in-distribution
-  synthetic WP12 experiment and fails to generalize safely across all audited
-  shifts. Supported public VM, real-fab, physical-defect, yield, or
-  control-efficacy claims: none.
+  simulation-only early-warning experiment. The separately hashed WP09 result
+  artifact supports its bounded public-data point-prediction claim; test count
+  alone does not. Neither source validates attribution, safety, controller
+  efficacy, actual CMP plumbing, or a real-fab causal effect.
+- Supported implementation claims: C-001 for bounded offline public-data point
+  prediction; C-002 and C-011 at the explicitly limited simulation level; and
+  C-003 only for the frozen in-distribution synthetic WP12 experiment. C-003
+  fails to generalize safely across all audited shifts. C-008 and the
+  cross-model C-009 gate are rejected on public data. Supported real-fab,
+  physical-defect, yield, or control-efficacy claims: none.
 - Dataset network transfer: none; the archive was supplied locally.
 - Agent/subagent actions: one user-authorized bounded manuscript agent created
   the journal-format LaTeX draft; all scientific modelling, WP12 execution,
@@ -255,37 +264,34 @@ efficacy.
   paired efficacy evaluation as pending. Its scientific claims remain valid,
   but a later presentation revision should add the frozen WP12 evidence.
 - T-PAPER-DRAFT is COMPLETE. The journal-neutral two-column LaTeX source builds
-  a visually reviewed 13-page A4 PDF containing the bounded WP12 target,
-  primary result, both warning figures, shift failures, and limitations while
-  retaining visible pending markers for unexecuted work. The PDF SHA-256 is
-  `9410051d76b3830be00d1c0be2afab7ca4ae6928e11b492297fe40db5d733f7c`;
-  the final LaTeX log has no overfull box, undefined-reference, or
-  undefined-citation warning. The methods now include the R2.1 split correction.
+  a visually reviewed 15-page A4 PDF containing public-data WP09 methods,
+  results, failed gates and figures alongside bounded WP08/WP10/WP12 evidence,
+  while retaining visible pending markers for unexecuted work. The PDF SHA-256
+  is `34a8a4be5826f47ff4c67af7bfd700610ccc759f88129546f824606a51760138`;
+  the final LaTeX log has no overfull box, undefined-reference,
+  undefined-citation, or rerun warning.
 
-## WP09 pre-holdout checkpoint
+## WP09 controlled execution
 
 The frozen implementation and target-blind split evidence are documented in
 `orchestration/reports/wp09_preholdout_checkpoint.md`. The one-shot script
-requires an explicit holdout flag, exact manifest replay, a completely clean
-Git checkpoint containing all protocol files, and a fresh passing focused
-suite. It writes a persistent opening marker immediately before target access
-and refuses an unreviewed rerun. The pre-holdout code and manifest must be
-committed before the already authorized one-shot execution can begin.
+verified pre-holdout commit `01c59a6`, replayed the exact manifest, reran the
+focused suite, wrote the persistent opening marker, and then consumed the
+authorized target access. The complete result and interpretation gates are in
+`orchestration/reports/wp09_virtual_metrology_validation.md`. The guard now
+refuses a silent rerun, preserving the one-shot audit trail.
 
 ## Next Phase 3 work
 
-T-WP08, T-WP10, and T-WP12 are scientifically closed within their stated
-synthetic claim boundaries. Remaining Phase 3 decision work is:
+T-WP08, T-WP09, T-WP10, and T-WP12 are scientifically closed within their
+stated claim boundaries. Remaining Phase 3 decision work is:
 
-1. T-WP09 — freeze and validate leakage-safe public PHM average-MRR virtual
-   metrology without mixing its native numeric target with SI simulator
-   coefficients;
-2. T-WP13 — freeze attribution scoring, residual-chain logic, and the
+1. T-WP13 — freeze attribution scoring, residual-chain logic, and the
    mandatory `UNKNOWN` outcome, with feature attribution explicitly excluded
    as causal proof;
-3. T-WP15 — freeze the predictive supervisory objective, action set, horizon,
+2. T-WP15 — freeze the predictive supervisory objective, action set, horizon,
    penalties, and fallback policy; and
-4. T-WP16 — freeze independent safety limits, applicability checks, sensor and
+3. T-WP16 — freeze independent safety limits, applicability checks, sensor and
    uncertainty rejection rules, hold replacement, and controlled-resume
    criteria.
 
@@ -294,4 +300,4 @@ authorized by this status; those remain downstream work.
 
 Current governance evidence: 16 YAML files parse with zero duplicate keys; all
 29 tasks form an acyclic dependency graph and reference 25 valid assumptions;
-110 Markdown files contain 98 valid local links and zero missing local links.
+116 Markdown files contain 122 valid local links and zero missing local links.

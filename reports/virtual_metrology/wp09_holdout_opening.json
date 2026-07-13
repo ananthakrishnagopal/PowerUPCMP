@@ -1,0 +1,8 @@
+{
+  "accessed_at_utc": "2026-07-13T06:57:27.147692+00:00",
+  "claim_boundary": "OFFLINE_PUBLIC_AVERAGE_MRR_ONLY",
+  "git_head": "01c59a6172f621ed7f81a01487a5e4358805463c",
+  "schema_version": "1.0.0",
+  "split_manifest_payload_sha256": "44c8851653b39832357e42fba29f5d797ab574dc2e64f3e073c88c686b0ba944",
+  "state": "OPENING_AUTHORIZATION_CONSUMED_RUN_STARTED"
+}

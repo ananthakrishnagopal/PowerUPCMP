@@ -1,4 +1,4 @@
-registry_version: "1.3.0"
+registry_version: "1.4.0"
 effective_date: "2026-07-13"
 dataset_network_access_used: false
 reference_network_review_used: true
@@ -103,6 +103,31 @@ sources:
       fit_scope_audit: IMPLEMENTED
       physical_machine_holdout_feasible: false
       machine_data_holdout_feasible: false
+    virtual_metrology_evaluation:
+      status: COMPLETE_WITH_LIMITATIONS
+      executed_at_utc: "2026-07-13T06:57:27.585957+00:00"
+      pre_holdout_git_commit: 01c59a6172f621ed7f81a01487a5e4358805463c
+      primary_model: HISTOGRAM_GRADIENT_BOOSTED_TREE
+      target_scale: SOURCE_NATIVE_UNIT_NOT_DECLARED
+      primary_roles:
+        test: {rows: 311, wafers: 302, mae: 3.1852167645, rmse: 5.1756382051, r2: 0.9751022, interval_coverage: 0.8392283}
+        validation: {rows: 275, wafers: 267, mae: 3.3953747458, rmse: 6.6931621041, r2: 0.9584844, interval_coverage: 0.8472727}
+      interpretation_gates:
+        point_prediction_vs_mean: PASSED
+        uncertainty_coverage_minimum_0_85: FAILED
+        physics_plus_residual_improves_tree: FAILED
+        consumable_association_cross_model: FAILED
+      validation_report: orchestration/reports/wp09_virtual_metrology_validation.md
+      result_artifact: reports/virtual_metrology/wp09_validation.json
+      result_sha256: 52d25cf92c4eea24158e0821cd7b7dd60fabe2ec04967443e3417397313bd10c
+      predictions_artifact: reports/virtual_metrology/wp09_predictions.csv
+      predictions_sha256: ea3e9e813e8343862340fb42bfc31c784e0f5df9bd15f5b0f707624bb4679826
+      limitations:
+        - OFFLINE_AVERAGE_MRR_ONLY
+        - FULL_SOURCE_HOLDOUTS_COLLISION_CONTAMINATED
+        - PRIMARY_INTERVAL_COVERAGE_BELOW_FROZEN_MINIMUM
+        - CHRONOLOGICAL_STRESS_DOMINATED_BY_ONE_PREREGISTERED_EXTREME
+        - NO_SI_CALIBRATION_BRIDGE
     local_candidate_archive:
       path: PHM-Data-Challenge-master.zip
       byte_size: 17399074
@@ -138,7 +163,6 @@ sources:
         imputation: forbidden
     blockers:
       - dataset_licence_not_separately_stated_but_user_authorized_local_use
-      - public_virtual_metrology_models_not_yet_evaluated
     fallback_policy: Continue synthetic simulator development and mark public-data modelling claims blocked; never substitute synthetic data under this dataset ID.
 
   - id: UCI_SECOM

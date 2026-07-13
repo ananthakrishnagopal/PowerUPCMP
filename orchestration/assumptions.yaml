@@ -1,5 +1,5 @@
-register_version: "1.4.0"
-effective_date: "2026-07-12"
+register_version: "1.5.0"
+effective_date: "2026-07-13"
 basis_vocabulary:
   coupling_parameter_required_values:
     - Literature-supported
@@ -28,7 +28,7 @@ assumptions:
     basis: Data-verified evidence
     status: ACCEPTED_FOR_POC
     applies_to: [WP03, WP09]
-    validation: R2 validates source-order timing, phase-aware native-unit features, all official one-to-one feature/label joins, anomaly treatments, inner wafer/chronological splits, fit-scope audits, and the R2.1 whole-wafer precedence correction; the source partitions themselves reuse wafer IDs, while retained 1,981/311/275 evaluation rows are mutually wafer-disjoint. Model accuracy and the separate dataset licence remain unresolved.
+    validation: R2 validates source-order timing, phase-aware native-unit features, all official one-to-one feature/label joins, anomaly treatments, inner wafer/chronological splits, fit-scope audits, and the R2.1 whole-wafer precedence correction; the source partitions themselves reuse wafer IDs, while retained 1,981/311/275 evaluation rows are mutually wafer-disjoint. WP09 validates bounded offline point prediction on those retained roles, while interval calibration fails its frozen floor and the separate dataset licence remains unresolved.
     consequence_if_false: Remove public-data model claims while preserving verified raw/provenance and semantic-audit evidence.
 
   - id: A-003
@@ -37,7 +37,7 @@ assumptions:
     basis: Literature-supported
     status: ACCEPTED_FOR_POC
     applies_to: [WP08, WP09]
-    validation: WP08 records primary structural citations, SI dimensional analysis, nominal power-mean normalization, zero-pressure/speed and process-mode limiting cases, bounded states, thermal residual closure, deterministic replay, and monotone timestep refinement; all parameter values remain synthetic and public-model residual diagnostics remain a separate WP09 requirement.
+    validation: WP08 records primary structural citations, SI dimensional analysis, nominal power-mean normalization, zero-pressure/speed and process-mode limiting cases, bounded states, thermal residual closure, deterministic replay, and monotone timestep refinement. WP09 separately finds that a dimensionless native-scale Preston proxy is noncompetitive and that its physics-plus-residual model is worse than the selected tree; neither result changes the accepted synthetic WP08 structural baseline.
     consequence_if_false: Replace the physics baseline through formal interface impact analysis; do not reinterpret residual performance.
 
   - id: A-004
@@ -206,9 +206,9 @@ assumptions:
     statement: Preparation, active polishing, ending, dressing or cleaning, hold, and recovery must not all be treated as one stationary material-removal phase.
     category: physics
     basis: Engineering approximation
-    status: REQUIRES_VALIDATION
+    status: ACCEPTED_FOR_POC
     applies_to: [WP03, WP08, WP09]
-    validation: Input-only phase segmentation, manual trace audit, ablation, fit-scope checks, and time-weighted phase-feature tests.
+    validation: R2 input-only phase segmentation, manual trace audit, fit-scope checks, and time-weighted phase features pass; WP09 active-only and unresolved-proxy ablations retain tree point MAE near the primary result while changing coverage, supporting separate phase treatment without claiming measured physical phase identity.
     consequence_if_false: Use conservative recipe/stage-specific segmentation and qualify phase labels; do not aggregate all rows as active removal.
 
   - id: A-023

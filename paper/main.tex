@@ -14,7 +14,7 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{cite}
 
-\graphicspath{{../reports/figures/}{../reports/early_warning/figures/}}
+\graphicspath{{../reports/figures/}{../reports/early_warning/figures/}{../reports/virtual_metrology/figures/}}
 \setlength{\parindent}{1em}
 \setlength{\parskip}{0pt}
 \setlength{\emergencystretch}{2em}
@@ -25,12 +25,12 @@
 \newcommand{\native}{\text{native PHM target unit}}
 
 \title{A Simulation-First Framework for Predictive Supervisory Control of CMP under Electrical and Ultrapure-Water Disturbances:\\
-Physics, Coupling, and Synthetic Early-Warning Validation through WP12}
+Public Virtual Metrology, Physics, Coupling, and Synthetic Early Warning}
 
 \author{Living manuscript for the Semiconductor CMP Predictive-Control PoC\\
 \small Journal-neutral draft; author list and affiliations pending}
 
-\date{Evidence freeze: 12 July 2026\\Last manuscript build: \today}
+\date{Evidence freeze: 13 July 2026\\Last manuscript build: \today}
 
 \begin{document}
 
@@ -38,12 +38,14 @@ Physics, Coupling, and Synthetic Early-Warning Validation through WP12}
 \begin{center}
 \fbox{\parbox{0.91\columnwidth}{\small
 \textbf{Evidence boundary.} This living paper reports verified data provenance,
-synthetic plant/CMP/coupling evidence through WP10, and the frozen WP12
-simulation-only early-warning experiment. Public-data model accuracy,
-root-cause attribution, controller efficacy, and safety-filter outcomes are not
-yet available. WP12 has only three independent held-out events and fails under
-important structural and observation shifts. No real-fab, physical-defect,
-yield, equipment-protection, or production-control conclusion is made.}}
+leakage-safe PHM average-MRR virtual metrology, synthetic plant/CMP/coupling
+evidence, and the frozen WP12 simulation-only early-warning experiment. The
+PHM target unit is source-undeclared and the selected tree's primary intervals
+undercover. WP12 has only three independent held-out events and fails under
+important structural and observation shifts. Root-cause attribution,
+controller efficacy, and safety-filter outcomes remain unavailable. No
+real-fab, physical-defect, yield, equipment-protection, or production-control
+conclusion is made.}}
 \end{center}
 \vspace{0.7em}
 
@@ -57,8 +59,16 @@ disturbances. The intended chain is electrical disturbance, UPS and
 variable-frequency-drive response, motor and pump response, UPW hydraulic and
 thermal response, an explicitly declared CMP boundary, and finally a change
 in simulated MRR. The PHM 2016 CMP archive was locally supplied,
-integrity-checked, selectively extracted, and audited, but no public-data
-model-performance result is reported here. A reduced-order CMP subsystem
+integrity-checked, selectively extracted, and audited. A leakage-safe offline
+comparison uses 311/275 precedence-retained test/final-validation records from
+mutually disjoint wafers in the source-native target scale. A tree selected
+before holdout access attains MAE 3.185/3.395 and $R^2$ 0.975/0.958, reducing
+MAE by 89.2\%/88.6\% relative to a mean baseline. Its nominal 90\%
+split-conformal intervals cover only 83.9\%/84.7\%, below a frozen 85\%
+interpretation floor, and a chronological stress is dominated by one
+preregistered extreme label. The physics-plus-residual hybrid is significantly
+worse than the tree, so no hybrid-improvement claim is supported. A
+reduced-order CMP subsystem
 implements explicit process modes, signed rotary kinematics, generalized
 pressure--velocity exposure, dynamic consumable and slurry states, an
 interface energy balance, and cumulative removal. Its nominal reference is
@@ -110,19 +120,22 @@ energy and hydraulic balances, the connection into CMP must be explicit, the
 true latent state must remain distinct from delayed and corrupted observations,
 and controller comparisons must be paired on identical disturbances and seeds.
 
-This manuscript is intentionally staged. The completed contribution through
-WP12 comprises a scientifically bounded synthetic plant, a declared
-utility-to-CMP connection with null controls and sensitivity, and an open-loop
-early-warning experiment with disjoint run-level fitting/calibration roles.
-The PHM 2016 archive and preprocessing contracts are also documented. Public
-virtual metrology, attribution, predictive control, safety filtering, and the
-integrated comparison remain protocols until their acceptance evidence exists.
+This manuscript is intentionally staged. The completed contribution comprises
+a leakage-safe PHM average-MRR comparison, a scientifically bounded synthetic
+plant, a declared utility-to-CMP connection with null controls and sensitivity,
+and an open-loop early-warning experiment with disjoint run-level
+fitting/calibration roles. Attribution, predictive control, safety filtering,
+and the integrated comparison remain protocols until their acceptance evidence
+exists.
 
 The present contributions are:
 \begin{enumerate}
   \item a data and claims contract that separates measured process output,
   simulated physical state, observed sensor state, process excursion,
   quality-risk proxy, physical defect, and yield outcome;
+  \item a target-blind whole-wafer split, six-family source-native virtual-
+  metrology comparison, grouped uncertainty analysis, and explicit label,
+  feature-proxy, continuity, and chronological sensitivities;
   \item a reduced-order utility and CMP simulator with conserved UPS energy,
   hydraulic mass balance, explicit process modes, cumulative removal, and
   causal observation clocks;
@@ -130,7 +143,7 @@ The present contributions are:
   with bounded dressing-water, thermal, synthetic slurry-support, and null
   structures; and
   \item negative-control, positive-chain, numerical, structural, local,
-  global, and mismatch evidence for the synthetic plant and coupling; and
+  global, and mismatch evidence for the synthetic plant and coupling;
   \item a frozen active-POLISH early-warning target, causal arrived-signal
   feature boundary, disjoint probability/conformal calibration, held-out
   warning metrics, target sensitivity, and explicit structural/noise failures.
@@ -146,19 +159,21 @@ Without measured spatial metrology, every spatial output is labelled exactly:
 WIWNU}.
 
 Two evidence planes are kept dimensionally separate. The SI simulator uses Pa,
-m$^3$/s, m/s, K, s, and m. The PHM model will predict a stage-average target in
+m$^3$/s, m/s, K, s, and m. The PHM model predicts a stage-average target in
 the source's native numeric unit because the original source does not declare
 the target unit and its process columns use hidden scaling factors. An SI
 physics prediction cannot be added to a residual fitted on scaled PHM inputs
 without a separately supported calibration bridge.
 
-The supported claims at this evidence freeze are narrow: the synthetic CMP
-subsystem satisfies its declared equations and invariants; configured
-electrical disturbances can propagate through the tested synthetic utility
-topology into CMP state; and two frozen models predict one preregistered
-simulator excursion target on the named primary ensemble. The last claim rests
-on only three held-out events and does not survive all audited shifts. The
-study does not claim prediction or prevention of physical defects, real
+The supported claims at this evidence freeze are narrow: one selected tree
+predicts source-native average MRR on the precedence-retained PHM roles; the
+synthetic CMP subsystem satisfies its declared equations and invariants;
+configured electrical disturbances can propagate through the tested synthetic
+utility topology into CMP state; and two frozen models predict one
+preregistered simulator excursion target on the named primary ensemble. The
+public result has interval undercoverage and temporal fragility; the warning
+claim rests on only three held-out events and does not survive all audited
+shifts. The study does not claim prediction or prevention of physical defects, real
 wafer-yield loss, real equipment damage, controller benefit, or readiness for
 production control. Feature attribution, when later implemented, will not be
 described as causal proof.
@@ -261,10 +276,12 @@ infeasible because all records use machine ID 2; a varying field named
 
 \subsection{Public-data result status}
 
-\pending{}: no mean, linear, ridge, tree, physics, hybrid, uncertainty, or
-holdout performance result is reported in this paper version. Archive and
-preprocessing verification do not imply that a useful public-data MRR model
-has been demonstrated.
+WP09 is complete for offline average MRR in the source-native target scale.
+The selected tree beats the mean baseline on both precedence-retained
+holdouts, but its primary split-conformal intervals fall below the frozen
+coverage floor. The result does not establish physical units, machine
+generalization, electrical/UPW causality, streaming performance, or control
+utility.
 
 \section{System architecture and causal timing}
 
@@ -780,31 +797,133 @@ repository tests passed. The runtime schema/interface versions are
 zero. Test counts certify the checked software contracts and synthetic
 invariants, not real-fab validity.
 
-\section{Synthetic early-warning result and remaining protocols}
+\section{Virtual-metrology and early-warning results; remaining protocols}
 
-WP12 is now a frozen simulation result. The other subsections remain
-preregistered protocols so that modelling and evaluation choices are fixed
-before their holdout results are inspected. The WP12 runner is open loop: it
-does not propose or apply controller actions and is not the WP17 runtime.
+WP09 is now a frozen offline public-data result and WP12 a frozen synthetic
+early-warning result. The attribution, control, safety, and integrated-runtime
+subsections remain protocols so that modelling and evaluation choices are
+fixed before their results are inspected. The WP12 runner is open loop: it does
+not propose or apply controller actions and is not the WP17 runtime.
 
 \subsection{WP09: public-data virtual metrology}
 
-\pending{}: the public-data study will compare a training-target mean,
-ordinary linear regression, ridge regression, a dimensionally compatible
-physics-inspired baseline, a tree ensemble, and a physics-plus-residual model.
-All models will receive the same eligible predictors and grouped splits. Any
-physics-inspired PHM term must operate in the native PHM evidence plane; the SI
-simulator output in Eq.~\eqref{eq:mrr} will not be added numerically to a
-residual fitted on scaled public features.
+The one-shot WP09 study compares a training-target mean, ordinary linear and
+ridge regression, a dimensionless native-scale physics proxy, histogram
+gradient boosting, and a physics-plus-residual tree. All scientific choices,
+the 405-column predictor order, whole-wafer roles, and interpretation gates
+were committed before official holdout targets were opened. Training wafers
+were assigned by feature identity to TRAIN\_CORE (1,396 rows/1,189 wafers),
+MODEL\_SELECTION (299/255), and INTERVAL\_CALIBRATION (286/255). Five grouped
+folds inside TRAIN\_CORE tune hyperparameters; MODEL\_SELECTION recommends a
+family; final development fitting combines the first two roles; and the third
+supplies interval scores. The retained test/final-validation roles contain
+311/275 rows from 302/267 additional whole wafers.
 
-Preprocessing, imputation, scaling, feature selection, and hyperparameter
-fitting will occur inside training folds. Inner folds will preserve whole
-wafers and chronological blocks. The official test set will be used once for
-offline comparison and the official validation set once for the final public
-holdout. Results will report MRR MAE, RMSE, relative error, $R^2$, prediction
-interval coverage, and uncertainty width, plus the three preregistered extreme
-target treatments from Section~4. No machine-generalization result will be
-claimed.
+For six active-polish proxy pressures, fit-only positive medians $m_j^+$ give
+$P_i^*=\frac{1}{6}\sum_j\max(0,p_{ij})/m_j^+$. Absolute wafer, stage, and
+head rotations are similarly normalized, with
+$V_i^*=(\max(r_{w,i}^*,r_{s,i}^*)+r_{h,i}^*)/2$. The declared exposure and
+native coefficient are
+\begin{equation}
+ \begin{aligned}
+ \phi_i &={} \mathbb I[\text{active support}]P_i^*V_i^*,\\
+ \widehat K_{native} &={} \max\left(0,
+ \frac{\sum_i\phi_i y_i}{\sum_i\phi_i^2}\right).
+ \end{aligned}
+ \label{eq:wp09-native-proxy}
+\end{equation}
+This is not an SI Preston coefficient. The hybrid predicts
+$\max(0,\widehat K_{native}\phi_i+f_\theta(X_i))$. Common fit-only median
+imputation appends one missing indicator per predictor and removes
+zero-variance derived columns. Linear/ridge designs are standardized; tree
+designs are not. No target-driven feature selection occurs.
+
+For calibration residuals $s_i=|y_i-\widehat y_i|$, the symmetric 90\%
+split-conformal radius uses
+\begin{equation}
+ \begin{aligned}
+ k &={} \min\{n,\lceil(n+1)(1-0.10)\rceil\},\\
+ q &={} s_{(k)},\\
+ [L_i,U_i] &={} [\max(0,\widehat y_i-q),\widehat y_i+q].
+ \end{aligned}
+ \label{eq:wp09-conformal}
+\end{equation}
+The selected tree uses absolute loss, 15 leaves, minimum leaf size 20, L2
+regularization 0.1, and radius $q=5.3498$ in the source-native target scale.
+
+\begin{table*}[t]
+\centering
+\caption{WP09 primary precedence-retained holdout results. Target values are
+source-native and the unit is undeclared. Coverage is empirical for the
+nominal 90\% split-conformal interval.}
+\label{tab:wp09-primary}
+\scriptsize
+\begin{tabular}{lrrrrrrc}
+\toprule
+Family & Test MAE & Val. MAE & Test RMSE & Val. RMSE & Test $R^2$ & Val. $R^2$ & Test/val. coverage\\
+\midrule
+Mean & 29.540 & 29.703 & 33.152 & 33.170 & -0.022 & -0.020 & 0.852/0.865\\
+Linear & 101.255 & 215.637 & 413.773 & 1955.543 & -158.132 & -3542.915 & 0.894/0.895\\
+Ridge & 28.426 & 35.325 & 47.449 & 65.038 & -1.093 & -2.920 & 0.913/0.884\\
+Physics proxy & 34.077 & 35.709 & 61.086 & 62.124 & -2.468 & -2.577 & 0.875/0.887\\
+\textbf{Tree} & \textbf{3.185} & \textbf{3.395} & \textbf{5.176} & \textbf{6.693} & \textbf{0.975} & \textbf{0.958} & \textbf{0.839/0.847}\\
+Hybrid & 4.723 & 5.935 & 8.251 & 11.704 & 0.937 & 0.873 & 0.916/0.905\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The tree was recommended on MODEL\_SELECTION before holdout access and reduces
+MAE relative to the mean by 89.22\%/88.57\%. The final-validation whole-wafer
+bootstrap interval for paired tree-minus-mean MAE is
+$[-28.191,-24.363]$, so the preregistered public-prediction gate passes. Its
+test/final-validation grouped-bootstrap MAE intervals are
+$[2.779,3.737]$ and $[2.784,4.108]$. Relative MAE is 3.572\%/3.858\%.
+
+The hybrid is worse than the tree on both roles; the final-validation paired
+hybrid-minus-tree interval is $[1.502,3.650]$. Thus the physics-plus-residual
+improvement claim fails. Ordinary least squares has severe extrapolation and
+22/23 clipped negative predictions on test/validation. The physics proxy is
+also worse than the mean in MAE; it remains a structural baseline rather than
+a calibrated physical model.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.48\textwidth]{wp09_model_comparison.png}\hfill
+\includegraphics[width=0.39\textwidth]{wp09_tree_validation_scatter.png}
+\caption{WP09 public-data results in the source-native target scale. Left: all
+six frozen model families on mutually whole-wafer-disjoint retained roles; the
+MAE axis is logarithmic. Right: tree predictions on retained final validation,
+stratified by source stage. Neither axis has a declared physical unit.}
+\label{fig:wp09-primary}
+\end{figure*}
+
+The primary tree intervals fail the frozen 0.85 coverage floor on both roles.
+Test Stage A/B coverage is 0.853/0.818 and validation coverage 0.852/0.840, so
+the shortfall is not isolated to one role. Gap-threshold (5/20 s), active-only,
+and no-unresolved-proxy sensitivities keep tree MAE near 3.0--3.6 and generally
+increase coverage, but secondary variants cannot rescue the primary gate.
+Excluding the four preregistered extreme training labels yields MAE
+3.050/3.100; the separately labelled hypothetical divide-by-60 sensitivity
+yields 3.032/3.356. The original-label result remains primary.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.91\textwidth]{wp09_tree_sensitivity.png}
+\caption{Preregistered tree sensitivities. Point MAE is stable across declared
+label, continuity, and feature-proxy variants, whereas empirical interval
+coverage changes materially. The dashed line is nominal 90\% and the dotted
+line is the frozen 85\% interpretation floor.}
+\label{fig:wp09-sensitivity}
+\end{figure*}
+
+Consumable-feature removal worsens tree MAE but improves ridge MAE, so the
+cross-model association gate fails and no causal degradation claim is made.
+Chronological stress is also severe: tree MAE/RMSE become 18.50/239.84 with
+$R^2=0.037$ and coverage 0.812. Median absolute error remains 3.19, but one
+preregistered extreme late-block label (target 4326.154 versus prediction
+152.927 and late-block median target 83.309) dominates the tail. No post-hoc
+exclusion model was fitted. Machine generalization remains infeasible because
+all records expose the same machine identifier.
 
 \subsection{WP12: early-warning target and models}
 
@@ -985,7 +1104,7 @@ claim is made here.
 
 \begin{table*}[t]
 \centering
-\caption{Manuscript evidence status at the WP12 freeze. ``Protocol'' means the
+\caption{Manuscript evidence status at the WP09/WP12 freeze. ``Protocol'' means the
 method is described but no performance result is asserted.}
 \label{tab:status}
 \small
@@ -993,11 +1112,11 @@ method is described but no performance result is asserted.}
 \toprule
 Work package & Topic & Status & Current manuscript treatment\\
 \midrule
-WP03/R2 & PHM data pipeline & Verified contract & Provenance, semantics, split policy; no model accuracy\\
+WP03/R2 & PHM data pipeline & Verified contract & Provenance, semantics, native-unit and split policy\\
 WP04--WP07/R3--R4 & Utility, sensing, timing & Synthetic checks complete & Equations, conservation, causal observation contract\\
 WP08 & CMP physics & Synthetic checks complete & Reference, limiting, energy, timestep, replay results\\
 WP10 & Utility--CMP coupling & Synthetic checks complete & Null/positive chain and sensitivity results\\
-WP09 & Virtual metrology & Protocol & Baselines, leakage-safe split, uncertainty plan\\
+WP09 & Virtual metrology & Public-data result & Six-family comparison, grouped uncertainty, sensitivities and failed gates\\
 WP12 & Early warning & Synthetic result & Frozen target, causal features,
 disjoint calibration, primary and shift results\\
 WP13 & Attribution & Protocol & Classes, unknown policy, evidence combination\\
@@ -1052,7 +1171,20 @@ by the original source. The simulator can still supply hypotheses and
 dimensionless structures, but an SI Preston term cannot become a public-data
 physics residual baseline merely by matching a number. Model comparison must
 remain native-unit and leakage-safe until a defensible unit/calibration bridge
-exists.
+exists. Within that boundary, the tree supplies a strong offline point model,
+but the physics proxy and hybrid results are cautionary: structural plausibility
+does not guarantee predictive improvement when units and physical calibration
+are absent. The hybrid's significantly worse error blocks the intended
+physics-plus-residual claim rather than being hidden behind the tree result.
+
+The public-data uncertainty and chronology findings also separate point
+accuracy from reliability. The primary tree's narrow symmetric intervals
+undercover both retained roles, and an extreme late-block target collapses
+chronological RMSE despite a small median error. Label and continuity
+sensitivities show that both coverage and tail behaviour depend on defensible
+data semantics. A controller or safety filter therefore cannot treat the
+WP09 interval as an approved operating bound, nor can it assume the random
+whole-wafer split establishes future temporal performance.
 
 Finally, the study treats supervisory safety as an independent software
 contract, not as a property inferred from predictive accuracy. An accurate
@@ -1071,6 +1203,10 @@ future work.
   wafer/stage groups remain unresolved across splits, four extreme training
   labels require preregistered sensitivity analyses, and all records use one
   machine ID.
+  \item The source partitions reuse wafer IDs across roles; only the
+  precedence-retained roles support the primary independent-wafer comparison.
+  The selected tree's nominal 90\% intervals cover only 83.9\%/84.7\%, and
+  one known extreme label dominates the chronological stress RMSE.
   \item PHM data do not contain paired electrical/UPW utility histories and
   therefore cannot validate the proposed utility-to-CMP causal chain.
   \item UPS, VFD, motor, pump, UPW compliance, thermal, and sensor/network
@@ -1104,9 +1240,9 @@ future work.
   \item Known schedule, battery capacity, and load are simulator configuration;
   real availability is unverified. Reported WP12 timing is vectorized offline
   inference, not streaming controller latency.
-  \item No public-data virtual-metrology accuracy, attribution, controller,
-  safety-filter, integrated-runtime, or controller-robustness result is
-  available at this evidence freeze.
+  \item Public-data virtual metrology is an offline source-native result only.
+  Attribution, controller, safety-filter, integrated-runtime, and controller-
+  robustness results are unavailable at this evidence freeze.
   \item No measured spatial metrology, physical-defect label, wafer-yield
   outcome, equipment trial, or real actuator interface is present. The work
   does not support defect, yield, equipment-damage, or production-control
@@ -1131,20 +1267,31 @@ hash is \texttt{b5373001\ldots df1e05}, eligible-dataset hash is
 payload hash is \texttt{5a4fb701\ldots 0ede}. The payload excludes measured
 latency and set-valued conformal outputs by design.
 
+WP09 was opened from clean Git checkpoint
+\texttt{01c59a6172\ldots e4358805463c}. Its target-blind split payload hash is
+\texttt{44c88516\ldots 0ba944}; validation JSON and prediction CSV hashes are
+\texttt{52d25cf9\ldots bd10c} and
+\texttt{ea3e9e81\ldots 79826}; and the deterministic validation payload hash is
+\texttt{84d4823b\ldots 320db}. All six model artifacts reload under checksum
+verification. The result records CPython, NumPy, pandas, Pydantic, PyYAML, and
+scikit-learn versions.
+
 All six communication figures are generated from frozen CSV/JSON evidence. A
 machine-readable manifest records input and output SHA-256 values and states
 that it contains interim WP08/WP10 synthetic evidence only. This manuscript's
 two WP12 figures are generated by the frozen early-warning validation driver
 and have hashes \texttt{76863b51\ldots 53b16f} and
-\texttt{077177e0\ldots 2dcfcb}. The evidence map links each quantitative
+\texttt{077177e0\ldots 2dcfcb}. Three WP09 figures are regenerated from the
+frozen JSON/CSV only; their input/output hashes and public-data claim boundary
+are recorded in a separate figure manifest. The evidence map links each quantitative
 statement to the governing report and artifact. The article is rebuilt locally with
 \texttt{conda run -n devkki make paper}; intermediate LaTeX files remain under
 \texttt{paper/build}, and the reviewed PDF is written under
 \texttt{reports/paper}.
 
-At the WP12 evidence freeze, 16 focused warning tests and the complete 170/170
-repository suite passed with warnings treated as errors. These counts are
-historical evidence tied to the frozen revision, not a claim that future
+Immediately before WP09 target access, 19 focused tests passed; the complete
+repository suite passed 192/192 with warnings treated as errors. These counts
+are historical evidence tied to the frozen revisions, not a claim that future
 changes automatically preserve the result. Reproducible paired controller
 manifests and the final claims audit remain pending.
 
@@ -1162,12 +1309,15 @@ materially on synthetic connection assumptions.
 The detection half of the central question now has a narrow synthetic answer:
 two frozen models anticipate all three configured primary events with useful
 lead time. The structural-null and noise failures show why that result cannot
-be interpreted as topology-independent causality or permission to act. The
-mitigation and safety half remains open until public-data virtual metrology,
+be interpreted as topology-independent causality or permission to act.
+Separately, a leakage-safe public-data tree predicts source-native average MRR
+well on retained whole-wafer holdouts, but interval undercoverage, a failed
+hybrid claim, and chronological tail fragility prevent stronger reliability or
+physical-model conclusions. The mitigation and safety half remains open until
 held-out attribution, bounded control, independent safety filtering, and
-paired robust evaluation are complete. The supported conclusion remains
-limited to the tested synthetic equations, declared topology, and named WP12
-ensemble.
+paired robust evaluation are complete. Supported conclusions remain limited
+to the retained PHM roles and to the tested synthetic equations, declared
+topology, and named WP12 ensemble.
 
 \section*{Data, code, and manuscript status}
 

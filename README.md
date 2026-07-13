@@ -26,8 +26,12 @@ logistic regression, and gradient boosting using disjoint whole-run fit,
 probability-calibration, conformal-calibration, and TEST roles. Both learned
 models detect all three primary synthetic TEST events, but structural-null,
 compound-shift, and high-noise failures prohibit topology-independent use.
-Public-data virtual metrology, root-cause attribution, controllers, the safety
-filter, dashboard, and any supported control-efficacy result remain pending.
+WP09 now provides guarded, leakage-safe offline PHM average-MRR virtual
+metrology: the selected tree achieves 3.185/3.395 test/validation MAE in the
+source-native target scale, while its uncertainty coverage fails the frozen
+minimum and the hybrid-improvement claim is rejected. Root-cause attribution,
+controllers, the safety filter, dashboard, and any supported control-efficacy
+result remain pending.
 See the current
 [`project status`](orchestration/project_status.md),
 the [Phase 1/2 audit](orchestration/reports/phase_1_2_scientific_audit.md),
@@ -45,6 +49,9 @@ and
 [coupling validation report](orchestration/reports/wp10_coupling_validation.md).
 WP12 methods, results, and limitations are in the
 [early-warning validation report](orchestration/reports/wp12_early_warning_validation.md).
+WP09 methods, point performance, uncertainty failure, sensitivities, and
+artifact hashes are in the
+[virtual-metrology validation report](orchestration/reports/wp09_virtual_metrology_validation.md).
 
 The living evidence ledger is maintained at
 [`docs/running_paper.md`](docs/running_paper.md). A journal-neutral LaTeX
@@ -58,10 +65,12 @@ The primary target is average material-removal rate (MRR). The PHM 2016 CMP
 archive is present locally; its selected raw files, checksums, headers, and
 training-label joins are verified. The original challenge does not declare the
 MRR target unit, its process columns are proprietary scaled values, and its
-licence is not separately stated. Phase-aware preprocessing and split/fit-scope
-audits now pass, but virtual-metrology models have not been evaluated. Therefore
-there is no public-data model-validation claim. PHM results and SI simulator
-results must remain separate.
+licence is not separately stated. Phase-aware preprocessing, whole-wafer
+precedence, split/fit-scope audits, and the frozen WP09 comparison now pass.
+The public-data claim is limited to offline average-MRR point prediction on the
+311/275 precedence-retained test/validation rows: tree interval calibration,
+hybrid improvement, and cross-model consumable-association gates fail. PHM
+results and SI simulator results remain separate.
 
 The supported WP12 claim is narrower: frozen logistic and gradient-boosted
 models predict the preregistered ±5%, 0.25 s persistent active-POLISH simulator

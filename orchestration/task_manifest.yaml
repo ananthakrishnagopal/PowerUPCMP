@@ -585,7 +585,7 @@ tasks:
   - id: T-WP09
     title: WP09 CMP virtual metrology comparison
     phase: 3
-    state: IN_PROGRESS
+    state: COMPLETE
     priority: HIGH
     dependencies: [T-WP03, T-PHASE12-REMEDIATION, T-WP08]
     inputs:
@@ -617,17 +617,32 @@ tasks:
       - calibration_and_test_isolation_preserved
       - required_MRR_metrics_and_interval_coverage_reported
       - public_and_synthetic_results_separated
-    assumptions: [A-001, A-002, A-003, A-018]
+    assumptions: [A-001, A-002, A-003, A-018, A-021, A-022]
     blockers: []
     notes:
       - Scientific protocol, six model families, native-scale Preston proxy, grouped roles, split-conformal intervals, metrics, sensitivities, and interpretation gates frozen on 2026-07-13 before official holdout target access.
       - R2.1 precedence-retained roles are 1981/311/275 rows from 1699/302/267 mutually disjoint wafers; full 424-row source holdouts are collision-contaminated diagnostics only.
-      - Official test and validation MRR values remain unopened for WP09 model design and selection.
+      - Official test and validation MRR values were opened once only after the model recommendation and all interpretation gates were frozen; they were not used for family selection or post-hoc refitting.
       - Controlled implementation opened after preregistration commit 0f9d55b; synthetic fixtures and the feature-only split manifest must pass before holdout access.
       - "2026-07-13: target-blind split manifest payload SHA-256 44c8851653b39832357e42fba29f5d797ab574dc2e64f3e073c88c686b0ba944; all pairwise role wafer overlaps are zero"
       - "2026-07-13: WP09 focused suite passed 19/19 in 5.63 s and complete suite passed 192/192 in 52.40 s with warnings treated as errors"
       - "2026-07-13: one-shot runner requires explicit authorization, clean committed protocol files, exact manifest replay, passing preflight tests, and an unused persistent opening marker"
       - orchestration/reports/wp09_preholdout_checkpoint.md
+    validation_evidence:
+      - orchestration/reports/wp09_virtual_metrology_validation.md
+      - reports/virtual_metrology/wp09_holdout_opening.json
+      - reports/virtual_metrology/wp09_validation.json
+      - reports/virtual_metrology/wp09_predictions.csv
+      - reports/virtual_metrology/figures/wp09_figure_manifest.json
+      - "2026-07-13: selected tree test/validation MAE 3.1852/3.3954 and R2 0.9751/0.9585 on precedence-retained whole-wafer roles"
+      - "2026-07-13: final-validation paired tree-minus-mean MAE interval [-28.1911, -24.3631] supports the narrow C-001 point-prediction claim"
+      - "2026-07-13: selected-tree coverage 0.8392/0.8473 failed the frozen 0.85 minimum; calibrated-uncertainty interpretation rejected"
+      - "2026-07-13: hybrid-minus-tree validation MAE interval [1.5017, 3.6496] rejects public-data C-008"
+      - "2026-07-13: consumable ablation sign conflict between tree and ridge rejects the model-family-independent C-009 gate"
+      - "2026-07-13: validation JSON SHA-256 52d25cf92c4eea24158e0821cd7b7dd60fabe2ec04967443e3417397313bd10c; prediction CSV SHA-256 ea3e9e813e8343862340fb42bfc31c784e0f5df9bd15f5b0f707624bb4679826"
+      - "2026-07-13: post-documentation WP09 focused suite passed 19/19 in 5.08 s and complete suite passed 192/192 in 51.13 s with warnings treated as errors"
+      - "2026-07-13: governance audit passed for 16 YAML, 29-task acyclic DAG, 25 assumptions, 116 Markdown files, 122 valid local links, and zero missing links"
+      - "2026-07-13: WP09-integrated manuscript passed build/log/visual review as a 15-page A4 PDF with SHA-256 34a8a4be5826f47ff4c67af7bfd700610ccc759f88129546f824606a51760138"
 
   - id: T-WP10
     title: WP10 utility-to-CMP coupling and sensitivity
@@ -746,10 +761,12 @@ tasks:
       - orchestration/claims_matrix.md
       - orchestration/assumptions.yaml
       - orchestration/reports/wp08_cmp_validation.md
+      - orchestration/reports/wp09_virtual_metrology_validation.md
       - orchestration/reports/wp10_literature_review.md
       - orchestration/reports/wp10_coupling_validation.md
       - orchestration/reports/wp12_early_warning_validation.md
       - reports/figures/communication_figure_manifest.json
+      - reports/virtual_metrology/wp09_validation.json
       - reports/early_warning/wp12_validation.json
     outputs:
       - paper/main.tex
@@ -771,7 +788,9 @@ tasks:
     blockers: []
     notes:
       - Implementation opened at 2026-07-12T13:20:28+05:30 after T-COMMS-DEMO completed and the user authorized continuation.
-      - WP12 final evidence was integrated after the frozen revision-1.4 validation report completed; WP09, WP13, WP14-WP18 remain visibly pending.
+      - WP12 final evidence was integrated after the frozen revision-1.4 validation report completed.
+      - WP09 public-data methods, results, failed gates, figures, and limitations are integrated and the revised PDF passed build, log, and representative visual review.
+      - WP13 and WP14-WP18 remain visibly pending.
       - Root Makefile target `paper` delegates to the manuscript build without adding a Python dependency.
       - Task closed COMPLETE on 2026-07-13 after build, log, traceability, and representative visual review.
     validation_evidence:
@@ -783,6 +802,12 @@ tasks:
       - "paper/evidence_map.md traces WP08, WP10, and bounded WP12 numerical statements to governing artifacts"
       - "governance: 15 YAML, zero duplicate keys, 29-task acyclic DAG, 25 assumptions, 99 Markdown, 97 valid links, zero missing links"
       - "post-manuscript complete suite: 170 passed in 51.32 s with warnings treated as errors in devkki"
+      - "WP09-integrated output: 15-page A4 PDF; SHA-256 34a8a4be5826f47ff4c67af7bfd700610ccc759f88129546f824606a51760138"
+      - "WP09-integrated LaTeX log: no overfull box, undefined-reference, undefined-citation, or rerun warning"
+      - "WP09 representative visual review: title/evidence boundary, native-scale equations, model table, three WP09 figures, WP12 results, discussion, limitations, status table, and references legible"
+      - "paper/evidence_map.md traces WP09, WP08, WP10, and bounded WP12 numerical statements to governing artifacts"
+      - "WP09-closeout governance: 16 YAML, zero duplicate keys, 29-task acyclic DAG, 25 assumptions, 116 Markdown files, 122 valid links, zero missing links"
+      - "WP09-closeout complete suite: 192 passed in 51.13 s with warnings treated as errors in devkki"
 
   - id: T-WP11
     title: WP11 deterministic declarative scenario engine

@@ -15,8 +15,10 @@ The reviewed output is written to
 [`reports/paper/semifab_cmp_poc_draft.pdf`](../reports/paper/semifab_cmp_poc_draft.pdf).
 Intermediate LaTeX files remain under the ignored `paper/build/` directory.
 
-The current manuscript reports bounded synthetic WP08/WP10 evidence and the
-frozen WP12 simulation-only early-warning experiment. Public-data model
-performance, attribution, predictive control, safety filtering, and paired
-controller results remain visibly pending. A target journal class and final
-author affiliations will be selected only before submission.
+The current manuscript reports guarded public-data WP09 virtual metrology,
+bounded synthetic WP08/WP10 evidence, and the frozen WP12 simulation-only
+early-warning experiment. It reports WP09's failed uncertainty and hybrid
+gates alongside its point performance. Attribution, predictive control, safety
+filtering, and paired controller results remain visibly pending. A target
+journal class and final author affiliations will be selected only before
+submission.

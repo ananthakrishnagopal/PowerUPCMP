@@ -1,0 +1,14 @@
+{
+  "claim_boundary": "Offline precedence-retained PHM average-MRR evidence in an undeclared source-native target scale; no SI, real-fab, physical-defect, yield, causal-utility, or control-efficacy claim.",
+  "evidence_plane": "PUBLIC_PHM_SOURCE_NATIVE_OFFLINE_AVERAGE_MRR",
+  "inputs": {
+    "reports/virtual_metrology/wp09_predictions.csv": "ea3e9e813e8343862340fb42bfc31c784e0f5df9bd15f5b0f707624bb4679826",
+    "reports/virtual_metrology/wp09_validation.json": "52d25cf92c4eea24158e0821cd7b7dd60fabe2ec04967443e3417397313bd10c"
+  },
+  "outputs": {
+    "reports/virtual_metrology/figures/wp09_model_comparison.png": "ae54f4abf04e07fa600dd62d726162ed9d46cfa1f1366a542448d850fff5b531",
+    "reports/virtual_metrology/figures/wp09_tree_sensitivity.png": "879026920fb3791d17ab4827790f77ab9d6dbb13b130fbadaf26794e694b672f",
+    "reports/virtual_metrology/figures/wp09_tree_validation_scatter.png": "4715a3c1661419d408ed6a40bd67c7cde053b087c2e56c30f8dca044243c8cac"
+  },
+  "schema_version": "1.0.0"
+}

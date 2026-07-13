@@ -1,7 +1,7 @@
 # Dataset provenance and evaluation policy
 
-Status: raw PHM evidence and corrective Gate R2 semantic pipeline validated;
-public virtual-metrology evaluation has not begun.  
+Status: raw PHM evidence, corrective Gate R2 semantic pipeline, and bounded
+public-data WP09 virtual metrology complete.<br>
 Last updated: 2026-07-13
 
 ## PHM 2016 CMP source
@@ -142,6 +142,29 @@ observed machine ID is `2`. `MACHINE_DATA` takes values 1--6 but changes within
 1,979 of 1,981 training wafer/stage groups and every test and validation group;
 it is therefore a descriptive input, not a machine identity or stable regime.
 No machine-generalization claim will be made from this dataset.
+
+## WP09 evaluation outcome
+
+WP09 executed once after the protocol, model implementations, target-blind
+role manifest, and guard were committed at `01c59a6`. The selected histogram
+gradient-boosted tree reports the following precedence-retained results in the
+undeclared source-native target scale:
+
+| Role | Rows/wafers | MAE | RMSE | R² | Nominal 90% interval coverage |
+|---|---:|---:|---:|---:|---:|
+| Test | 311/302 | 3.185 | 5.176 | 0.975 | 0.839 |
+| Final validation | 275/267 | 3.395 | 6.693 | 0.958 | 0.847 |
+
+The final-validation paired tree-minus-mean MAE interval is
+[-28.191, -24.363], supporting a bounded point-prediction claim. Coverage is
+below the frozen 0.85 minimum on both roles, so calibrated uncertainty is not
+claimed. The physics-plus-residual model is worse than the selected tree, and
+consumable-feature ablations disagree in sign across tree and ridge. Full
+source test/validation results remain collision-contaminated diagnostics.
+
+The complete model comparison, label/proxy/gap sensitivities, chronological
+stress test, artifact hashes, and limitations are in
+[`wp09_virtual_metrology_validation.md`](../orchestration/reports/wp09_virtual_metrology_validation.md).
 
 The authoritative R2 decision and validation evidence are in
 [`r2_phm_semantics.md`](../orchestration/decisions/r2_phm_semantics.md) and

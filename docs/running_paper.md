@@ -1,7 +1,7 @@
 # Predictive Supervisory Control of CMP Under Electrical and UPW Disturbances
 
-**Living research paper draft**  
-Status: corrective R1--R4, synthetic CMP WP08, declared-topology WP10 coupling, and synthetic WP12 early-warning validation complete; public virtual metrology, attribution, control, and safety results pending<br>
+**Living research paper draft**<br>
+Status: corrective R1--R4, public-data WP09 virtual metrology, synthetic CMP WP08, declared-topology WP10 coupling, and synthetic WP12 early-warning validation complete; attribution, control, and safety results pending<br>
 Last updated: 2026-07-13
 
 > This document is maintained throughout implementation and will become the basis of the final technical paper. Every result must link to a reproducible artifact, configuration, code path, and provenance record. Missing evidence is recorded as pending rather than inferred.
@@ -24,7 +24,15 @@ pump/network conservation, observation timing, and scenario validation required
 correction before integration. Native-unit contracts and phase-aware,
 time-weighted PHM preprocessing, conserved pump/network physics, UPS
 energy/frequency states, causal observation delivery, and executable scenario
-semantics now pass their corrective gates. The previous direct UPW-to-MRR
+semantics now pass their corrective gates. A target-blind whole-wafer split
+then froze the PHM virtual-metrology experiment before official holdout access.
+The selected tree achieved retained test/final-validation MAE 3.185/3.395 and
+\(R^2\) 0.975/0.958 in the source-native, unit-undeclared target scale,
+reducing MAE by 89.2%/88.6% relative to the mean. Its 90% residual intervals
+covered only 83.9%/84.7%, below the frozen 85% interpretation floor; the
+physics-plus-residual hybrid was significantly worse than the tree, and a
+chronological stress was dominated by one preregistered extreme label. The
+previous direct UPW-to-MRR
 multiplier was withdrawn. A reduced-order CMP subsystem with explicit modes,
 signed rotary kinematics, dynamic pressure/spindles/slurry, consumable health,
 interface energy balance, and cumulative removal now passes its synthetic
@@ -65,7 +73,9 @@ This paper will not claim validated prediction or prevention of scratches, dishi
 
 1. A typed, provenance-aware CMP/utility data contract that separates measured output, simulated state, observed sensors, excursions, risk proxies, defects, and yield outcomes.
 2. A deterministic simulator that exposes the declared electrical → UPS/VFD → pump → UPW → CMP/MRR propagation chain.
-3. A leakage-safe PHM CMP virtual-metrology pipeline with grouped splits and explicit empty-trace handling.
+3. A leakage-safe PHM CMP virtual-metrology comparison with six frozen model
+   families, grouped uncertainty, explicit empty-trace handling, and
+   preregistered semantic sensitivities.
 4. Early-warning and root-cause methods evaluated against simulator labels without describing feature attribution as causal proof.
 5. Baseline and predictive supervisory controllers evaluated under an independent safety filter.
 6. Reproducible paired scenario evidence comparing no action, threshold control, and predictive control.
@@ -397,14 +407,87 @@ evidence is in
 
 ## 6. Models and supervisory methods
 
-### 6.1 Public-data virtual metrology (pending)
+### 6.1 Public-data virtual metrology
 
-The WP09 PHM comparison remains pending. Its frozen candidate families are a
-training-target mean, linear and ridge regression, a dimensionally compatible
-native-unit physics-inspired baseline, a tree ensemble, and a
-physics-plus-residual model. Training transformations must stay inside grouped
-folds, and no SI simulator coefficient may be added to the source-undeclared
-PHM target unit.
+WP09 is complete for offline average MRR in the PHM source-native target scale;
+the unit remains undeclared. The one-shot experiment was committed and tested
+before official test/validation targets were opened. It compares a mean,
+ordinary linear regression, ridge, a dimensionless native-scale physics proxy,
+histogram gradient boosting, and a physics-plus-residual boosted model.
+
+Feature identity alone assigned the precedence-retained training data to:
+
+| Role | Rows | Whole wafers | Use |
+|---|---:|---:|---|
+| TRAIN_CORE | 1,396 | 1,189 | Five-fold grouped hyperparameter tuning |
+| MODEL_SELECTION | 299 | 255 | Family recommendation |
+| INTERVAL_CALIBRATION | 286 | 255 | Residual-radius calibration |
+
+Fit-only preprocessing median-imputes non-finite values, appends one missing
+indicator per raw feature, and removes zero-variance derived columns. Linear
+and ridge designs use fit-only scaling. For normalized active-polish proxy
+pressure and rotation,
+
+\[
+P_i^*=\frac{1}{6}\sum_{j=1}^{6}\frac{\max(0,p_{ij})}{m_j^+},
+\qquad
+V_i^*=\frac{\max(r_{w,i}^*,r_{s,i}^*)+r_{h,i}^*}{2},
+\]
+
+\[
+\phi_i=\mathbf{1}[\text{active support}]P_i^*V_i^*,
+\qquad
+\widehat K_{native}=\max\left(0,
+\frac{\sum_i\phi_i y_i}{\sum_i\phi_i^2}\right).
+\]
+
+This is not an SI Preston coefficient. The hybrid predicts
+
+\[
+\widehat y_i=\max(0,\widehat K_{native}\phi_i+f_\theta(X_i)).
+\]
+
+For disjoint calibration residuals \(s_i=|y_i-\widehat y_i|\), the nominal
+90% interval uses
+
+\[
+k=\min\{n,\lceil(n+1)(1-0.10)\rceil\},
+\qquad q=s_{(k)},
+\]
+
+\[
+[L_i,U_i]=[\max(0,\widehat y_i-q),\widehat y_i+q].
+\]
+
+The tree was recommended on `MODEL_SELECTION` before holdout access. Primary
+precedence-retained metrics are:
+
+| Family | Test MAE | Validation MAE | Test RMSE | Validation RMSE | Test/validation \(R^2\) | Test/validation coverage |
+|---|---:|---:|---:|---:|---:|---:|
+| Mean | 29.540 | 29.703 | 33.152 | 33.170 | -0.022 / -0.020 | 0.852 / 0.865 |
+| Linear | 101.255 | 215.637 | 413.773 | 1955.543 | -158.132 / -3542.915 | 0.894 / 0.895 |
+| Ridge | 28.426 | 35.325 | 47.449 | 65.038 | -1.093 / -2.920 | 0.913 / 0.884 |
+| Physics proxy | 34.077 | 35.709 | 61.086 | 62.124 | -2.468 / -2.577 | 0.875 / 0.887 |
+| Tree | **3.185** | **3.395** | **5.176** | **6.693** | **0.975 / 0.958** | **0.839 / 0.847** |
+| Hybrid | 4.723 | 5.935 | 8.251 | 11.704 | 0.937 / 0.873 | 0.916 / 0.905 |
+
+The tree reduces MAE versus the mean by 89.22%/88.57%. Its final-validation
+whole-wafer paired `tree - mean` interval is [-28.191, -24.363], so C-001
+passes with a narrow public-data claim. The primary tree interval coverage is
+below the frozen 0.85 interpretation floor on both roles, so its uncertainty
+gate fails. Hybrid-minus-tree final-validation MAE has interval
+[1.502, 3.650], so C-008 hybrid improvement fails.
+
+Point performance remains near 3.0--3.6 MAE across the preregistered four-label,
+5/20 s continuity, active-only, and no-unresolved-proxy sensitivities, but
+coverage changes materially. Consumable-feature removal worsens tree error but
+improves ridge error, so the cross-model C-009 association gate fails. In the
+chronological stress, tree MAE/RMSE become 18.50/239.84 because one
+preregistered extreme target of 4326.154 receives prediction 152.927; no
+post-hoc exclusion model was fitted.
+
+Detailed results, hashes, figures, failed gates, and claim boundaries are in
+[`wp09_virtual_metrology_validation.md`](../orchestration/reports/wp09_virtual_metrology_validation.md).
 
 ### 6.2 WP12 synthetic early-warning target
 
@@ -536,12 +619,14 @@ unseen-compound diagnostic, and a structural no-connection diagnostic. These
 are open-loop warning evaluations; amortized vectorized prediction timing is
 not a controller or production-latency result.
 
-All future controller comparisons will use identical scenarios, initial
-states, parameter draws, observation corruptions, and seed maps. Remaining
-metrics include public-data MRR MAE/RMSE/relative error/R² and interval
-coverage; paired pressure/flow violations, MRR excursion, cumulative-removal
-error, hold duration, recovery time, action magnitude, safety rejections,
-attribution accuracy, and end-to-end runtime/controller latency.
+WP09 reports source-native MRR MAE, RMSE, relative MAE, R², bias, grouped-
+bootstrap intervals, and prediction-interval coverage for the public-data
+virtual-metrology experiment. All future controller comparisons will use
+identical scenarios, initial states, parameter draws, observation corruptions,
+and seed maps. Remaining metrics include paired pressure/flow violations, MRR
+excursion, cumulative-removal error, hold duration, recovery time, action
+magnitude, safety rejections, attribution accuracy, and end-to-end
+runtime/controller latency.
 
 Results will report mean, median, standard deviation, 5th percentile, 95th percentile, and worst case where applicable.
 
@@ -566,7 +651,7 @@ Results will report mean, median, standard deviation, 5th percentile, 95th perce
 | Standalone reduced-order CMP physics | `orchestration/reports/wp08_cmp_validation.md`; 48 focused and 130/130 full tests | Validated synthetic equations/invariants; no real-tool calibration, utility propagation, or controller claim |
 | Utility-to-CMP topology | `orchestration/reports/wp10_coupling_validation.md`; local/global/mismatch artifacts | Validated synthetic declared-topology behavior; no real-tool plumbing or calibration claim |
 | Synthetic early-warning target and models | `orchestration/reports/wp12_early_warning_validation.md`; 16 focused and 170/170 full tests | Validated only on the named simulator ensemble; three independent TEST events; structural-null and high-noise failures prohibit topology-independent use |
-| Public-data virtual-metrology accuracy | Future model evaluation artifact | Pending |
+| Public-data virtual-metrology accuracy | `orchestration/reports/wp09_virtual_metrology_validation.md`; `reports/virtual_metrology/wp09_validation.json` | Tree MAE 3.19 test and 3.40 validation in source-native MRR units; 83.9%/84.7% interval coverage missed the frozen 85% minimum; public-data virtual metrology only |
 | Electrical → UPW → CMP causal propagation | `reports/sensitivity/wp10_positive_chain_trace.csv` | Validated only for the declared synthetic degraded-UPS/DRESS topology; no causal claim for a real fab |
 | Early-warning performance | `reports/early_warning/wp12_validation.json`; TEST predictions and figures | Logistic PR-AUC 0.9904 and GBT 0.9130; both detect 3/3 synthetic events with 2.71 s median lead; no controller or real-fab claim |
 | Root-cause attribution | Future simulator-label evaluation | Pending |
@@ -582,6 +667,25 @@ Results will report mean, median, standard deviation, 5th percentile, 95th perce
   phases; 306 official wafer/stage groups remain unresolved across the splits.
 - Four extreme training labels require all three preregistered sensitivity
   reports; the hypothetical divide-by-60 policy is not a factual correction.
+- Primary WP09 inference uses only the precedence-retained 311 test and 275
+  validation rows from whole wafers absent from earlier source partitions. The
+  complete 424-row source holdouts reuse wafer identities and remain
+  collision-contaminated diagnostics.
+- The selected tree's nominal 90% split-conformal intervals cover 83.92% of
+  retained test targets and 84.73% of retained validation targets, below the
+  frozen 85% interpretation floor. Its point estimates are supported, but its
+  uncertainty estimates are not accepted as calibrated.
+- The physics-plus-residual model is significantly worse than the selected
+  tree, and consumable-feature ablation changes sign between tree and ridge.
+  WP09 therefore rejects a hybrid-improvement claim and does not support a
+  model-family-independent consumable association or causal-age claim.
+- Chronological stress error is dominated by one preregistered 4326.154 target:
+  tree MAE/RMSE rise to 18.50/239.84 while median absolute error remains 3.19.
+  This sensitivity is retained rather than repaired post hoc.
+- WP09 is offline average-MRR virtual metrology in a source-native numeric
+  scale. It neither validates the simulated electrical-to-CMP pathway nor
+  supplies an online early-warning, attribution, control, defect, or yield
+  result.
 - A physical-machine generalization test is impossible with only machine ID 2.
 - The PHM dataset does not validate the electrical/UPW disturbance causal chain.
 - The electrical/UPS model is a lumped engineering approximation with constant
@@ -677,14 +781,28 @@ Results will report mean, median, standard deviation, 5th percentile, 95th perce
   deterministic probability-payload hash:
   `5a4fb7011fd6688718455c9692689937caa679ea29c884cdca099835a9830ede`.
   The payload intentionally excludes measured latency and conformal sets.
+- WP09 was frozen at Git checkpoint
+  `01c59a6172f621ed7f81a01487a5e4358805463c` before target access. The
+  one-shot guard replayed the target-blind manifest, required a clean worktree,
+  and passed 19/19 focused plus 192/192 complete tests with warnings treated as
+  errors. Split-manifest payload SHA-256:
+  `44c8851653b39832357e42fba29f5d797ab574dc2e64f3e073c88c686b0ba944`;
+  validation JSON SHA-256:
+  `52d25cf92c4eea24158e0821cd7b7dd60fabe2ec04967443e3417397313bd10c`;
+  deterministic validation-payload SHA-256:
+  `84d4823b7972e289a67f62a4bf1ea348d007ddd0f6285b4dd32d36178da320db`;
+  prediction CSV SHA-256:
+  `ea3e9e813e8343862340fb42bfc31c784e0f5df9bd15f5b0f707624bb4679826`.
+  All six serialized models reload with checksum verification.
 - Dataset archive and extraction checksums: recorded above and in the extraction manifest.
-- Current source status: Git branch `main`; validated WP10 baseline commit
-  `51ba07a` and interim WP10 demonstration commit `bf5fa99` precede the
-  uncommitted WP12 checkpoint recorded in this draft.
-- WP12 reproduction commands:
+- Current source status: Git branch `main`; WP12 validation is committed at
+  `25dd7ac`, the whole-wafer split correction at `de9ff10`, the WP09 protocol
+  at `0f9d55b`, and the frozen pre-holdout implementation at `01c59a6`.
+- WP09/WP12 reproduction and repository-audit commands:
 
   ```text
   conda run -n devkki python -m pytest -q -W error
+  conda run -n devkki python scripts/validate_wp09_virtual_metrology.py --help
   env MPLCONFIGDIR=/tmp/semifab-poc-matplotlib conda run -n devkki python scripts/validate_wp12_early_warning.py
   conda run -n devkki python scripts/validate_governance.py
   ```

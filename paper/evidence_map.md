@@ -1,17 +1,20 @@
 # Manuscript evidence map
 
 Status: working traceability record for the journal-neutral manuscript<br>
-Evidence freeze: WP08, WP10, and bounded synthetic WP12 complete; public virtual metrology, attribution, control, and safety results pending
+Evidence freeze: public-data WP09, synthetic WP08/WP10, and bounded synthetic WP12 complete; attribution, control, and safety results pending
 
 ## Claim boundary
 
-The manuscript may support C-002 and C-011 at the explicitly limited synthetic
-level. It may support C-003 only for the frozen ±5%, 0.25 s persistent, 3 s
-horizon target on the named primary WP12 ensemble, with three independent TEST
-events and explicit structural/noise failures. It must not represent
-public-data virtual metrology, root-cause attribution, controller efficacy,
-safety filtering, physical defects, yield, real equipment, or production
-control as completed.
+The manuscript may support C-001 only for offline average MRR on the
+precedence-retained PHM whole-wafer roles in the source-native, undeclared
+target scale. The tree's point-performance gate passes, while its frozen
+uncertainty-coverage gate fails. It may support C-002 and C-011 at the
+explicitly limited synthetic level and C-003 only for the frozen ±5%, 0.25 s
+persistent, 3 s horizon target on the named primary WP12 ensemble, with three
+independent TEST events and explicit structural/noise failures. C-008 and the
+cross-model C-009 gate fail on public data. The manuscript must not represent
+root-cause attribution, controller efficacy, safety filtering, physical
+defects, yield, real equipment, or production control as completed.
 
 Primary governance source: [`claims_matrix.md`](../orchestration/claims_matrix.md).
 
@@ -21,6 +24,10 @@ Primary governance source: [`claims_matrix.md`](../orchestration/claims_matrix.m
 |---|---|---|
 | PHM archive: 17,399,074 compressed bytes; 558 selected members; 58 header-only traces | [`data_sources.yaml`](../orchestration/data_sources.yaml), `data/raw/phm_2016_cmp/extraction_manifest.yaml` | Provenance/schema evidence only; no public-model performance claim |
 | PHM processed source rows: 1,981/424/424 with 405 target-free predictors; precedence-retained evaluation rows: 1,981/311/275 from mutually disjoint wafers | [`r2_phm_semantics_validation.md`](../orchestration/reports/r2_phm_semantics_validation.md), [`r2_official_wafer_precedence.md`](../orchestration/decisions/r2_official_wafer_precedence.md) | Native target unit remains source-undeclared; full source holdouts are collision-contaminated diagnostics; no SI bridge |
+| WP09 tree: test/validation MAE 3.185/3.395, RMSE 5.176/6.693, and R² 0.975/0.958 | [`wp09_virtual_metrology_validation.md`](../orchestration/reports/wp09_virtual_metrology_validation.md), [`wp09_validation.json`](../reports/virtual_metrology/wp09_validation.json) | Offline source-native average MRR only; selected before holdout opening; final-validation paired tree-minus-mean interval [-28.191, -24.363] |
+| WP09 tree interval coverage: 0.839 test and 0.847 validation | [`wp09_virtual_metrology_validation.md`](../orchestration/reports/wp09_virtual_metrology_validation.md) | Fails the frozen 0.85 minimum despite nominal 90% intervals; no calibrated-uncertainty claim |
+| WP09 hybrid-minus-tree validation MAE interval [1.502, 3.650]; consumable ablation changes sign across tree and ridge | [`wp09_virtual_metrology_validation.md`](../orchestration/reports/wp09_virtual_metrology_validation.md) | Rejects public-data C-008 and the model-family-independent C-009 gate; association is not causation |
+| WP09 chronological tree stress: MAE 18.50, RMSE 239.84, median absolute error 3.19 | [`wp09_virtual_metrology_validation.md`](../orchestration/reports/wp09_virtual_metrology_validation.md), [`wp09_predictions.csv`](../reports/virtual_metrology/wp09_predictions.csv) | Dominated by one preregistered 4326.154 target; retained without post-hoc correction |
 | CMP nominal power-mean speed, 100 nm/min reference, energy residual, mode gating, timestep refinement | [`wp08_cmp_validation.md`](../orchestration/reports/wp08_cmp_validation.md) | Synthetic WP08 structure and numerics only |
 | Healthy 25%/400 ms sag retains full coupling support and identical CMP traces | [`wp10_coupling_validation.md`](../orchestration/reports/wp10_coupling_validation.md), `reports/sensitivity/wp10_negative_control_trace.csv` | Structural negative control, not a failed attempt to create an excursion |
 | Degraded 500 J UPS interruption reduces end-DRESS pad activity by 5.3576% and later mean simulated MRR by 3.1926% | [`wp10_coupling_validation.md`](../orchestration/reports/wp10_coupling_validation.md), `reports/sensitivity/wp10_positive_chain_trace.csv` | Declared synthetic stress test; no safe envelope or controller claim |
@@ -30,7 +37,7 @@ Primary governance source: [`claims_matrix.md`](../orchestration/claims_matrix.m
 | Logistic: PR-AUC 0.9904, precision 0.9750, row recall 0.9286, event recall 3/3, median lead 2.71 s, coverage 0.9296 | [`wp12_early_warning_validation.md`](../orchestration/reports/wp12_early_warning_validation.md), [`wp12_validation.json`](../reports/early_warning/wp12_validation.json) | Named primary synthetic ensemble only; one false-alarm episode; no model selected for downstream use |
 | Gradient boosted: PR-AUC 0.9130, row recall 1.0, event recall 3/3, median lead 2.71 s, coverage 0.8773 | [`wp12_early_warning_validation.md`](../orchestration/reports/wp12_early_warning_validation.md), [`wp12_validation.json`](../reports/early_warning/wp12_validation.json) | Named primary synthetic ensemble only; one false-alarm episode |
 | Structural null: zero events but 30 logistic and 9 gradient-boosted false-alarm episodes | [`wp12_early_warning_validation.md`](../orchestration/reports/wp12_early_warning_validation.md) | Demonstrates missing topology-independent applicability; constrains WP15/WP16 |
-| Complete repository suite: 173/173 after R2.1 correction | [`project_status.md`](../orchestration/project_status.md) | Supports tested contracts/equations/WP12 experiment and corrected split governance; not public-model accuracy, real-fab, or controller validation |
+| Pre-WP09 holdout suite: 192/192 with warnings treated as errors | [`wp09_virtual_metrology_validation.md`](../orchestration/reports/wp09_virtual_metrology_validation.md) | Supports frozen code/contracts and guarded target access; public-data performance comes from the separately hashed result artifact, not test count |
 
 ## Figure provenance
 
@@ -43,19 +50,28 @@ The WP12 model-comparison and held-out timeline figures are generated by
 their SHA-256 values are recorded in
 [`wp12_early_warning_validation.md`](../orchestration/reports/wp12_early_warning_validation.md).
 
+The WP09 model comparison, retained-validation scatter, and preregistered
+sensitivity figures are generated by
+[`generate_wp09_figures.py`](../scripts/generate_wp09_figures.py). Their frozen
+input and output hashes are recorded in
+[`wp09_figure_manifest.json`](../reports/virtual_metrology/figures/wp09_figure_manifest.json).
+
 The communication manifest remains explicitly WP08/WP10-only. The two WP12
-figures are likewise synthetic and open loop; neither source supports a
-public-data, real-fab, defect, yield, controller-efficacy, or equipment claim.
+figures are synthetic and open loop. The three WP09 figures are public-data,
+offline virtual-metrology evidence in the undeclared source-native target
+scale. None supports a real-fab, defect, yield, controller-efficacy, or
+equipment claim.
 
 ## Reviewed manuscript artifact
 
-`reports/paper/semifab_cmp_poc_draft.pdf` is a 13-page A4 PDF with SHA-256
-`9410051d76b3830be00d1c0be2afab7ca4ae6928e11b492297fe40db5d733f7c`.
+`reports/paper/semifab_cmp_poc_draft.pdf` is a 15-page A4 PDF with SHA-256
+`34a8a4be5826f47ff4c67af7bfd700610ccc759f88129546f824606a51760138`.
 It was rebuilt from the repository root with
-`conda run -n devkki make paper`. Title, WP12 equations, result table, both
-warning figures, discussion, limitations, and references passed representative
-visual review; the final LaTeX log contains no overfull box, undefined-reference,
-or undefined-citation warning.
+`conda run -n devkki make paper`. Title/evidence boundary, WP09 equations,
+primary model table, three WP09 figures, WP12 results, discussion, limitations,
+status table, and references passed representative visual review. The final
+LaTeX log contains no overfull box, undefined-reference, undefined-citation, or
+rerun warning.
 
 ## Literature-use boundary
 
@@ -70,7 +86,6 @@ support transfer of material-specific numerical effects.
 
 The following remain protocols rather than results:
 
-- WP09 public-data virtual metrology and uncertainty coverage;
 - WP13 root-cause attribution and `UNKNOWN` policy;
 - WP14 no-action and fixed-threshold baselines;
 - WP15 bounded predictive supervisory controller;

@@ -1,5 +1,5 @@
 manifest_version: "1.0.0"
-last_updated: "2026-07-13T14:53:23+05:30"
+last_updated: "2026-07-13T14:55:59+05:30"
 workflow: single_agent_phase_gated
 allowed_states:
   - PLANNED
@@ -942,6 +942,7 @@ tasks:
       - The 264-row TRAIN and 132-row CALIBRATION roles were generated without TEST access; their deterministic preholdout payload SHA-256 is e8b47b67a37972addedd5dc230005979bcb3d20f3bea76aa1ec07a5d186d3ab9.
       - Calibration-only hybrid accuracy and macro recall are both 0.8182, UNKNOWN recall is 1.0, known-cause coverage is 0.80, and selective accuracy is 1.0; pressure-sensor-fault recall is zero and remains an explicit frozen-policy risk.
       - Twenty-two focused WP13 tests and the complete 210-test repository suite pass in conda environment devkki with warnings treated as errors before TEST opening.
+      - The frozen pre-holdout implementation is committed at 7489bf1d14add57033c685998ced4f75b8b7fc98; the checkpoint is recorded in orchestration/reports/wp13_preholdout_checkpoint.md.
 
   - id: T-WP14
     title: WP14 baseline controllers

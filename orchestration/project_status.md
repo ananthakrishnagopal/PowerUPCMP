@@ -1,6 +1,6 @@
 # Project status
 
-Last updated: 2026-07-13 14:53 IST<br>
+Last updated: 2026-07-13 14:55 IST<br>
 Current phase: Phase 3 — scientific modelling and coupling<br>
 Phase state: WP08, WP09, WP10, and WP12 COMPLETE within bounded claims<br>
 Active task: T-WP13 root-cause attribution — frozen design, implementation in progress
@@ -300,7 +300,7 @@ authorized by this status; those remain downstream work.
 
 Current governance evidence: 17 YAML files parse with zero duplicate keys; all
 29 tasks form an acyclic dependency graph and reference 25 valid assumptions;
-118 Markdown files contain 122 valid local links and zero missing local links.
+119 Markdown files contain 122 valid local links and zero missing local links.
 
 ## WP13 pre-holdout state
 
@@ -320,4 +320,6 @@ Calibration-only hybrid accuracy/macro recall are 0.8182/0.8182, UNKNOWN recall
 is 1.0, known-cause coverage is 0.80, and selective accuracy is 1.0. Hybrid
 pressure-sensor-fault recall is zero on CALIBRATION; this risk will be reported
 without threshold or model retuning. Twenty-two focused tests and the complete
-210-test suite pass with warnings treated as errors.
+210-test suite pass with warnings treated as errors. The exact committed
+pre-holdout evidence and opening conditions are in
+`orchestration/reports/wp13_preholdout_checkpoint.md`.

@@ -99,6 +99,14 @@ keeps targets separate until audited one-to-one joins. The processed bundle has
 target-free predictor columns. All three joins have zero missing and zero orphan
 keys. Complete-trace features are explicitly offline-only.
 
+A pre-WP09 identity audit found that the source partitions are not disjoint by
+whole wafer: 113 training/test, 115 training/validation, and 34 test/validation
+wafer IDs recur in the opposite stage. No MRR value was used to discover or
+resolve the collision. The frozen R2.1 precedence rule retains all training
+rows, 311 test rows, and 275 final-validation rows from 1,699, 302, and 267
+mutually disjoint wafers. Full 424-row source holdouts are retained only as
+collision-contaminated diagnostics.
+
 Current audits: [`phm_missingness.json`](../reports/data/phm_missingness.json),
 [`phm_semantic_audit.json`](../reports/data/phm_semantic_audit.json), and
 [`feature_manifest.yaml`](../data/processed/phm_2016_cmp/feature_manifest.yaml).

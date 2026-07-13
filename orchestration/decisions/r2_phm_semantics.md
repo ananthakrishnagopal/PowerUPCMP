@@ -139,18 +139,25 @@ may be selected using test or validation results.
 ## Split hierarchy and leakage policy
 
 1. Official training is the only fitting/tuning source.
-2. Official test is an offline holdout.
-3. Official validation is the final public holdout.
-4. Inner development splits group whole `WAFER_ID` values.
-5. A chronological training stress split orders whole wafers by group start
+2. Official test is an offline source role.
+3. Official validation is the final public source role.
+4. A feature-only R2.1 audit found that those source partitions reuse wafer
+   IDs across opposite stages. The accepted precedence correction retains all
+   training wafers, only test wafers absent from training, and only validation
+   wafers absent from both original training and original test. The retained
+   row counts are 1,981/311/275 and are mutually wafer-disjoint. Full 424-row
+   test/validation partitions are collision-contaminated diagnostics only. See
+   `orchestration/decisions/r2_official_wafer_precedence.md`.
+5. Inner development splits group whole `WAFER_ID` values.
+6. A chronological training stress split orders whole wafers by group start
    timestamp; absolute time is not a model feature.
-6. A physical `MACHINE_ID` holdout is infeasible because the loaded dataset has
+7. A physical `MACHINE_ID` holdout is infeasible because the loaded dataset has
    only machine ID 2. This fact is reported, not hidden.
-7. `MACHINE_DATA` is not a substitute grouping variable: 1,979 of 1,981
+8. `MACHINE_DATA` is not a substitute grouping variable: 1,979 of 1,981
    training wafer/stage groups and every test/validation group contain multiple
    values. It may be summarized as an input signal but cannot define a
    leave-one-regime-out group split.
-8. Stage A, stage B, combined-stage, and chronological/trace stress results are
+9. Stage A, stage B, combined-stage, and chronological/trace stress results are
    reported separately; no machine-generalization result is claimed.
 
 Every fitted imputer, scaler, selector, phase threshold beyond the fixed R2
@@ -163,8 +170,9 @@ and disjoint from calibration/test groups.
 - Unit tests for source-order preservation, gap segmentation, centered time
   weights, proxy labels, unresolved groups, and absence of target use.
 - Unit tests for each label policy and exact-key/value guards.
-- Split tests for official isolation, wafer grouping, chronological grouping,
-  fit-scope audit, and infeasible physical-machine holdout.
+- Split tests for official source-role construction, cross-partition wafer
+  collisions, precedence-retained isolation, wafer grouping, chronological
+  grouping, fit-scope audit, and infeasible physical-machine holdout.
 - Real-data semantic report with timing, modes, labels, regimes, and policies.
 - Real-data feature generation with one row per official wafer/stage key and no
   absolute timestamp predictor.

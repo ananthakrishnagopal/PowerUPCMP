@@ -25,12 +25,15 @@ from .schema import (
 from .splits import (
     FitScopeAudit,
     HoldoutResult,
+    OfficialPrecedenceAudit,
+    OfficialPrecedenceResult,
     SplitAudit,
     SplitResult,
     audit_fit_scope,
     chronological_group_split,
     grouped_split,
     held_out_group_values,
+    official_group_precedence_split,
     physical_machine_holdout_feasibility,
 )
 
@@ -44,6 +47,8 @@ __all__ = [
     "LabelPolicyResult",
     "LatentStateRecord",
     "ObservationRecord",
+    "OfficialPrecedenceAudit",
+    "OfficialPrecedenceResult",
     "ProcessModeProxy",
     "PublicMeasurementRecord",
     "QualityFlag",
@@ -61,6 +66,7 @@ __all__ = [
     "engineer_phase_aware_features",
     "grouped_split",
     "held_out_group_values",
+    "official_group_precedence_split",
     "physical_machine_holdout_feasibility",
     "semantic_audit_report",
     "sha256_file",

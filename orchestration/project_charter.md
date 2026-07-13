@@ -18,8 +18,11 @@ Average material removal rate, written as \(\widehat{MRR}\), is the sole
 primary measured target. The PHM 2016 CMP archive is locally present and its
 raw integrity, selected schema, training-label joins, native-unit handling,
 phase-aware/time-weighted preprocessing, preregistered label-anomaly policies,
-and official/whole-wafer splits are verified. A physical-machine holdout is
-impossible because only machine ID 2 is present. Virtual-metrology model
+source-role construction, and a conservative whole-wafer precedence split are
+verified. The source partitions reuse wafer IDs across opposite stages; the
+retained training/test/validation roles contain 1,981/311/275 mutually
+wafer-disjoint rows. A physical-machine holdout is impossible because only
+machine ID 2 is present. Virtual-metrology model
 fitting, uncertainty calibration, and official holdout evaluation remain
 pending, so no PHM predictive-performance claim is supported.
 Simulator-control results remain a separate SI evidence plane.

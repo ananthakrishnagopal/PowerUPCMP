@@ -1,9 +1,9 @@
 # Project status
 
-Last updated: 2026-07-13 10:43 IST<br>
+Last updated: 2026-07-13 11:45 IST<br>
 Current phase: Phase 3 — scientific modelling and coupling<br>
-Phase state: WP12 VALIDATED; REMAINING CONTROL/ATTRIBUTION DECISIONS NOT FROZEN<br>
-Active tasks: none; the next Phase 3 scientific task has not been opened
+Phase state: WP12 VALIDATED; R2.1 WHOLE-WAFER CORRECTION VALIDATED; WP09 PROTOCOL FREEZE NEXT<br>
+Active tasks: none; T-WP09 remains unopened until its scientific protocol is frozen
 
 ## Review outcome
 
@@ -76,13 +76,17 @@ efficacy.
   RunManifest requires parameter provenance, DynamicSubsystem 2.0.0 matches all
   four plant components, sensing remains independent, and the complete strict
   `configs/default.yaml` is present and deterministically hashed.
-- R2 VALIDATED: PHM processing retains source row order, starts new continuity
+- R2/R2.1 VALIDATED: PHM processing retains source row order, starts new continuity
   segments at non-positive increments and gaps above 10 s, uses centered
   time-support weights within segments, derives input-only process-mode
   proxies, keeps targets separate from features, and materializes all three
   preregistered four-label treatments without holdout-based selection.
-- Official training/test/validation roles and whole-wafer chronological/grouped
-  development splits are enforced. Physical-machine holdout is infeasible
+- Official source partitions reuse 113/115/34 wafer IDs across their three
+  role pairs in opposite stages. The accepted `training > test > validation`
+  precedence retains 1,981/311/275 rows from 1,699/302/267 mutually disjoint
+  wafers; the full 424-row source holdouts are contaminated diagnostics only.
+  Inner whole-wafer chronological/grouped development splits are enforced.
+  Physical-machine holdout is infeasible
   because all records use machine ID 2; `MACHINE_DATA` varies within nearly
   every wafer/stage group and is not represented as a machine or stable regime.
 - R3 VALIDATED: the speed-scaled pump curve is evaluated against network
@@ -136,7 +140,8 @@ efficacy.
   semantic preprocessing, anomaly-policy materialization, and split/fit-scope
   contracts are verified. The processed offline bundle contains 1,981 training,
   424 test, and 424 validation wafer/stage rows with 405 target-free predictor
-  columns; public virtual-metrology modelling has not begun.
+  columns. R2.1 retains 1,981/311/275 mutually wafer-disjoint modelling rows;
+  public virtual-metrology fitting has not begun.
 - Dataset licence: not separately stated; local research use is limited to
   the user's recorded authorization.
 - Synthetic simulator: corrected R3 utility-plant components pass equilibrium,
@@ -162,9 +167,10 @@ efficacy.
   specificity falls to 0.0657 and tree PR-AUC to 0.5283. The observed-signal
   models therefore require topology/applicability checking and an independent
   WP16 safety filter.
-- R1/R2 verification: R1 focused tests passed 21/21; R2 focused tests passed
-  13/13; real-data integration tests passed 6/6; and the complete suite passed
-  82/82 with zero warnings in conda environment `devkki`.
+- R1/R2 verification: the historical R2 gate passed 13 focused, 6 real-data,
+  and 82 complete tests. The R2.1 correction passed 16 focused tests, then the
+  complete repository passed 173/173 in 49.71 s with warnings treated as errors
+  in conda environment `devkki`.
 - R3 verification: 52/52 focused tests and 94/94 complete tests passed. At the
   10 ms default step, the 0.70-pu speed test differs from the 0.5 ms reference
   by 36.19 Pa (0.0121% nominal); generated mass-balance residuals remain below
@@ -242,9 +248,9 @@ efficacy.
   a visually reviewed 13-page A4 PDF containing the bounded WP12 target,
   primary result, both warning figures, shift failures, and limitations while
   retaining visible pending markers for unexecuted work. The PDF SHA-256 is
-  `862c53cde3bc0e5697f695a130099e6713a1c637e17bbeefaa7d08702ce575c7`;
+  `9410051d76b3830be00d1c0be2afab7ca4ae6928e11b492297fe40db5d733f7c`;
   the final LaTeX log has no overfull box, undefined-reference, or
-  undefined-citation warning.
+  undefined-citation warning. The methods now include the R2.1 split correction.
 
 ## Next Phase 3 work
 

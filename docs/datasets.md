@@ -2,7 +2,7 @@
 
 Status: raw PHM evidence and corrective Gate R2 semantic pipeline validated;
 public virtual-metrology evaluation has not begun.  
-Last updated: 2026-07-11
+Last updated: 2026-07-13
 
 ## PHM 2016 CMP source
 
@@ -93,6 +93,15 @@ predictors. All three feature/label key audits have zero missing and zero
 orphan keys. Checksums and contracts are in
 `data/processed/phm_2016_cmp/feature_manifest.yaml`, and the detailed evidence
 is in `reports/data/phm_semantic_audit.json`.
+
+Those source partitions are disjoint by `(WAFER_ID, STAGE)`, but not by whole
+wafer: training/test, training/validation, and test/validation share 113, 115,
+and 34 wafer IDs, respectively, always in the opposite stage. The R2.1
+correction therefore applies immutable source precedence
+`training > test > validation`. Public-model evaluation uses 1,981 training,
+311 test, and 275 final-validation rows from 1,699, 302, and 267 mutually
+disjoint wafers. The complete 424-row source test and validation tables may be
+reported only as collision-contaminated diagnostics.
 
 ## Training-label anomaly policy
 

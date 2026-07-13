@@ -1,5 +1,5 @@
-registry_version: "1.2.0"
-effective_date: "2026-07-11"
+registry_version: "1.3.0"
+effective_date: "2026-07-13"
 dataset_network_access_used: false
 reference_network_review_used: true
 reviewed_reference_urls:
@@ -85,13 +85,19 @@ sources:
     processed_feature_bundle:
       directory: data/processed/phm_2016_cmp
       manifest: data/processed/phm_2016_cmp/feature_manifest.yaml
-      manifest_sha256: ff465151aa621a197aac2d253dd36879dfd39e57cfb29913b5788e3b112ece48
+      manifest_sha256: 40c0d9121f87517eba8bb2d100ff49c17357f348d0821756f59a5c87da98707c
       feature_rows: {training: 1981, test: 424, validation: 424}
       predictor_column_count: 405
       target_in_feature_files: false
       complete_trace_features_streaming_eligible: false
     split_status:
-      official_splits_isolated: true
+      official_feature_and_label_roles_separate: true
+      source_partitions_whole_wafer_isolated: false
+      source_partition_wafer_overlap_counts: {training_test: 113, training_validation: 115, test_validation: 34}
+      whole_wafer_precedence: [training, test, validation]
+      precedence_retained_rows: {training: 1981, test: 311, validation: 275}
+      precedence_retained_wafers: {training: 1699, test: 302, validation: 267}
+      full_source_partition_interpretation: OFFICIAL_SOURCE_PARTITION_COLLISION_CONTAMINATED
       inner_wafer_group_split: IMPLEMENTED
       chronological_wafer_stress_split: IMPLEMENTED
       fit_scope_audit: IMPLEMENTED

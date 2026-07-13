@@ -1,7 +1,7 @@
 # Phase 3 modeling notes and decision ledger
 
 Status: living technical ledger; corrective gates R1--R4, standalone WP08 CMP physics, and WP10 declared-topology coupling are validated.  
-Last updated: 2026-07-11
+Last updated: 2026-07-13
 
 ## Purpose
 
@@ -29,8 +29,9 @@ Four remediation gates are mandatory before CMP implementation:
 
 - R1: native/unknown public units, frozen subsystem contracts, and complete
   default configuration;
-- R2: phase-aware time-weighted PHM features, label-anomaly policy, and
-  official/wafer/time/machine splits;
+- R2/R2.1: phase-aware time-weighted PHM features, label-anomaly policy,
+  source-role collision audit, whole-wafer precedence, and inner
+  wafer/time/machine split evidence;
 - R3: pump-curve/system interaction, conserved relief/bypass flow,
   compliance-governed transients, and UPS/frequency consistency; and
 - R4: causal source/reported/arrival timing plus target- and overlap-aware
@@ -81,14 +82,20 @@ unresolved states remain separately summarized. All complete-trace summaries
 are marked offline-only. Targets are joined after feature construction and
 remain in separate files.
 
-The official training/test/validation hierarchy is frozen as fit-and-tune,
-offline holdout, and final public holdout. Inner splits hold out whole wafers
-and chronological blocks; fitted transformations carry a fit-scope audit. A
+The official training/test/validation source hierarchy is frozen as
+fit-and-tune, offline holdout, and final public holdout. Because 113/115/34
+wafer IDs recur across the three source-role pairs in opposite stages, R2.1
+applies `training > test > validation` precedence. This leaves
+1,981/311/275 mutually wafer-disjoint evaluation rows; full 424-row source
+holdouts are collision-contaminated diagnostics. Inner splits hold out whole
+wafers and chronological blocks; fitted transformations carry a fit-scope audit. A
 physical-machine holdout is infeasible because only machine ID 2 exists.
 `MACHINE_DATA` varies within nearly every wafer/stage group and is retained
 only as descriptive metadata/input, not machine or regime identity.
 
-The 1,981/424/424 processed rows each use 405 target-free predictor columns.
+The complete 1,981/424/424 processed source rows each use 405 target-free
+predictor columns; the leakage-safe evaluation roles contain 1,981/311/275
+rows.
 The original label treatment is primary; excluding the four preregistered
 records and hypothetically dividing only those four by 60 are sensitivity
 analyses. R2 passed 13 focused tests, 6 real-data integration tests, and the

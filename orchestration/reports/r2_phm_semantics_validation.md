@@ -1,8 +1,9 @@
 # R2 PHM semantics validation
 
-Date: 2026-07-11  
+Date: 2026-07-11; R2.1 precedence correction 2026-07-13
 Task: T-PHASE12-REMEDIATION, subgate R2  
-Disposition: VALIDATED FOR OFFLINE NATIVE-UNIT VM PREPARATION
+Disposition: VALIDATED WITH WHOLE-WAFER PRECEDENCE CORRECTION FOR OFFLINE
+NATIVE-UNIT VM PREPARATION
 
 ## Scope and evidence boundary
 
@@ -104,6 +105,13 @@ maximum remaining ordinary training label is 162.6417.
 
 - Official training, test, and validation feature construction runs
   independently before labels are joined.
+- The source partitions are not whole-wafer independent: 113 training/test,
+  115 training/validation, and 34 test/validation wafer IDs recur in the
+  opposite stage. No `(WAFER_ID, STAGE)` key repeats.
+- The accepted `training > test > validation` precedence rule retains
+  1,981/311/275 rows from 1,699/302/267 mutually disjoint wafers. Full 424-row
+  test and validation source partitions are explicitly collision-contaminated
+  diagnostics and cannot support independent-wafer claims.
 - Inner random development splits retain whole wafers.
 - Chronological stress splits retain whole wafers and use group-start time as
   split metadata, not a predictor.
@@ -122,7 +130,18 @@ R2 synthetic unit suite:       13 passed
 R2 real-data integration:       6 passed
 Complete repository suite:     82 passed in 36.83 s
 Warnings:                       0
+R2.1 focused correction suite:  16 passed in 36.88 s
+Post-correction complete suite: 173 passed in 49.71 s
 ```
+
+The regenerated nine processed CSV files preserve their exact pre-correction
+SHA-256 values. The additive feature manifest hash is
+`40c0d9121f87517eba8bb2d100ff49c17357f348d0821756f59a5c87da98707c`,
+and the regenerated semantic-audit hash is
+`c4eeede30caa8a24f0c2dbdfcc3a5cb4465cc703193ed7ba6921fa83a0a88732`.
+Governance parses 15 YAML files with zero duplicate keys, an acyclic 29-task
+DAG, 25 assumptions, 105 Markdown files, 98 valid local links, and zero missing
+links. The amended 13-page manuscript rebuild passes its severe-warning audit.
 
 The earlier one-test failure was resolved under the failure policy after
 source-order inspection proved the test expectation wrong. The implementation
@@ -139,7 +158,9 @@ and report now preserve all five timestamp reversals.
 | Input-only mode proxy tested | PASS |
 | Unresolved groups retained | PASS |
 | Target excluded from feature construction | PASS |
-| Official splits isolated | PASS |
+| Official source roles and labels constructed separately | PASS |
+| Cross-partition wafer collisions measured | PASS |
+| Precedence-retained evaluation subsets wafer-disjoint | PASS |
 | Four anomaly policies exact and audited | PASS |
 | Wafer and chronological group splits leakage-free | PASS |
 | Fit scope audited | PASS |
@@ -155,6 +176,8 @@ and report now preserve all five timestamp reversals.
   analysis if downstream model rankings depend on it.
 - Feature dimensionality and missing-mode behavior require train-only
   preprocessing and model ablation in WP09.
+- The retained test and validation subsets are smaller than the source
+  partitions; full-partition diagnostics are not independent-wafer evidence.
 - No PHM accuracy or uncertainty result exists yet.
 - Dataset licensing remains limited to recorded local user authorization.
 - R3 plant physics and R4 timing/scenario corrections remain open.

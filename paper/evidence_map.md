@@ -20,7 +20,7 @@ Primary governance source: [`claims_matrix.md`](../orchestration/claims_matrix.m
 | Manuscript result | Evidence source | Status and limitation |
 |---|---|---|
 | PHM archive: 17,399,074 compressed bytes; 558 selected members; 58 header-only traces | [`data_sources.yaml`](../orchestration/data_sources.yaml), `data/raw/phm_2016_cmp/extraction_manifest.yaml` | Provenance/schema evidence only; no public-model performance claim |
-| PHM processed rows: 1,981/424/424 with 405 target-free predictors | [`r2_phm_semantics_validation.md`](../orchestration/reports/r2_phm_semantics_validation.md) | Native target unit remains source-undeclared; no SI bridge |
+| PHM processed source rows: 1,981/424/424 with 405 target-free predictors; precedence-retained evaluation rows: 1,981/311/275 from mutually disjoint wafers | [`r2_phm_semantics_validation.md`](../orchestration/reports/r2_phm_semantics_validation.md), [`r2_official_wafer_precedence.md`](../orchestration/decisions/r2_official_wafer_precedence.md) | Native target unit remains source-undeclared; full source holdouts are collision-contaminated diagnostics; no SI bridge |
 | CMP nominal power-mean speed, 100 nm/min reference, energy residual, mode gating, timestep refinement | [`wp08_cmp_validation.md`](../orchestration/reports/wp08_cmp_validation.md) | Synthetic WP08 structure and numerics only |
 | Healthy 25%/400 ms sag retains full coupling support and identical CMP traces | [`wp10_coupling_validation.md`](../orchestration/reports/wp10_coupling_validation.md), `reports/sensitivity/wp10_negative_control_trace.csv` | Structural negative control, not a failed attempt to create an excursion |
 | Degraded 500 J UPS interruption reduces end-DRESS pad activity by 5.3576% and later mean simulated MRR by 3.1926% | [`wp10_coupling_validation.md`](../orchestration/reports/wp10_coupling_validation.md), `reports/sensitivity/wp10_positive_chain_trace.csv` | Declared synthetic stress test; no safe envelope or controller claim |
@@ -30,7 +30,7 @@ Primary governance source: [`claims_matrix.md`](../orchestration/claims_matrix.m
 | Logistic: PR-AUC 0.9904, precision 0.9750, row recall 0.9286, event recall 3/3, median lead 2.71 s, coverage 0.9296 | [`wp12_early_warning_validation.md`](../orchestration/reports/wp12_early_warning_validation.md), [`wp12_validation.json`](../reports/early_warning/wp12_validation.json) | Named primary synthetic ensemble only; one false-alarm episode; no model selected for downstream use |
 | Gradient boosted: PR-AUC 0.9130, row recall 1.0, event recall 3/3, median lead 2.71 s, coverage 0.8773 | [`wp12_early_warning_validation.md`](../orchestration/reports/wp12_early_warning_validation.md), [`wp12_validation.json`](../reports/early_warning/wp12_validation.json) | Named primary synthetic ensemble only; one false-alarm episode |
 | Structural null: zero events but 30 logistic and 9 gradient-boosted false-alarm episodes | [`wp12_early_warning_validation.md`](../orchestration/reports/wp12_early_warning_validation.md) | Demonstrates missing topology-independent applicability; constrains WP15/WP16 |
-| Complete repository suite: 170/170 | [`project_status.md`](../orchestration/project_status.md) | Supports tested contracts/equations/WP12 experiment; not real-fab or controller validation |
+| Complete repository suite: 173/173 after R2.1 correction | [`project_status.md`](../orchestration/project_status.md) | Supports tested contracts/equations/WP12 experiment and corrected split governance; not public-model accuracy, real-fab, or controller validation |
 
 ## Figure provenance
 
@@ -50,7 +50,7 @@ public-data, real-fab, defect, yield, controller-efficacy, or equipment claim.
 ## Reviewed manuscript artifact
 
 `reports/paper/semifab_cmp_poc_draft.pdf` is a 13-page A4 PDF with SHA-256
-`862c53cde3bc0e5697f695a130099e6713a1c637e17bbeefaa7d08702ce575c7`.
+`9410051d76b3830be00d1c0be2afab7ca4ae6928e11b492297fe40db5d733f7c`.
 It was rebuilt from the repository root with
 `conda run -n devkki make paper`. Title, WP12 equations, result table, both
 warning figures, discussion, limitations, and references passed representative

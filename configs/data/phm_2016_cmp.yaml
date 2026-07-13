@@ -15,6 +15,14 @@ label_join:
   test_validation_labels: offline_evaluation_only
 split_policy:
   official_hierarchy: [training_fit_and_tuning, test_offline_holdout, validation_final_holdout]
+  official_whole_wafer_precedence:
+    enabled: true
+    order: [training, test, validation]
+    group: WAFER_ID
+    source_roles_reassigned: false
+    retained_rows: {training: 1981, test: 311, validation: 275}
+    retained_wafer_counts: {training: 1699, test: 302, validation: 267}
+    full_source_partition_interpretation: OFFICIAL_SOURCE_PARTITION_COLLISION_CONTAMINATED
   inner_primary_group: WAFER_ID
   forbidden: random_row_split_within_group
   transforms_fit_scope: training_groups_only

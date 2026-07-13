@@ -80,8 +80,10 @@ WP00 → WP01 → WP02 → Phase 1/2 audit → R1–R4 remediation → WP08 → 
 
 WP03 and WP09 form a separate public-data evidence path. The PHM archive is
 locally present; raw integrity/schema, native-unit handling, source-order
-phase-aware time weighting, anomaly-policy materialization, official splits,
-and whole-wafer development splits pass R2. A physical-machine holdout is not
+phase-aware time weighting, anomaly-policy materialization, source-role
+construction, R2.1 whole-wafer precedence, and inner grouped splits pass R2.
+The source partitions themselves reuse wafer IDs, so only the retained
+1,981/311/275 roles support independent-wafer evaluation. A physical-machine holdout is not
 possible because only machine ID 2 is present. Public virtual-metrology model
 fitting and evaluation have not begun, so claims C-001, the public-data part of
 C-008, and the “primary validated target” demonstration remain blocked. None

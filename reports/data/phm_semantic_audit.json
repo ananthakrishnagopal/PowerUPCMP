@@ -23,6 +23,48 @@
     ],
     "physical_machine_holdout_feasible": false
   },
+  "official_wafer_precedence_evidence": {
+    "dropped_row_counts": {
+      "test": 113,
+      "training": 0,
+      "validation": 149
+    },
+    "group_columns": [
+      "WAFER_ID"
+    ],
+    "interpretation": "OFFICIAL_ROLE_PRECEDENCE_WHOLE_GROUP_DISJOINT",
+    "leakage_free": true,
+    "original_group_counts": {
+      "test": 415,
+      "training": 1699,
+      "validation": 416
+    },
+    "original_overlap_counts": {
+      "test_validation": 34,
+      "training_test": 113,
+      "training_validation": 115
+    },
+    "original_row_counts": {
+      "test": 424,
+      "training": 1981,
+      "validation": 424
+    },
+    "retained_group_counts": {
+      "test": 302,
+      "training": 1699,
+      "validation": 267
+    },
+    "retained_overlap_counts": {
+      "test_validation": 0,
+      "training_test": 0,
+      "training_validation": 0
+    },
+    "retained_row_counts": {
+      "test": 311,
+      "training": 1981,
+      "validation": 275
+    }
+  },
   "original_target_unit_status": "NOT_DECLARED_BY_ORIGINAL_SOURCE",
   "phase_labels_are": "INPUT_ONLY_PROCESS_MODE_PROXIES_NOT_MEASURED_PHASES",
   "process_signal_units": "PROPRIETARY_SCALED_WITH_HIDDEN_FACTORS",

@@ -12,6 +12,39 @@ official_split_roles:
   training: FIT_AND_TUNING_ONLY
   test: OFFLINE_HOLDOUT
   validation: FINAL_PUBLIC_HOLDOUT
+official_wafer_precedence_audit:
+  group_columns:
+  - WAFER_ID
+  original_group_counts:
+    training: 1699
+    test: 415
+    validation: 416
+  retained_group_counts:
+    training: 1699
+    test: 302
+    validation: 267
+  original_row_counts:
+    training: 1981
+    test: 424
+    validation: 424
+  retained_row_counts:
+    training: 1981
+    test: 311
+    validation: 275
+  dropped_row_counts:
+    training: 0
+    test: 113
+    validation: 149
+  original_overlap_counts:
+    training_test: 113
+    training_validation: 115
+    test_validation: 34
+  retained_overlap_counts:
+    training_test: 0
+    training_validation: 0
+    test_validation: 0
+  leakage_free: true
+  interpretation: OFFICIAL_ROLE_PRECEDENCE_WHOLE_GROUP_DISJOINT
 feature_audits:
   training:
     feature_contract: PHM_PHASE_AWARE_OFFLINE_VM_V1

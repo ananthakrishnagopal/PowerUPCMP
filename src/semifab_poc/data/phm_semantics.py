@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 from .phm_cmp import LabelJoinResult, PhmDataError, PhmDataset, TIMESERIES_COLUMNS
+from .splits import official_group_precedence_split
 
 
 TRACE_GROUP_COLUMNS = ("TRACE_ID", "WAFER_ID", "STAGE")
@@ -542,6 +543,20 @@ def semantic_audit_report(
             ].max()
         ),
     }
+    official_group_frames = {
+        split: getattr(dataset, f"{split}_timeseries")
+        .loc[:, list(FEATURE_GROUP_COLUMNS)]
+        .drop_duplicates()
+        .reset_index(drop=True)
+        for split in ("training", "test", "validation")
+    }
+    precedence = official_group_precedence_split(
+        official_group_frames["training"],
+        official_group_frames["test"],
+        official_group_frames["validation"],
+        ["WAFER_ID"],
+    )
+    report["official_wafer_precedence_evidence"] = precedence.audit.to_dict()
     training_machine_data_counts = dataset.training_timeseries.groupby(
         list(FEATURE_GROUP_COLUMNS)
     )["MACHINE_DATA"].nunique()

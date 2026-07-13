@@ -18,6 +18,7 @@ from semifab_poc.data.phm_semantics import (
 from semifab_poc.data.splits import (
     audit_fit_scope,
     chronological_group_split,
+    official_group_precedence_split,
     physical_machine_holdout_feasibility,
 )
 
@@ -77,6 +78,41 @@ def test_phase_aware_features_keep_official_splits_isolated(dataset, official_fe
         assert feature_result.audit["absolute_timestamp_is_predictor"] is False
 
 
+def test_official_features_require_wafer_precedence_for_independent_holdouts(
+    official_features,
+) -> None:
+    result = official_group_precedence_split(
+        official_features.training.frame,
+        official_features.test.frame,
+        official_features.validation.frame,
+        ["WAFER_ID"],
+    )
+    assert result.audit.original_overlap_counts == {
+        "training_test": 113,
+        "training_validation": 115,
+        "test_validation": 34,
+    }
+    assert result.audit.retained_row_counts == {
+        "training": 1981,
+        "test": 311,
+        "validation": 275,
+    }
+    assert result.audit.retained_group_counts == {
+        "training": 1699,
+        "test": 302,
+        "validation": 267,
+    }
+    assert result.test["STAGE"].value_counts().sort_index().to_dict() == {
+        "A": 190,
+        "B": 121,
+    }
+    assert result.validation["STAGE"].value_counts().sort_index().to_dict() == {
+        "A": 169,
+        "B": 106,
+    }
+    assert result.audit.leakage_free
+
+
 def test_real_data_semantic_audit_records_known_timing_and_regime_limits(dataset) -> None:
     report = semantic_audit_report(dataset)
     training = report["splits"]["training"]
@@ -103,6 +139,18 @@ def test_real_data_semantic_audit_records_known_timing_and_regime_limits(dataset
     }
     assert report["training_label_anomalies"]["count"] == 4
     assert report["training_label_anomalies"]["primary_policy"] == "ORIGINAL"
+    precedence = report["official_wafer_precedence_evidence"]
+    assert precedence["original_overlap_counts"] == {
+        "training_test": 113,
+        "training_validation": 115,
+        "test_validation": 34,
+    }
+    assert precedence["retained_row_counts"] == {
+        "training": 1981,
+        "test": 311,
+        "validation": 275,
+    }
+    assert precedence["leakage_free"] is True
 
 
 def test_actual_label_policies_and_training_only_fit_scope(dataset, official_features) -> None:

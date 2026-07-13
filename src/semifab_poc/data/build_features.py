@@ -17,6 +17,7 @@ from .phm_semantics import (
     build_official_feature_sets,
     join_group_labels,
 )
+from .splits import official_group_precedence_split
 
 
 def _sha256(path: Path) -> str:
@@ -52,6 +53,12 @@ def build_feature_bundle(
 
     dataset = load_phm_dataset(root, verify_checksums=verify_checksums)
     feature_sets = build_official_feature_sets(dataset, gap_threshold_s=gap_threshold_s)
+    precedence = official_group_precedence_split(
+        feature_sets.training.frame,
+        feature_sets.test.frame,
+        feature_sets.validation.frame,
+        ["WAFER_ID"],
+    )
     files: dict[str, Any] = {}
     joins: dict[str, Any] = {}
     feature_audits: dict[str, Any] = {}
@@ -113,6 +120,7 @@ def build_feature_bundle(
             "test": "OFFLINE_HOLDOUT",
             "validation": "FINAL_PUBLIC_HOLDOUT",
         },
+        "official_wafer_precedence_audit": precedence.audit.to_dict(),
         "feature_audits": feature_audits,
         "label_join_audits": joins,
         "label_policy_audits": label_policy_audits,

@@ -546,7 +546,7 @@ tasks:
     active_subgate: ALL_VALIDATED
     subgate_status:
       R1_contract_and_configuration: VALIDATED
-      R2_PHM_semantics: VALIDATED
+      R2_PHM_semantics: VALIDATED_WITH_20260713_WHOLE_WAFER_PRECEDENCE_CORRECTION
       R3_plant_physics: VALIDATED
       R4_online_and_scenario_timing: VALIDATED
       governance_reconciliation: VALIDATED
@@ -556,12 +556,19 @@ tasks:
       - "2026-07-11: R1 focused tests passed 21/21 in devkki"
       - "2026-07-11: full pytest suite passed 70/70; one known pandas FutureWarning assigned to R2"
       - orchestration/decisions/r2_phm_semantics.md
+      - orchestration/decisions/r2_official_wafer_precedence.md
       - orchestration/reports/r2_phm_semantics_validation.md
       - orchestration/decisions/r3_plant_physics.md
       - reports/data/phm_semantic_audit.json
       - data/processed/phm_2016_cmp/feature_manifest.yaml
       - "2026-07-11: R2 focused tests passed 13/13 and real-data integration tests passed 6/6 in devkki"
       - "2026-07-11: full pytest suite passed 82/82 with zero warnings"
+      - "2026-07-13: feature-only audit found 113/115/34 cross-source wafer-ID collisions and zero repeated wafer-stage keys"
+      - "2026-07-13: authorized precedence correction retained 1981/311/275 rows from 1699/302/267 mutually disjoint wafers"
+      - "2026-07-13: R2.1 focused correction suite passed 16/16 in 36.88 s with warnings treated as errors"
+      - "2026-07-13: post-correction complete suite passed 173/173 in 49.71 s with warnings treated as errors"
+      - "2026-07-13: all nine processed CSV hashes preserved; additive feature manifest SHA-256 40c0d9121f87517eba8bb2d100ff49c17357f348d0821756f59a5c87da98707c"
+      - "2026-07-13: governance passed for 15 YAML, 29-task acyclic DAG, 25 assumptions, 105 Markdown, 98 valid links, zero missing links"
       - orchestration/reports/r3_plant_physics_validation.md
       - orchestration/decisions/r4_online_scenario_timing.md
       - reports/plant/r3_validation.json
@@ -752,7 +759,8 @@ tasks:
       - Task closed COMPLETE on 2026-07-13 after build, log, traceability, and representative visual review.
     validation_evidence:
       - "conda run -n devkki make paper: exit 0"
-      - "reviewed output: 13-page A4 PDF; SHA-256 862c53cde3bc0e5697f695a130099e6713a1c637e17bbeefaa7d08702ce575c7"
+      - "reviewed WP12 output before R2.1 amendment: 13-page A4 PDF; SHA-256 862c53cde3bc0e5697f695a130099e6713a1c637e17bbeefaa7d08702ce575c7"
+      - "R2.1 methods-amended output: 13-page A4 PDF; SHA-256 9410051d76b3830be00d1c0be2afab7ca4ae6928e11b492297fe40db5d733f7c"
       - "LaTeX log: no overfull box, undefined-reference, or undefined-citation warning"
       - "representative visual review: title/evidence boundary, WP12 equations, primary table, both figures, discussion, limitations, and references legible"
       - "paper/evidence_map.md traces WP08, WP10, and bounded WP12 numerical statements to governing artifacts"

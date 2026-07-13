@@ -91,6 +91,49 @@ class HoldoutResult:
         return not self.development_values & self.holdout_values
 
 
+@dataclass(frozen=True)
+class OfficialPrecedenceAudit:
+    """Feature-only evidence for collision removal across source partitions."""
+
+    group_columns: tuple[str, ...]
+    original_group_counts: dict[str, int]
+    retained_group_counts: dict[str, int]
+    original_row_counts: dict[str, int]
+    retained_row_counts: dict[str, int]
+    dropped_row_counts: dict[str, int]
+    original_overlap_counts: dict[str, int]
+    retained_overlap_counts: dict[str, int]
+    interpretation: str
+
+    @property
+    def leakage_free(self) -> bool:
+        return not any(self.retained_overlap_counts.values())
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "group_columns": list(self.group_columns),
+            "original_group_counts": self.original_group_counts,
+            "retained_group_counts": self.retained_group_counts,
+            "original_row_counts": self.original_row_counts,
+            "retained_row_counts": self.retained_row_counts,
+            "dropped_row_counts": self.dropped_row_counts,
+            "original_overlap_counts": self.original_overlap_counts,
+            "retained_overlap_counts": self.retained_overlap_counts,
+            "leakage_free": self.leakage_free,
+            "interpretation": self.interpretation,
+        }
+
+
+@dataclass(frozen=True)
+class OfficialPrecedenceResult:
+    """Official-role frames after applying whole-group source precedence."""
+
+    training: pd.DataFrame
+    test: pd.DataFrame
+    validation: pd.DataFrame
+    audit: OfficialPrecedenceAudit
+
+
 def _group_keys(frame: pd.DataFrame, columns: tuple[str, ...]) -> pd.Series:
     missing = [column for column in columns if column not in frame.columns]
     if missing:
@@ -100,6 +143,80 @@ def _group_keys(frame: pd.DataFrame, columns: tuple[str, ...]) -> pd.Series:
     if frame.loc[:, list(columns)].isna().any().any():
         raise SplitError("grouping columns may not contain missing values")
     return frame.loc[:, list(columns)].apply(lambda row: tuple(row.tolist()), axis=1)
+
+
+def official_group_precedence_split(
+    training: pd.DataFrame,
+    test: pd.DataFrame,
+    validation: pd.DataFrame,
+    group_columns: Sequence[str],
+) -> OfficialPrecedenceResult:
+    """Apply conservative ``training > test > validation`` group precedence.
+
+    The official source roles are preserved, but a group occurring in an
+    earlier source partition is excluded from every later partition. Validation
+    is compared with the *original* test group set, including test groups that
+    were themselves excluded because they collide with training. This makes all
+    retained partitions mutually group-disjoint without reassigning rows.
+    """
+
+    columns = tuple(group_columns)
+    if not columns:
+        raise SplitError("at least one precedence grouping column is required")
+    frames = {"training": training, "test": test, "validation": validation}
+    keys = {name: _group_keys(frame, columns) for name, frame in frames.items()}
+    original_groups = {
+        name: frozenset(series.tolist()) for name, series in keys.items()
+    }
+    retained_groups = {
+        "training": original_groups["training"],
+        "test": original_groups["test"] - original_groups["training"],
+        "validation": original_groups["validation"]
+        - original_groups["training"]
+        - original_groups["test"],
+    }
+    retained_frames = {
+        name: frame.loc[keys[name].isin(retained_groups[name])].copy()
+        for name, frame in frames.items()
+    }
+    if any(frame.empty for frame in retained_frames.values()):
+        raise SplitError("official precedence split produced an empty retained partition")
+
+    original_overlaps = {
+        "training_test": len(original_groups["training"] & original_groups["test"]),
+        "training_validation": len(
+            original_groups["training"] & original_groups["validation"]
+        ),
+        "test_validation": len(original_groups["test"] & original_groups["validation"]),
+    }
+    retained_overlaps = {
+        "training_test": len(retained_groups["training"] & retained_groups["test"]),
+        "training_validation": len(
+            retained_groups["training"] & retained_groups["validation"]
+        ),
+        "test_validation": len(retained_groups["test"] & retained_groups["validation"]),
+    }
+    audit = OfficialPrecedenceAudit(
+        group_columns=columns,
+        original_group_counts={name: len(groups) for name, groups in original_groups.items()},
+        retained_group_counts={name: len(groups) for name, groups in retained_groups.items()},
+        original_row_counts={name: len(frame) for name, frame in frames.items()},
+        retained_row_counts={name: len(frame) for name, frame in retained_frames.items()},
+        dropped_row_counts={
+            name: len(frames[name]) - len(retained_frames[name]) for name in frames
+        },
+        original_overlap_counts=original_overlaps,
+        retained_overlap_counts=retained_overlaps,
+        interpretation="OFFICIAL_ROLE_PRECEDENCE_WHOLE_GROUP_DISJOINT",
+    )
+    if not audit.leakage_free:
+        raise SplitError("official precedence split retained overlapping groups")
+    return OfficialPrecedenceResult(
+        training=retained_frames["training"],
+        test=retained_frames["test"],
+        validation=retained_frames["validation"],
+        audit=audit,
+    )
 
 
 def _partition_counts(group_count: int, train_fraction: float, validation_fraction: float) -> tuple[int, int, int]:

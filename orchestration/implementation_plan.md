@@ -4,6 +4,15 @@
 
 Work is phase-gated and single-agent. Only tasks marked `READY` in `task_manifest.yaml` may be implemented. After each meaningful task, update its state and the project status. Stop on the first unexpected failure, preserve logs, create the required failure report, and wait for user direction. At every phase boundary, save a checkpoint and recommend the next model tier.
 
+Formatting and path preflight is mandatory because even non-functional hygiene
+failures invoke the same stop policy:
+
+- resolve paths with `rg --files` before opening inferred filenames;
+- inspect exact current context immediately before each patch;
+- use small file-specific patches;
+- do not encode Markdown line breaks with trailing spaces; and
+- run `git diff --check` after each patch batch and before tests or builds.
+
 ## Phase 1 — Architecture and planning
 
 Status: completed on 2026-07-10; controlled corrections are required by the
@@ -67,14 +76,16 @@ Before T-WP08 or T-WP10 resumes, complete the four gates defined in
 1. R1: reconcile frozen interfaces, native/unknown public units, and the
    complete default configuration through versioned change control.
 2. R2: implement PHM phase-aware, time-weighted processing, the preregistered
-   four-label anomaly sensitivities, and official/wafer/time/machine splits.
+   four-label anomaly sensitivities, source-role audits, whole-wafer precedence,
+   and inner wafer/time/machine split evidence.
 3. R3: solve the pump/system operating point, conserve hydraulic mass through
    explicit relief/bypass paths, restore compliance-governed transients, and
    reconcile frequency/UPS-energy claims.
 4. R4: enforce source-to-arrival causality and executable, target-bounded,
    interval-aware scenario validation.
 
-Gate status at 2026-07-11: R1, R2, R3, and R4 are VALIDATED. R2
+Gate status: R1, R3, and R4 are VALIDATED; R2 is VALIDATED with the
+2026-07-13 whole-wafer precedence correction. R2
 evidence is recorded in `orchestration/reports/r2_phm_semantics_validation.md`;
 R3 evidence is recorded in
 `orchestration/reports/r3_plant_physics_validation.md`; R4 evidence is recorded

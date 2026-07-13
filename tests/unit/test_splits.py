@@ -7,6 +7,7 @@ from semifab_poc.data.splits import (
     chronological_group_split,
     grouped_split,
     held_out_group_values,
+    official_group_precedence_split,
     physical_machine_holdout_feasibility,
 )
 
@@ -74,6 +75,42 @@ def test_fit_scope_audit_rejects_nontraining_groups() -> None:
     contaminated = pd.concat([split.train, split.validation.iloc[:1]])
     with pytest.raises(SplitError, match="non-training"):
         audit_fit_scope(contaminated, split)
+
+
+def test_official_precedence_removes_every_later_group_collision() -> None:
+    training = pd.DataFrame({"wafer_id": ["w1", "w1", "w2"], "value": [1, 2, 3]})
+    test = pd.DataFrame({"wafer_id": ["w2", "w3", "w4"], "value": [4, 5, 6]})
+    validation = pd.DataFrame(
+        {"wafer_id": ["w1", "w4", "w5"], "value": [7, 8, 9]}
+    )
+    result = official_group_precedence_split(
+        training, test, validation, ["wafer_id"]
+    )
+    assert result.training.index.tolist() == [0, 1, 2]
+    assert result.test["wafer_id"].tolist() == ["w3", "w4"]
+    assert result.validation["wafer_id"].tolist() == ["w5"]
+    assert result.audit.original_overlap_counts == {
+        "training_test": 1,
+        "training_validation": 1,
+        "test_validation": 1,
+    }
+    assert result.audit.retained_overlap_counts == {
+        "training_test": 0,
+        "training_validation": 0,
+        "test_validation": 0,
+    }
+    assert result.audit.dropped_row_counts == {
+        "training": 0,
+        "test": 1,
+        "validation": 2,
+    }
+    assert result.audit.leakage_free
+
+
+def test_official_precedence_rejects_missing_group_columns() -> None:
+    frame = pd.DataFrame({"wafer_id": ["w1"]})
+    with pytest.raises(SplitError, match="grouping columns"):
+        official_group_precedence_split(frame, frame, frame, ["unknown"])
 
 
 def test_regime_holdout_and_physical_machine_feasibility_are_explicit() -> None:

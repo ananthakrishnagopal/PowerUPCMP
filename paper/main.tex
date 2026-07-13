@@ -235,6 +235,14 @@ training, two in validation, 2,907 zero increments, and 2,855 long gaps. It
 also records 221, 43, and 42 unresolved wafer/stage groups in training, test,
 and validation, respectively.
 
+Before virtual-metrology fitting, a feature-only identity audit found that the
+source partitions share 113 training/test, 115 training/validation, and 34
+test/validation wafer IDs, always in the opposite stage. We therefore apply
+fixed source precedence (training, then test, then validation), retaining
+1,981, 311, and 275 rows from 1,699, 302, and 267 mutually disjoint wafers.
+The complete 424-row source holdouts remain collision-contaminated descriptive
+diagnostics and cannot support independent-wafer generalization claims.
+
 Four training targets lie between 4,129.494 and 4,326.154 while all other
 training targets are at most approximately 163. Dividing those four values by
 60 would place them between 68.825 and 72.103, but no authoritative source
@@ -244,9 +252,10 @@ sensitivity excluding the four records, and report a separately labelled
 hypothetical divide-by-60 sensitivity. Selection among these treatments based
 on holdout performance is forbidden.
 
-Official training is restricted to fitting and tuning, test is an offline
-holdout, and validation is the final public holdout. Inner resampling retains
-whole wafers and chronological blocks. A physical-machine holdout is
+Official training is restricted to fitting and tuning; precedence-retained
+test is an offline holdout; and precedence-retained validation is the final
+public holdout. Inner resampling retains whole wafers and chronological
+blocks. A physical-machine holdout is
 infeasible because all records use machine ID 2; a varying field named
 \texttt{MACHINE\_DATA} is not treated as a stable machine identifier.
 

@@ -28,7 +28,7 @@ assumptions:
     basis: Data-verified evidence
     status: ACCEPTED_FOR_POC
     applies_to: [WP03, WP09]
-    validation: R2 validates source-order timing, phase-aware native-unit features, all official one-to-one feature/label joins, anomaly treatments, wafer/chronological splits, and fit-scope audits; model accuracy and the separate dataset licence remain unresolved.
+    validation: R2 validates source-order timing, phase-aware native-unit features, all official one-to-one feature/label joins, anomaly treatments, inner wafer/chronological splits, fit-scope audits, and the R2.1 whole-wafer precedence correction; the source partitions themselves reuse wafer IDs, while retained 1,981/311/275 evaluation rows are mutually wafer-disjoint. Model accuracy and the separate dataset licence remain unresolved.
     consequence_if_false: Remove public-data model claims while preserving verified raw/provenance and semantic-audit evidence.
 
   - id: A-003

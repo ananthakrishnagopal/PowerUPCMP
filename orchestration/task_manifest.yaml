@@ -1221,7 +1221,7 @@ tasks:
   - id: T-WP19
     title: WP19 read-only results dashboard
     phase: 4
-    state: PLANNED
+    state: COMPLETE
     priority: MEDIUM
     dependencies: [T-WP18]
     inputs:

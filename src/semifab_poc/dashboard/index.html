@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerUPCMP - Evaluation Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <div class="header-content">
+                <h1>PowerUPCMP Results Dashboard</h1>
+                <p class="subtitle">Read-only Evaluation Explorer</p>
+            </div>
+            <div class="disclaimers">
+                <span class="badge synthetic-badge">SYNTHETIC VALUES: All data is simulated POC output</span>
+                <span class="badge proxy-badge">SPATIAL PROXY: Modeled as lumped parameter equivalents</span>
+            </div>
+        </header>
+
+        <main>
+            <section class="controls panel glassmorphism">
+                <h2>Trace Selection</h2>
+                <div class="control-group">
+                    <label for="trace-select">Select Run Artifact:</label>
+                    <select id="trace-select">
+                        <option value="">Loading traces...</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="summary-stats panel glassmorphism">
+                <h2>Run Details</h2>
+                <div id="run-summary" class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Run ID</span>
+                        <span class="stat-value" id="stat-run-id">--</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Family</span>
+                        <span class="stat-value" id="stat-family">--</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="visualizations">
+                <div class="chart-container panel glassmorphism">
+                    <h3>Signals & Truth</h3>
+                    <div id="chart-signals" class="chart"></div>
+                </div>
+                
+                <div class="chart-container panel glassmorphism">
+                    <h3>Predictions & Attribution</h3>
+                    <div id="chart-predictions" class="chart"></div>
+                </div>
+                
+                <div class="chart-container panel glassmorphism">
+                    <h3>Supervisory Actions & Modes</h3>
+                    <div id="chart-actions" class="chart"></div>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>WP19 Dashboard — No model or control logic is executed here.</p>
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+schema_version: "1.0.0"
+experiment_revision: "1.0-preregistered"
+dataset:
+  dataset_id: PHM_2016_CMP
+  feature_contract: PHM_PHASE_AWARE_OFFLINE_VM_V1
+  feature_manifest: data/processed/phm_2016_cmp/feature_manifest.yaml
+  expected_feature_manifest_sha256: 40c0d9121f87517eba8bb2d100ff49c17357f348d0821756f59a5c87da98707c
+  target: AVG_REMOVAL_RATE
+  target_unit_status: SOURCE_NATIVE_UNIT_UNDECLARED
+  process_signal_unit_status: PROPRIETARY_SCALED_SOURCE_SPACE
+  primary_gap_threshold_s: 10.0
+  expected_predictor_count: 405
+  target_in_feature_files: false
+splits:
+  group_column: WAFER_ID
+  stage_column: STAGE
+  official_precedence: [training, test, validation]
+  expected_retained_rows: {training: 1981, test: 311, validation: 275}
+  expected_retained_groups: {training: 1699, test: 302, validation: 267}
+  full_source_partition_interpretation: OFFICIAL_SOURCE_PARTITION_COLLISION_CONTAMINATED
+  inner_random_seed: 90209
+  train_core_fraction: 0.70
+  model_selection_fraction: 0.15
+  interval_calibration_fraction: 0.15
+  tuning_group_folds: 5
+  fold_assignment: SORT_STRING_PCG64_PERMUTE_CYCLIC
+  chronological_time_column: META_GROUP_START_TIMESTAMP
+  chronological_fractions: [0.70, 0.15, 0.15]
+features:
+  metadata_prefix: META_
+  forbidden_predictors: [WAFER_ID, STAGE, AVG_REMOVAL_RATE]
+  nonfinite_policy: TREAT_AS_MISSING
+  imputation: FIT_ONLY_MEDIAN
+  missing_indicators: EVERY_RAW_PREDICTOR
+  zero_variance_policy: REMOVE_AND_RECORD_ON_FIT_ROLE
+  target_driven_selection: false
+  feature_sets:
+    FULL: ALL_405_PREDICTORS
+    ACTIVE_ONLY: GLOBAL_QUALITY_PLUS_ACTIVE_POLISH_PROXY
+    NO_UNRESOLVED: FULL_MINUS_UNRESOLVED_PROXY
+    WITHOUT_CONSUMABLE_USAGE: FULL_MINUS_SIX_USAGE_SIGNAL_FAMILIES
+  consumable_signal_names:
+    - USAGE_OF_BACKING_FILM
+    - USAGE_OF_DRESSER
+    - USAGE_OF_POLISHING_TABLE
+    - USAGE_OF_DRESSER_TABLE
+    - USAGE_OF_MEMBRANE
+    - USAGE_OF_PRESSURIZED_SHEET
+target_policies:
+  primary: ORIGINAL
+  sensitivities: [EXCLUDE_FOUR_PREREGISTERED, HYPOTHETICAL_DIVIDE_FOUR_BY_60]
+  select_from_holdouts: false
+  reuse_primary_hyperparameters: true
+preston_proxy:
+  active_prefix: ACTIVE_POLISH_PROXY
+  active_duration_feature: ACTIVE_POLISH_PROXY__DURATION_FRACTION
+  pressure_signal_names:
+    - PRESSURIZED_CHAMBER_PRESSURE
+    - MAIN_OUTER_AIR_BAG_PRESSURE
+    - CENTER_AIR_BAG_PRESSURE
+    - RETAINER_RING_PRESSURE
+    - RIPPLE_AIR_BAG_PRESSURE
+    - EDGE_AIR_BAG_PRESSURE
+  surface_rotation_signal_names: [WAFER_ROTATION, STAGE_ROTATION]
+  head_rotation_signal_name: HEAD_ROTATION
+  statistic: TW_MEAN
+  positive_normalizer: FIT_ONLY_POSITIVE_MEDIAN
+  pressure_aggregation: ARITHMETIC_MEAN
+  velocity_aggregation: HALF_SUM_MAX_SURFACE_AND_HEAD
+  no_active_support_exposure: 0.0
+  coefficient_fit: NONNEGATIVE_ZERO_INTERCEPT_LEAST_SQUARES
+  coefficient_unit: SOURCE_NATIVE_TARGET_PER_DIMENSIONLESS_EXPOSURE
+models:
+  random_seed: 90209
+  prediction_floor: 0.0
+  tuning_metric: POOLED_GROUP_FOLD_MAE
+  tie_tolerance: 1.0e-12
+  family_simplicity_order: [mean, physics, linear, ridge, tree, hybrid]
+  required_families: [mean, linear, ridge, physics, tree, hybrid]
+  linear:
+    fit_intercept: true
+  ridge:
+    fit_intercept: true
+    alpha_grid: [0.1, 1.0, 10.0, 100.0, 1000.0]
+  gradient_boosted:
+    max_iter: 300
+    learning_rate: 0.05
+    early_stopping: false
+    max_bins: 255
+    loss_grid: [squared_error, absolute_error]
+    max_leaf_nodes_grid: [7, 15]
+    min_samples_leaf_grid: [20, 40]
+    l2_regularization_grid: [0.1, 1.0]
+  hybrid:
+    tune_residual_model_separately: true
+uncertainty:
+  method: SYMMETRIC_SPLIT_CONFORMAL_ABSOLUTE_RESIDUAL
+  alpha: 0.10
+  finite_sample_rank: CEIL_N_PLUS_1_TIMES_1_MINUS_ALPHA
+  lower_bound_floor: 0.0
+  minimum_interpretation_coverage: 0.85
+  claim: DESCRIPTIVE_MARGINAL_COVERAGE_NOT_REAL_WORLD_GUARANTEE
+evaluation:
+  relative_error_denominator_floor: 1.0e-12
+  grouped_bootstrap_repetitions: 1000
+  grouped_bootstrap_seed: 190209
+  bootstrap_percentiles: [2.5, 50.0, 97.5]
+  report_strata: [OVERALL, STAGE_A, STAGE_B]
+  required_metrics:
+    - mae
+    - rmse
+    - relative_mae
+    - r2
+    - bias
+    - interval_coverage
+    - interval_mean_width
+    - raw_negative_prediction_count
+    - clipped_prediction_count
+    - prediction_latency
+    - throughput
+  error_distribution_statistics: [mean, median, std, p05, p95, worst]
+  report_full_collision_contaminated_partitions: true
+  test_used_for_selection: false
+  validation_opened_once: true
+sensitivities:
+  gap_threshold_s: [5.0, 20.0]
+  proxy_feature_sets: [FULL, ACTIVE_ONLY, NO_UNRESOLVED]
+  proxy_models: [ridge, tree]
+  consumable_feature_sets: [FULL, WITHOUT_CONSUMABLE_USAGE]
+  consumable_models: [ridge, tree]
+  chronological_all_models: true
+interpretation_gates:
+  public_prediction:
+    comparison: RECOMMENDED_MINUS_MEAN
+    require_lower_mae_on: [test, validation]
+    require_validation_bootstrap_upper_below_zero: true
+  hybrid_improvement:
+    baseline_selection_role: MODEL_SELECTION
+    require_lower_mae_on: [test, validation]
+    require_validation_bootstrap_upper_below_zero: true
+  consumable_association:
+    comparison: WITHOUT_MINUS_FULL
+    require_positive_on: [test, validation]
+    require_validation_bootstrap_lower_above_zero: true
+holdout_opening:
+  require_decision_and_config_committed: true
+  require_feature_only_split_manifest: true
+  require_synthetic_fixture_tests: true
+  require_nonadaptive_runner: true
+  run_all_primary_and_sensitivities_together: true

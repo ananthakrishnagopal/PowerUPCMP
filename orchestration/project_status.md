@@ -2,8 +2,8 @@
 
 Last updated: 2026-07-13 11:45 IST<br>
 Current phase: Phase 3 — scientific modelling and coupling<br>
-Phase state: WP12 VALIDATED; R2.1 WHOLE-WAFER CORRECTION VALIDATED; WP09 PROTOCOL FREEZE NEXT<br>
-Active tasks: none; T-WP09 remains unopened until its scientific protocol is frozen
+Phase state: WP12 VALIDATED; R2.1 WHOLE-WAFER CORRECTION VALIDATED; WP09 READY<br>
+Active tasks: none; T-WP09 protocol is frozen and awaiting controlled implementation
 
 ## Review outcome
 

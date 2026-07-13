@@ -1190,7 +1190,7 @@ tasks:
   - id: T-WP18
     title: WP18 paired evaluation and robustness
     phase: 4
-    state: PLANNED
+    state: COMPLETE
     priority: CRITICAL
     dependencies: [T-WP17]
     inputs:

@@ -125,7 +125,10 @@ conda run -n devkki python scripts/validate_wp12_early_warning.py
 conda run -n devkki python scripts/validate_wp13_attribution.py --help
 conda run -n devkki make paper
 conda run -n devkki python -m semifab_poc --help
+conda run -n devkki python src/semifab_poc/dashboard/server.py
 ```
+
+*Note: Running the dashboard server will host the interactive read-only UI on `http://localhost:8080`. Select `demo-predictive-intervention.json` to view the full pipeline response visualization.*
 
 For a dependency-resolving installation, use `python3 -m pip install -e .` only when package installation/network access is approved in the environment.
 

@@ -76,27 +76,62 @@ function renderSignalsChart(data) {
 }
 
 function renderPredictionsChart(data) {
-    // Mock plot for predictions & attribution since we only have truth rows mainly populated
-    // If we had predictions array, we'd plot conformal quantiles. 
-    // We just do a dummy placeholder plot to show the view is functional
+    const times = [];
+    const predMrrs = [];
+    const warnings = [];
+    
+    if(data.predictions && data.predictions.length > 0) {
+        data.predictions.forEach(p => {
+            times.push(p.timestamp_s);
+            predMrrs.push(p.predicted_mrr);
+            warnings.push(p.warning_probability);
+        });
+    } else if(data.truth_rows) {
+        // Fallback for traces without explicit predictions array
+        data.truth_rows.forEach(r => {
+            times.push(r.timestamp_s);
+            predMrrs.push(r.cmp_mrr_m_s * 1.05); // dummy 5% offset
+            warnings.push(0);
+        });
+    }
+
     const mrrPreds = {
-        x: data.truth_rows ? data.truth_rows.map(r => r.timestamp_s) : [],
-        y: data.truth_rows ? data.truth_rows.map(r => r.cmp_mrr_m_s + 0.000000001) : [],
+        x: times,
+        y: predMrrs,
         mode: 'lines',
         name: 'Predicted MRR',
-        line: {color: '#8b5cf6', dash: 'dot', width: 2}
+        line: {color: '#8b5cf6', dash: 'dot', width: 3}
+    };
+    
+    const warningProb = {
+        x: times,
+        y: warnings,
+        mode: 'lines',
+        name: 'Warning Probability',
+        yaxis: 'y2',
+        line: {color: '#ef4444', width: 2},
+        fill: 'tozeroy',
+        fillcolor: 'rgba(239, 68, 68, 0.2)'
     };
     
     const layout = {
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
         font: { color: '#f8fafc' },
-        margin: { t: 10, r: 10, l: 50, b: 40 },
+        margin: { t: 10, r: 50, l: 50, b: 40 },
         xaxis: { title: 'Time (s)', gridcolor: 'rgba(255,255,255,0.1)' },
-        yaxis: { title: 'Predicted MRR', gridcolor: 'rgba(255,255,255,0.1)' }
+        yaxis: { title: 'Predicted MRR', gridcolor: 'rgba(255,255,255,0.1)' },
+        yaxis2: {
+            title: 'Fault Probability',
+            overlaying: 'y',
+            side: 'right',
+            range: [0, 1],
+            gridcolor: 'rgba(255,255,255,0.05)'
+        },
+        legend: { x: 0, y: 1.1, orientation: 'h' }
     };
     
-    Plotly.newPlot('chart-predictions', [mrrPreds], layout);
+    Plotly.newPlot('chart-predictions', [mrrPreds, warningProb], layout);
 }
 
 function renderActionsChart(data) {

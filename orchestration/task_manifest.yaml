@@ -1279,7 +1279,7 @@ tasks:
   - id: T-FINAL-AUDIT
     title: Phase 5 final integration review and audit
     phase: 5
-    state: PLANNED
+    state: COMPLETE
     priority: CRITICAL
     dependencies: [T-WP20]
     inputs:

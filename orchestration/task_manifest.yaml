@@ -1,5 +1,5 @@
 manifest_version: "1.0.0"
-last_updated: "2026-07-12T13:15:47+05:30"
+last_updated: "2026-07-12T22:25:40+05:30"
 workflow: single_agent_phase_gated
 allowed_states:
   - PLANNED
@@ -714,7 +714,7 @@ tasks:
   - id: T-PAPER-DRAFT
     title: Journal-neutral living LaTeX manuscript
     phase: 3
-    state: READY
+    state: COMPLETE
     priority: MEDIUM
     dependencies: [T-COMMS-DEMO]
     inputs:
@@ -724,10 +724,13 @@ tasks:
       - orchestration/reports/wp08_cmp_validation.md
       - orchestration/reports/wp10_literature_review.md
       - orchestration/reports/wp10_coupling_validation.md
+      - orchestration/reports/wp12_early_warning_validation.md
       - reports/figures/communication_figure_manifest.json
+      - reports/early_warning/wp12_validation.json
     outputs:
       - paper/main.tex
       - paper/references.bib
+      - paper/evidence_map.md
       - paper/README.md
       - reports/paper/semifab_cmp_poc_draft.pdf
     files_owned:
@@ -742,6 +745,19 @@ tasks:
       - build_is_reproducible_in_conda_environment_devkki
     assumptions: [A-001, A-003, A-007, A-008, A-018]
     blockers: []
+    notes:
+      - Implementation opened at 2026-07-12T13:20:28+05:30 after T-COMMS-DEMO completed and the user authorized continuation.
+      - WP12 final evidence was integrated after the frozen revision-1.4 validation report completed; WP09, WP13, WP14-WP18 remain visibly pending.
+      - Root Makefile target `paper` delegates to the manuscript build without adding a Python dependency.
+      - Task closed COMPLETE on 2026-07-13 after build, log, traceability, and representative visual review.
+    validation_evidence:
+      - "conda run -n devkki make paper: exit 0"
+      - "reviewed output: 13-page A4 PDF; SHA-256 862c53cde3bc0e5697f695a130099e6713a1c637e17bbeefaa7d08702ce575c7"
+      - "LaTeX log: no overfull box, undefined-reference, or undefined-citation warning"
+      - "representative visual review: title/evidence boundary, WP12 equations, primary table, both figures, discussion, limitations, and references legible"
+      - "paper/evidence_map.md traces WP08, WP10, and bounded WP12 numerical statements to governing artifacts"
+      - "governance: 15 YAML, zero duplicate keys, 29-task acyclic DAG, 25 assumptions, 99 Markdown, 97 valid links, zero missing links"
+      - "post-manuscript complete suite: 170 passed in 51.32 s with warnings treated as errors in devkki"
 
   - id: T-WP11
     title: WP11 deterministic declarative scenario engine
@@ -784,7 +800,7 @@ tasks:
   - id: T-WP12
     title: WP12 early-warning prediction
     phase: 3
-    state: PLANNED
+    state: COMPLETE
     priority: CRITICAL
     dependencies: [T-WP07, T-WP10, T-WP11]
     inputs:
@@ -793,23 +809,55 @@ tasks:
       - synthetic_scenario_splits
     outputs:
       - src/semifab_poc/models/early_warning.py
+      - configs/models/early_warning.yaml
+      - orchestration/decisions/wp12_early_warning_target.md
+      - orchestration/decisions/wp12_conformal_separation.md
+      - orchestration/decisions/wp12_observation_robustness_completion.md
+      - orchestration/decisions/wp12_secondary_model_selection_correction.md
+      - orchestration/reports/wp12_early_warning_validation.md
       - reports/early_warning/
+      - scripts/validate_wp12_early_warning.py
       - tests/unit/test_early_warning.py
       - tests/integration/test_warning_evaluation.py
+      - tests/integration/test_warning_chain.py
+      - tests/unit/test_wp12_scenario_ensemble.py
     files_owned:
       - src/semifab_poc/models/early_warning.py
+      - src/semifab_poc/models/__init__.py
+      - configs/models/early_warning.yaml
+      - orchestration/decisions/wp12_early_warning_target.md
+      - orchestration/decisions/wp12_conformal_separation.md
+      - orchestration/decisions/wp12_observation_robustness_completion.md
+      - orchestration/decisions/wp12_secondary_model_selection_correction.md
+      - orchestration/reports/wp12_early_warning_validation.md
       - reports/early_warning/
+      - scripts/validate_wp12_early_warning.py
+      - src/semifab_poc/simulation/chain.py
       - tests/unit/test_early_warning.py
+      - tests/unit/test_wp12_scenario_ensemble.py
       - tests/integration/test_warning_evaluation.py
+      - tests/integration/test_warning_chain.py
     acceptance_tests:
       - future_envelope_target_and_censoring_preregistered
       - logistic_and_gradient_boosted_models_compared
       - no_future_or_latent_feature_leakage
       - precision_recall_PR_AUC_false_alarms_misses_and_lead_time_reported
       - uncertainty_and_coverage_reported
+      - independent_probability_and_conformal_calibration_groups
+      - every_secondary_analysis_reports_all_frozen_model_families
+      - structural_and_observation_shift_failures_reported
+      - deterministic_probability_payload_reproduced
     assumptions: [A-012, A-013, A-019]
-    blockers:
-      - Phase_3_safe_envelope_horizon_and_uncertainty_not_frozen
+    blockers: []
+    notes:
+      - Target, censoring, causal feature boundary, grouped splits, model hyperparameters, sigmoid calibration, split-conformal uncertainty, metrics, sensitivities, and interpretation gates frozen before dataset generation.
+      - Implementation opened at 2026-07-12T14:19:29+05:30 after the user requested parallel WP12 completion.
+      - Revision 1.0 stopped before fitting because TRAIN had no positive target; the user authorized a documented full-DRESS feasibility amendment without changing the target or TEST-derived settings.
+      - Revision 1.2 separated sigmoid and conformal calibration after a post-run methods audit; revision 1.3 completed event-bearing corruption robustness; revision 1.4 removed TEST-driven secondary model selection.
+      - Final TEST has 1,932 eligible rows, 84 positive rows, and three event-bearing runs. Logistic PR-AUC is 0.9904, event recall 3/3, median lead 2.71 s, and empirical conformal coverage 0.9296; GBT also passes the frozen synthetic gate.
+      - Structural-null, unseen-compound, and high-noise cases expose severe false-alarm and uncertainty failures; no topology-independent, real-fab, controller, safety, defect, yield, equipment, or production claim is supported.
+      - Final probability payload SHA-256 is 5a4fb7011fd6688718455c9692689937caa679ea29c884cdca099835a9830ede; runtime hash remains b2b07edbaad458f6f66cf26ce88ffc5deef656a33701a7cccd8da94104d7383f.
+      - Sixteen focused WP12 tests and the complete 170-test repository suite pass in conda environment devkki with warnings treated as errors.
 
   - id: T-WP13
     title: WP13 root-cause attribution

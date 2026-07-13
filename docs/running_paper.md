@@ -1,8 +1,8 @@
 # Predictive Supervisory Control of CMP Under Electrical and UPW Disturbances
 
 **Living research paper draft**  
-Status: corrective R1--R4, synthetic CMP WP08, and declared-topology WP10 coupling validation complete; prediction/control results pending  
-Last updated: 2026-07-11
+Status: corrective R1--R4, synthetic CMP WP08, declared-topology WP10 coupling, and synthetic WP12 early-warning validation complete; public virtual metrology, attribution, control, and safety results pending<br>
+Last updated: 2026-07-13
 
 > This document is maintained throughout implementation and will become the basis of the final technical paper. Every result must link to a reproducible artifact, configuration, code path, and provenance record. Missing evidence is recorded as pending rather than inferred.
 
@@ -36,8 +36,16 @@ interruption during DRESS propagates through pump/UPW loss into reduced stored
 pad activity and a 3.19% reduction in later simulated MRR relative to the
 identical no-connection run. Structural, local, global, and mismatch analyses
 show that this effect is contingent on synthetic topology and coefficients.
-No predictive-control efficacy,
-real-fab, defect, yield, or production-control claim is made.
+For a separately frozen early-warning experiment, a paired event-disabled
+reference defines a ±5% active-POLISH trajectory envelope, 0.25 s persistence,
+and a 3 s horizon. On 24 held-out synthetic runs containing only three
+independent events, logistic regression achieved PR-AUC 0.9904, detected 3/3
+events with 2.71 s median lead, and produced one false-alarm episode; a frozen
+gradient-boosted model also detected 3/3 events with PR-AUC 0.9130. These
+primary results do not generalize safely: both models alarm severely under an
+explicit no-connection topology, and high sensor noise degrades discrimination,
+specificity, and uncertainty coverage. No predictive-control efficacy,
+real-fab, defect, yield, equipment, or production-control claim is made.
 
 ## 1. Research question and scope
 
@@ -379,13 +387,153 @@ synthetic numerical-validation results, not real-equipment calibration. Full
 evidence is in
 [`r3_plant_physics_validation.md`](../orchestration/reports/r3_plant_physics_validation.md).
 
-## 6. Models and controllers (pending)
+## 6. Models and supervisory methods
 
-Planned virtual-metrology baselines: mean, linear/ridge regression, physics-only, tree-based, and physics-plus-residual models. Planned warning models: logistic regression and gradient-boosted trees. Planned controllers: no action, fixed threshold/hysteresis, safe hold, controlled resume, and bounded predictive supervisory control. Reinforcement learning is excluded from this PoC.
+### 6.1 Public-data virtual metrology (pending)
 
-## 7. Evaluation plan (pending)
+The WP09 PHM comparison remains pending. Its frozen candidate families are a
+training-target mean, linear and ridge regression, a dimensionally compatible
+native-unit physics-inspired baseline, a tree ensemble, and a
+physics-plus-residual model. Training transformations must stay inside grouped
+folds, and no SI simulator coefficient may be added to the source-undeclared
+PHM target unit.
 
-All controller comparisons will use identical scenarios, initial states, parameter draws, observation corruptions, and seed maps. Planned metrics include MRR MAE/RMSE/relative error/R², interval coverage, warning precision/recall/PR-AUC, false alarms per simulated hour, missed events, warning lead time, pressure/flow violations, MRR excursion, hold duration, recovery time, action magnitude, safety rejections, attribution accuracy, and runtime/controller latency.
+### 6.2 WP12 synthetic early-warning target
+
+WP12 is complete for one preregistered simulator target. Let $R_k$ be the
+disturbed true simulated instantaneous average MRR and $R_k^{ref}$ the paired
+event-disabled reference at the same step. The reference uses the same initial
+state, schedule, topology, and static plant parameters; only the initiating
+event is disabled. The point-violation indicator is
+
+\[
+v_k = \mathbf{1}[m_k=\mathrm{POLISH}]
+      \mathbf{1}[R_k^{ref}>10^{-12}\ \mathrm{m/s}]
+      \mathbf{1}[R_k<0.95R_k^{ref}\ \lor\ R_k>1.05R_k^{ref}].
+\]
+
+At the 0.01 s simulator step, an event requires
+
+\[
+n_p=\left\lceil\frac{0.25\ \mathrm{s}}{0.01\ \mathrm{s}}\right\rceil=25
+\]
+
+consecutive active-POLISH violating intervals. Its stored onset is the first
+interval of the subsequently persistent departure. This mode gate prevents
+zero MRR during DRESS, PREPARE, HOLD, RECOVER, IDLE, or COMPLETE from becoming
+an under-polish event.
+
+At eligible 0.10 s decision time $t_d$, with horizon $H=3.0$ s,
+
+\[
+y(t_d)=\mathbf{1}[t_d<t_e\le t_d+H],
+\]
+
+where $t_e$ is the first accepted episode onset. The future-truth label is
+created offline and is never a feature. Rows are censored, rather than labelled
+negative, if the complete horizon is unavailable, the horizon lacks 0.25 s of
+contiguous active POLISH, or an event has already begun.
+
+### 6.3 Causal features, fitting roles, and uncertainty
+
+Only observations satisfying
+
+\[
+t_{arrival}\le t_d,\qquad k_{source}\le k_d
+\]
+
+enter the 65-feature vector. The eight channels are grid voltage, UPS output
+voltage, UPS battery energy, motor speed, pump flow, UPW supply pressure, tool
+flow, and UPW temperature. Each normalized channel contributes the latest
+value and age, 0.5 s mean/minimum/slope/missing fraction, and history minimum.
+UPS output, pressure, and tool flow also use the causal history deficit
+
+\[
+D_j(t_d)=\int_0^{t_d}\max(0,0.95-z_j(t))\,dt.
+\]
+
+Known synthetic recipe schedule indicators and static battery/load ratios are
+allowed configuration. MRR, latent pad activity, coupling availability, event
+family/magnitude, initiating cause, and future truth are prohibited. Median
+imputation and scaling are fitted on TRAIN only.
+
+Whole runs are disjoint across TRAIN, sigmoid CALIBRATION, independent
+CONFORMAL_CALIBRATION, and TEST. Their eligible/positive row counts are
+2,988/84, 1,404/84, 1,404/84, and 1,932/84, respectively. The 84 positive TEST
+rows arise from three event-bearing runs with 28 warning decisions each, not 84
+independent events. The frozen models are a training-prevalence constant,
+balanced logistic regression, and balanced histogram gradient boosting; TEST
+does not tune hyperparameters or select a model for secondary analysis.
+
+For calibrated probability \(\tilde p\), independent conformal rows use
+
+\[
+s_i=\begin{cases}1-\tilde p_i,&y_i=1,\\
+\tilde p_i,&y_i=0,
+\end{cases}
+\]
+
+and the nominal 90% finite-sample quantile is the
+$\lceil(n_q+1)(1-0.10)\rceil$-th ordered score. Prediction sets may be empty
+or contain both classes. Because rows within a run are dependent and severity
+grids are fixed, coverage is an empirical row-level simulator diagnostic, not
+a run-wise or real-world guarantee.
+
+### 6.4 Held-out warning result and failure modes
+
+| Metric | Prevalence | Logistic | Gradient boosted |
+|---|---:|---:|---:|
+| PR-AUC (TEST prevalence 0.04348) | 0.04348 | 0.99040 | 0.91304 |
+| Precision | Undefined | 0.97500 | 0.91304 |
+| Row recall | 0.00000 | 0.92857 | 1.00000 |
+| Specificity | 1.00000 | 0.99892 | 0.99567 |
+| Brier score | 0.04186 | 0.00321 | 0.00678 |
+| Event recall | 0/3 | 3/3 | 3/3 |
+| Median warning lead | Undefined | 2.71 s | 2.71 s |
+| False-alarm episodes | 0 | 1 | 1 |
+| Conformal coverage | 0.95652 | 0.92961 | 0.87733 |
+| Empty-set fraction | 0.00000 | 0.07039 | 0.12267 |
+
+Both learned models pass the frozen primary synthetic gate, but that gate has
+no false-alarm acceptance threshold and only three independent events. One
+false-alarm episode over 193.2 eligible simulated seconds equals 18.63 per
+eligible simulated hour; this denominator is not a real-fab operating rate.
+Whole-run bootstrap intervals resample the same 24 configured TEST runs and do
+not create additional mechanisms.
+
+The negative diagnostics are scientifically decisive. Under severe upstream
+events with explicit `NO_CONNECTION`, no MRR event occurs, yet logistic and
+gradient boosting raise 30 and 9 false-alarm episodes and achieve specificity
+0.3371 and 0.2860. Under high synthetic noise, logistic PR-AUC/precision/
+specificity/coverage are 0.6002/0.1019/0.0657/0.0959; gradient boosting yields
+0.5283/0.5283/0.9053/0.7671. Thus the models frequently identify upstream
+severity rather than proving a downstream CMP connection. They cannot be used
+as topology-independent alarms. Complete equations, revisions, sensitivities,
+and artifacts are in
+[`wp12_early_warning_validation.md`](../orchestration/reports/wp12_early_warning_validation.md).
+
+### 6.5 Attribution, controllers, and safety (pending)
+
+WP13 attribution, WP14 baselines, the WP15 predictive supervisor, and the WP16
+independent safety filter remain pending. Planned controllers are no action,
+fixed threshold/hysteresis, safe hold, controlled resume, and bounded
+predictive supervisory control. Reinforcement learning is excluded from this
+PoC. The WP12 runner is open loop and proposes or applies no action.
+
+## 7. Evaluation status and remaining plan
+
+WP12 reports held-out row and event metrics, whole-run bootstrap intervals,
+target-definition sensitivities, named noise/delay/dropout corruptions, an
+unseen-compound diagnostic, and a structural no-connection diagnostic. These
+are open-loop warning evaluations; amortized vectorized prediction timing is
+not a controller or production-latency result.
+
+All future controller comparisons will use identical scenarios, initial
+states, parameter draws, observation corruptions, and seed maps. Remaining
+metrics include public-data MRR MAE/RMSE/relative error/R² and interval
+coverage; paired pressure/flow violations, MRR excursion, cumulative-removal
+error, hold duration, recovery time, action magnitude, safety rejections,
+attribution accuracy, and end-to-end runtime/controller latency.
 
 Results will report mean, median, standard deviation, 5th percentile, 95th percentile, and worst case where applicable.
 
@@ -409,9 +557,10 @@ Results will report mean, median, standard deviation, 5th percentile, 95th perce
 | R4 online/scenario timing correction | `orchestration/reports/r4_online_scenario_timing_validation.md`; 45 focused tests; 107/107 full suite | Validated causal software visibility and scenario semantics |
 | Standalone reduced-order CMP physics | `orchestration/reports/wp08_cmp_validation.md`; 48 focused and 130/130 full tests | Validated synthetic equations/invariants; no real-tool calibration, utility propagation, or controller claim |
 | Utility-to-CMP topology | `orchestration/reports/wp10_coupling_validation.md`; local/global/mismatch artifacts | Validated synthetic declared-topology behavior; no real-tool plumbing or calibration claim |
+| Synthetic early-warning target and models | `orchestration/reports/wp12_early_warning_validation.md`; 16 focused and 170/170 full tests | Validated only on the named simulator ensemble; three independent TEST events; structural-null and high-noise failures prohibit topology-independent use |
 | Public-data virtual-metrology accuracy | Future model evaluation artifact | Pending |
 | Electrical → UPW → CMP causal propagation | `reports/sensitivity/wp10_positive_chain_trace.csv` | Validated only for the declared synthetic degraded-UPS/DRESS topology; no causal claim for a real fab |
-| Early-warning performance | Future held-out scenario report | Pending |
+| Early-warning performance | `reports/early_warning/wp12_validation.json`; TEST predictions and figures | Logistic PR-AUC 0.9904 and GBT 0.9130; both detect 3/3 synthetic events with 2.71 s median lead; no controller or real-fab claim |
 | Root-cause attribution | Future simulator-label evaluation | Pending |
 | Predictive-control improvement | Future paired controller report | Pending |
 | Safety-filter constraint compliance | Future runtime audit | Pending |
@@ -452,6 +601,22 @@ Results will report mean, median, standard deviation, 5th percentile, 95th perce
   link strength and threshold/reference ranges; actual tool plumbing is unknown.
 - Empty traces are retained but do not provide measured process evidence.
 - Simulator truth supports internal evaluation, not real-fab causal proof.
+- WP12 primary TEST evidence contains only three independent event-bearing
+  runs. Its 84 positive rows are repeated decision opportunities around those
+  events, and the positive endpoints require nearly full-DRESS synthetic
+  service loss near the target's feasibility boundary.
+- The early-warning models false-alarm severely under no-connection and unseen
+  compound shifts. High synthetic noise particularly damages logistic
+  discrimination, specificity, and empirical conformal coverage.
+- Split probability and conformal calibration use independent whole runs, but
+  time rows are dependent and the fixed severity grid is not an iid fab
+  sample. Empty conformal sets occur on 7.04% of logistic and 12.27% of
+  gradient-boosted primary rows and must become a WP16 invalid/high-uncertainty
+  condition.
+- Static schedule, capacity, and load fields are known in the synthetic
+  experiment; real deployment would require independently audited availability
+  and consistency. WP12 vectorized offline latency is not streaming-control
+  latency.
 - No physical defect, yield, equipment-damage, or production-control labels are available.
 - Temporal resolution and software latency must not be represented as production real-time guarantees.
 
@@ -495,9 +660,29 @@ Results will report mean, median, standard deviation, 5th percentile, 95th perce
   `19f440b2fd31959c619c31b851003ac496ff4d3b66c1643a6c6fbbb4951dfa10`.
   WP10 does not validate public VM, a real utility connection, early warning,
   attribution, safety, or controller efficacy.
+- WP12 suite: 16/16 focused tests and 170/170 complete repository tests passed
+  with warnings treated as errors. Final experiment revision:
+  `1.4-no-test-selection`. WP12 configuration hash:
+  `b53730011cb4f3c26173c727ba9fc562e9677a24a422f558a1c3330ab2df1e05`;
+  eligible dataset hash:
+  `fabe232a503320c59e9a201b62731adc8bf4c6b1f5fd5ee57bb30091a30b43fa`;
+  deterministic probability-payload hash:
+  `5a4fb7011fd6688718455c9692689937caa679ea29c884cdca099835a9830ede`.
+  The payload intentionally excludes measured latency and conformal sets.
 - Dataset archive and extraction checksums: recorded above and in the extraction manifest.
-- Current source status: unborn Git `master`; no commit baseline exists.
-- Reproduction commands will be expanded as simulator, models, controllers, reports, and dashboard become available.
+- Current source status: Git branch `main`; validated WP10 baseline commit
+  `51ba07a` and interim WP10 demonstration commit `bf5fa99` precede the
+  uncommitted WP12 checkpoint recorded in this draft.
+- WP12 reproduction commands:
+
+  ```text
+  conda run -n devkki python -m pytest -q -W error
+  env MPLCONFIGDIR=/tmp/semifab-poc-matplotlib conda run -n devkki python scripts/validate_wp12_early_warning.py
+  conda run -n devkki python scripts/validate_governance.py
+  ```
+
+  Simulator, controller, report, and dashboard reproduction commands will be
+  expanded as later work packages become available.
 
 ## 11. Pending paper updates
 

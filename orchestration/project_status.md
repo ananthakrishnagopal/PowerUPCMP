@@ -1,9 +1,9 @@
 # Project status
 
-Last updated: 2026-07-12 13:15 IST<br>
+Last updated: 2026-07-13 10:43 IST<br>
 Current phase: Phase 3 — scientific modelling and coupling<br>
-Phase state: SCIENTIFIC MODEL FREEZE IN PROGRESS<br>
-Active task: T-COMMS-DEMO COMPLETE; T-PAPER-DRAFT READY; scientific critical path remains the WP12 safe-envelope/horizon/uncertainty freeze
+Phase state: WP12 VALIDATED; REMAINING CONTROL/ATTRIBUTION DECISIONS NOT FROZEN<br>
+Active tasks: none; the next Phase 3 scientific task has not been opened
 
 ## Review outcome
 
@@ -22,9 +22,13 @@ as history. The user approved the replacement CMP redesign as the controlled
 implementation basis on 2026-07-11. This approval opens the required
 interface/schema impact process; it does not validate an equation or parameter.
 R1--R4 now pass. T-WP08 passes its controlled CMP-model implementation and
-validation gate. T-WP10 now also passes its declared-topology implementation,
+validation gate. T-WP10 passes its declared-topology implementation,
 null-control, full-chain, local/global/mismatch sensitivity, historical
-reproduction, and validation gates.
+reproduction, and validation gates. T-WP12 passes its frozen simulation-only
+early-warning implementation and validation gate. Its learned models detect
+all three independent TEST events, but the small event count and severe
+structural-null, compound-shift, and high-noise failures sharply limit the
+claim and require an independent applicability/safety gate before control use.
 
 Detailed evidence:
 
@@ -39,6 +43,12 @@ Detailed evidence:
 - `orchestration/decisions/wp10_utility_cmp_coupling.md`
 - `orchestration/reports/wp10_literature_review.md`
 - `orchestration/reports/wp10_coupling_validation.md`
+- `orchestration/decisions/wp12_early_warning_target.md`
+- `orchestration/decisions/wp12_conformal_separation.md`
+- `orchestration/decisions/wp12_observation_robustness_completion.md`
+- `orchestration/decisions/wp12_secondary_model_selection_correction.md`
+- `orchestration/reports/wp12_revision_1_1_method_audit.md`
+- `orchestration/reports/wp12_early_warning_validation.md`
 - `orchestration/decisions/20260711_phase_3_cmp_and_utility_model.md`
 - `orchestration/decisions/phase_1_2_remediation.md`
 
@@ -108,6 +118,17 @@ efficacy.
 - The healthy-UPS 25 percent, 400 ms sag yields only a small downstream
   response and unchanged tool flow in the current model. It is a valuable
   negative control, not a scenario to tune into a large excursion.
+- WP12 VALIDATED: target `SIM_ACTIVE_POLISH_MRR_TRAJECTORY_V1` uses a paired
+  event-disabled reference, a ±5% active-POLISH envelope, 0.25 s persistence,
+  and a 3 s forward horizon. Labels are censored after onset, when the horizon
+  is incomplete, and when no active-POLISH opportunity exists. Features use
+  only arrived observations available by each decision time; MRR, latent CMP
+  states, event truth, and cause labels are prohibited.
+- TRAIN, probability CALIBRATION, independent CONFORMAL_CALIBRATION, and TEST
+  roles are disjoint by whole run. All preregistered models receive the same
+  TEST, target-sensitivity, observation-robustness, unseen-compound, and
+  structural-null analyses; TEST results are not used to choose a downstream
+  model.
 
 ## Current evidence state
 
@@ -127,6 +148,20 @@ efficacy.
   500 J UPS interruption during DRESS reduces stored pad activity and later
   simulated MRR by 3.19% versus no connection. This is not real-tool
   calibration or controller efficacy.
+- Early warning: the frozen v1.4 simulation-only experiment contains 8,784
+  eligible decision rows and 336 positive rows across disjoint split roles.
+  TEST contains 1,932 rows, 84 positives, and only three independent
+  event-bearing runs. Logistic regression attains PR-AUC 0.9904, row recall
+  0.9286, event recall 3/3, and median warning lead 2.71 s; gradient-boosted
+  trees attain PR-AUC 0.9130, row recall 1.0, event recall 3/3, and the same
+  median lead. These are simulator results, not public-data or real-fab
+  validation.
+- Early-warning robustness is not sufficient for autonomous use. Under the
+  structural-null topology, logistic regression produces 30 false-alarm
+  episodes and the tree model nine; under high observation noise, logistic
+  specificity falls to 0.0657 and tree PR-AUC to 0.5283. The observed-signal
+  models therefore require topology/applicability checking and an independent
+  WP16 safety filter.
 - R1/R2 verification: R1 focused tests passed 21/21; R2 focused tests passed
   13/13; real-data integration tests passed 6/6; and the complete suite passed
   82/82 with zero warnings in conda environment `devkki`.
@@ -152,20 +187,38 @@ efficacy.
   `3560cb28a4cc8e87d778146f2cf0964290d733da2a0b59bee283659644ae41fc`
   and
   `19f440b2fd31959c619c31b851003ac496ff4d3b66c1643a6c6fbbb4951dfa10`.
+- WP12 verification: 16/16 focused tests and 170/170 complete tests pass with
+  warnings treated as errors in `devkki`. The dataset hash is
+  `fabe232a503320c59e9a201b62731adc8bf4c6b1f5fd5ee57bb30091a30b43fa`;
+  the probability-payload hash, which intentionally excludes measured
+  latency and set-valued outputs, is
+  `5a4fb7011fd6688718455c9692689937caa679ea29c884cdca099835a9830ede`.
+  The runtime and WP12 configuration hashes are respectively
+  `b2b07edbaad458f6f66cf26ce88ffc5deef656a33701a7cccd8da94104d7383f`
+  and
+  `b53730011cb4f3c26173c727ba9fc562e9677a24a422f558a1c3330ab2df1e05`.
+- Post-manuscript verification reran the complete suite with warnings treated
+  as errors: 170/170 tests passed in 51.32 s in `devkki`.
 - Historical reproduction: R3 validation JSON/trace hashes are restored to
   `02ba8166715c1022d54685d96ded8b85c196dbd0dbc6b29ea544dd4b085eddb7`
   and
   `5191cbdcbf36c8709d92ed0de9662104c3ba6adfdd030ac45a661020ea17fdd0`;
   R4 hashes and the WP08 trace hash also reproduce exactly.
 - The passing suite validates corrective gates R1--R4, standalone synthetic
-  CMP invariants, and the declared synthetic coupling mechanics. It does not
-  validate virtual metrology performance, early warning, attribution, safety,
-  controller efficacy, actual CMP plumbing, or a real-fab causal effect.
+  CMP invariants, declared synthetic coupling mechanics, and the frozen WP12
+  simulation-only early-warning experiment. It does not validate public-data
+  virtual metrology, attribution, safety, controller efficacy, actual CMP
+  plumbing, or a real-fab causal effect.
 - Supported implementation claims: C-002 and C-011 at the explicitly limited
-  simulation level. Supported public VM, real-fab, physical-defect, yield, or
+  simulation level. C-003 is supported only for the frozen in-distribution
+  synthetic WP12 experiment and fails to generalize safely across all audited
+  shifts. Supported public VM, real-fab, physical-defect, yield, or
   control-efficacy claims: none.
 - Dataset network transfer: none; the archive was supplied locally.
-- Agent/subagent actions: none.
+- Agent/subagent actions: one user-authorized bounded manuscript agent created
+  the journal-format LaTeX draft; all scientific modelling, WP12 execution,
+  validation, governance, and repository integration remain primary-agent
+  work.
 
 ## Git and interim communication state
 
@@ -181,24 +234,38 @@ efficacy.
   ZIP-member, embedded-media, and non-empty slide-content checks; independent
   LibreOffice rendering is recorded as an environment limitation, not a
   passed test.
-- The deck explicitly marks public-data modelling, early warning, attribution,
-  controllers, safety filtering, and paired efficacy evaluation as pending.
-  It makes no physical-defect, yield, equipment-protection, real-fab, or
-  production-control claim.
-- T-PAPER-DRAFT is READY. It will convert the running evidence ledger into a
-  journal-neutral two-column LaTeX manuscript while retaining visible pending
-  markers for unexecuted Phase 3/4 work.
+- The committed interim deck predates WP12 and therefore still marks public-data
+  modelling, early warning, attribution, controllers, safety filtering, and
+  paired efficacy evaluation as pending. Its scientific claims remain valid,
+  but a later presentation revision should add the frozen WP12 evidence.
+- T-PAPER-DRAFT is COMPLETE. The journal-neutral two-column LaTeX source builds
+  a visually reviewed 13-page A4 PDF containing the bounded WP12 target,
+  primary result, both warning figures, shift failures, and limitations while
+  retaining visible pending markers for unexecuted work. The PDF SHA-256 is
+  `862c53cde3bc0e5697f695a130099e6713a1c637e17bbeefaa7d08702ce575c7`;
+  the final LaTeX log has no overfull box, undefined-reference, or
+  undefined-citation warning.
 
 ## Next Phase 3 work
 
-T-WP08 and T-WP10 are scientifically closed within their synthetic claim
-boundaries. The critical-path next activity is to freeze the WP12 average-MRR
-safe envelope, persistence rule, warning horizon, label censoring, streaming
-feature cutoff, uncertainty method, calibration split, and coverage target.
-T-WP12 must remain PLANNED until that blocker is cleared. WP09 public
-virtual-metrology decisions also remain unfrozen and cannot mix the PHM native
-numeric target with SI simulator coefficients.
+T-WP08, T-WP10, and T-WP12 are scientifically closed within their stated
+synthetic claim boundaries. Remaining Phase 3 decision work is:
 
-Current governance evidence: 14 YAML files parse with zero duplicate keys; all
+1. T-WP09 — freeze and validate leakage-safe public PHM average-MRR virtual
+   metrology without mixing its native numeric target with SI simulator
+   coefficients;
+2. T-WP13 — freeze attribution scoring, residual-chain logic, and the
+   mandatory `UNKNOWN` outcome, with feature attribution explicitly excluded
+   as causal proof;
+3. T-WP15 — freeze the predictive supervisory objective, action set, horizon,
+   penalties, and fallback policy; and
+4. T-WP16 — freeze independent safety limits, applicability checks, sensor and
+   uncertainty rejection rules, hold replacement, and controlled-resume
+   criteria.
+
+No controller-efficacy comparison or WP17 integrated closed-loop runtime is
+authorized by this status; those remain downstream work.
+
+Current governance evidence: 15 YAML files parse with zero duplicate keys; all
 29 tasks form an acyclic dependency graph and reference 25 valid assumptions;
-81 Markdown files contain 55 valid local links and zero missing local links.
+99 Markdown files contain 97 valid local links and zero missing local links.

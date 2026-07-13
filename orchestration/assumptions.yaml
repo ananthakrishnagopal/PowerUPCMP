@@ -1,5 +1,5 @@
-register_version: "1.3.0"
-effective_date: "2026-07-11"
+register_version: "1.4.0"
+effective_date: "2026-07-12"
 basis_vocabulary:
   coupling_parameter_required_values:
     - Literature-supported
@@ -116,9 +116,9 @@ assumptions:
     statement: A future safe-envelope excursion can be defined from average MRR and selected utility constraints without treating the event as a physical defect.
     category: target
     basis: Synthetic assumption
-    status: OPEN
+    status: ACCEPTED_FOR_POC
     applies_to: [WP12, WP15]
-    validation: Preregister envelope, horizon, persistence rule, and censoring policy in Phase 3.
+    validation: WP12 revision 1.4 implements the event-disabled paired reference, ±5% active-POLISH trajectory band, 0.25 s persistence, 3.0 s horizon, explicit censoring, causal feature cutoffs, target sensitivities, and held-out gate. Both learned models pass on the named synthetic primary ensemble, but only three TEST events exist and structural/noise shifts show major false-alarm and coverage failures; see orchestration/reports/wp12_early_warning_validation.md.
     consequence_if_false: Early-warning and predictive-control objectives must be reformulated.
 
   - id: A-013
@@ -127,7 +127,7 @@ assumptions:
     basis: Engineering approximation
     status: ACCEPTED_FOR_POC
     applies_to: [WP12]
-    validation: Compare against prevalence/constant baselines and calibrate uncertainty.
+    validation: WP12 compares a prevalence baseline, frozen logistic regression, and frozen histogram gradient boosting on disjoint whole-run TRAIN, sigmoid-calibration, conformal-calibration, and TEST roles. Both learned models pass the primary synthetic gate; all models receive every secondary analysis without TEST-driven selection. Results remain limited by three event runs and poor shift robustness.
     consequence_if_false: Additional bounded model families may be considered after baseline evidence.
 
   - id: A-014
@@ -180,8 +180,8 @@ assumptions:
     category: timing
     basis: Project constraint
     status: ACCEPTED_FOR_POC
-    applies_to: [WP17, WP18]
-    validation: Timestep convergence and honest measured latency reporting.
+    applies_to: [WP12, WP17, WP18]
+    validation: WP12 labels inference timing as amortized vectorized offline latency and explicitly excludes streaming/controller/production interpretation; WP17/WP18 still require end-to-end timing and timestep evidence.
     consequence_if_false: Runtime claims exceed the architecture's evidence.
 
   - id: A-020

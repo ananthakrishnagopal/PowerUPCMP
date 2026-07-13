@@ -20,8 +20,14 @@ signed rotary kinematics, bounded actuator/slurry/consumable/thermal states,
 cumulative removal, and a neutral typed coupling boundary. The stateless WP10
 coupler implements no-connection, dressing-water, thermal, and explicitly
 synthetic slurry-support structures with exact null controls and parameter
-sensitivity. No predictive
-models, controllers, dashboard, or supported control-efficacy result exists.
+sensitivity. WP12 now freezes a simulation-only early-warning target relative
+to a paired event-disabled MRR trajectory and compares a prevalence baseline,
+logistic regression, and gradient boosting using disjoint whole-run fit,
+probability-calibration, conformal-calibration, and TEST roles. Both learned
+models detect all three primary synthetic TEST events, but structural-null,
+compound-shift, and high-noise failures prohibit topology-independent use.
+Public-data virtual metrology, root-cause attribution, controllers, the safety
+filter, dashboard, and any supported control-efficacy result remain pending.
 See the current
 [`project status`](orchestration/project_status.md),
 the [Phase 1/2 audit](orchestration/reports/phase_1_2_scientific_audit.md),
@@ -37,8 +43,14 @@ WP10 design and evidence are in the
 [coupling decision](orchestration/decisions/wp10_utility_cmp_coupling.md)
 and
 [coupling validation report](orchestration/reports/wp10_coupling_validation.md).
+WP12 methods, results, and limitations are in the
+[early-warning validation report](orchestration/reports/wp12_early_warning_validation.md).
 
-The living paper draft is maintained at [`docs/running_paper.md`](docs/running_paper.md). It records evidence-backed results and keeps pending scientific claims explicitly marked as pending.
+The living evidence ledger is maintained at
+[`docs/running_paper.md`](docs/running_paper.md). A journal-neutral LaTeX
+manuscript lives under [`paper/`](paper/) and builds to
+[`reports/paper/semifab_cmp_poc_draft.pdf`](reports/paper/semifab_cmp_poc_draft.pdf).
+Both record evidence-backed results and keep pending claims explicitly marked.
 
 ## Scientific boundaries
 
@@ -50,6 +62,13 @@ licence is not separately stated. Phase-aware preprocessing and split/fit-scope
 audits now pass, but virtual-metrology models have not been evaluated. Therefore
 there is no public-data model-validation claim. PHM results and SI simulator
 results must remain separate.
+
+The supported WP12 claim is narrower: frozen logistic and gradient-boosted
+models predict the preregistered ±5%, 0.25 s persistent active-POLISH simulator
+event within 3 s on one named held-out dressing-support ensemble. TEST contains
+only three event-bearing runs, and the models fail important no-connection and
+sensor-noise diagnostics. This is process-excursion prediction in simulation,
+not attribution, safe intervention, or real-fab validation.
 
 This PoC will not claim validated prediction or prevention of scratches, dishing, erosion, corrosion, contamination, delamination, cracking, real yield loss, equipment damage, production control, or microsecond response. Any future spatial output must carry the label: “Simulated spatial-uniformity proxy; not experimentally validated WIWNU.”
 
@@ -65,6 +84,8 @@ conda run -n devkki python -m pip install --no-deps --no-build-isolation -e .
 conda run -n devkki python -m pytest
 conda run -n devkki python scripts/validate_wp08_cmp.py
 conda run -n devkki python scripts/validate_wp10_coupling.py
+conda run -n devkki python scripts/validate_wp12_early_warning.py
+conda run -n devkki make paper
 conda run -n devkki python -m semifab_poc --help
 ```
 

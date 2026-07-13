@@ -26,6 +26,14 @@ from .pump import PumpConfig, PumpState, PumpSubsystem
 from .upw import UpwConfig, UpwState, UpwSubsystem
 from .sensors import SensorConfig, SensorModel, SensorModelError
 from .scenario import Scenario, ScenarioError, ScenarioEvent, ScenarioProfile, load_scenarios
+from .chain import (
+    ChainEventKind,
+    ChainRunnerError,
+    ChainScenario,
+    ChainSchedule,
+    ChainTrace,
+    SyntheticChainRunner,
+)
 
 __all__ = [
     "DynamicSubsystem",
@@ -65,4 +73,10 @@ __all__ = [
     "ScenarioEvent",
     "ScenarioProfile",
     "load_scenarios",
+    "ChainEventKind",
+    "ChainRunnerError",
+    "ChainScenario",
+    "ChainSchedule",
+    "ChainTrace",
+    "SyntheticChainRunner",
 ]

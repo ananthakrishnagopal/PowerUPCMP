@@ -4,7 +4,7 @@ MPLCONFIGDIR ?= /tmp/semifab-poc-matplotlib
 export PYTHONPATH := src
 export MPLCONFIGDIR
 
-.PHONY: help test test-unit validate-config package-check figures presentation
+.PHONY: help test test-unit validate-config package-check figures presentation paper
 
 help:
 	@printf '%s\n' \
@@ -13,7 +13,8 @@ help:
 		'validate-config Validate a YAML runtime configuration (CONFIG=path)' \
 		'package-check   Verify the package imports without installing optional extras' \
 		'figures         Regenerate reviewed WP08/WP10 communication figures' \
-		'presentation    Build the interim WP10 PDF and PPTX deck'
+		'presentation    Build the interim WP10 PDF and PPTX deck' \
+		'paper           Build the journal-neutral LaTeX manuscript PDF'
 
 test:
 	$(PYTHON) -m pytest
@@ -35,3 +36,6 @@ presentation: figures
 	mkdir -p reports/presentation presentation/build
 	$(PANDOC) presentation/wp10_demo.md --from markdown+tex_math_dollars --slide-level=2 --resource-path=.:presentation:reports/figures -o reports/presentation/wp10_demo.pptx
 	$(PANDOC) presentation/wp10_demo.md --from markdown+tex_math_dollars --to beamer --slide-level=2 --resource-path=.:presentation:reports/figures --pdf-engine=xelatex -V aspectratio=169 -o reports/presentation/wp10_demo.pdf
+
+paper:
+	$(MAKE) -C paper

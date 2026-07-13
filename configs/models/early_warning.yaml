@@ -1,0 +1,107 @@
+schema_version: "1.0.0"
+experiment_revision: "1.4-no-test-selection"
+target:
+  target_id: SIM_ACTIVE_POLISH_MRR_TRAJECTORY_V1
+  lower_relative_fraction: 0.95
+  upper_relative_fraction: 1.05
+  persistence_s: 0.25
+  horizon_s: 3.0
+  decision_period_s: 0.10
+  full_horizon_required: true
+  require_active_polish_opportunity: true
+  pre_onset_only: true
+  reference_policy: PAIRED_EVENT_DISABLED_SAME_INITIAL_STATE
+  minimum_reference_mrr_m_s: 1.0e-12
+features:
+  short_window_s: 0.50
+  history_start_s: 0.0
+  maximum_observation_age_s: 0.25
+  allowed_signal_ids:
+    - electrical.grid_voltage
+    - electrical.ups_output_voltage
+    - electrical.ups_battery_energy
+    - drive.motor_angular_speed
+    - pump.volumetric_flow
+    - upw.supply_pressure
+    - upw.tool_flow
+    - upw.temperature
+  statistics: [latest, age, short_mean, short_min, short_slope, missing_fraction, history_min]
+  integrated_deficit_signal_ids:
+    - electrical.ups_output_voltage
+    - upw.supply_pressure
+    - upw.tool_flow
+  forbidden_signal_ids:
+    - cmp.mrr
+    - cmp.pad_surface_activity
+    - coupling.effective_availability
+  include_phase_indicators: true
+  include_time_to_polish_start: true
+  include_known_battery_capacity_and_load: true
+sensors:
+  sample_period_s: 0.05
+  delay_s: 0.05
+  packet_loss_probability: 0.01
+  timestamp_jitter_std_s: 0.005
+  noise_by_signal:
+    electrical.grid_voltage: 0.002
+    electrical.ups_output_voltage: 0.002
+    electrical.ups_battery_energy: 2.0
+    drive.motor_angular_speed: 0.5
+    pump.volumetric_flow: 1.0e-6
+    upw.supply_pressure: 250.0
+    upw.tool_flow: 5.0e-7
+    upw.temperature: 0.02
+simulation:
+  dt_s: 0.01
+  duration_s: 16.0
+  plant_warmup_s: 3.0
+  dress_end_s: 6.0
+  polish_start_s: 7.0
+  full_dress_anchor_start_s: 0.0
+  full_dress_anchor_end_s: 5.99
+  topology: DRESSING_WATER_SUPPORT
+  link_strength: 1.0
+splits:
+  train_seed_start: 12000
+  calibration_seed_start: 22000
+  conformal_calibration_seed_start: 62000
+  test_seed_start: 32000
+  unseen_compound_seed_start: 42000
+  structural_null_seed_start: 52000
+  runs_per_family:
+    training: 6
+    calibration: 3
+    conformal_calibration: 3
+    test: 4
+    unseen_compound: 6
+    structural_null: 6
+  primary_families: [NORMAL, HEALTHY_SAG, GRID_INTERRUPTION, PUMP_TRIP, VALVE_RESTRICTION, TOOL_DEMAND_SPIKE]
+models:
+  random_seed: 20260712
+  probability_threshold: 0.50
+  conformal_alpha: 0.10
+  calibration_probability_clip: 1.0e-6
+  sigmoid_calibration_c: 1.0
+  logistic:
+    c: 1.0
+    max_iter: 1000
+    class_weight: balanced
+  gradient_boosted:
+    max_iter: 200
+    learning_rate: 0.05
+    max_leaf_nodes: 15
+    min_samples_leaf: 20
+    l2_regularization: 0.1
+evaluation:
+  calibration_bins: 10
+  observation_robustness_family_positions: [UPPER_MEDIAN, MAXIMUM]
+  grouped_bootstrap_repetitions: 1000
+  grouped_bootstrap_seed: 20260712
+  useful_pr_auc_margin_over_prevalence: 0.05
+  useful_minimum_event_recall: 0.80
+  useful_minimum_median_lead_time_s: 0.50
+  useful_minimum_conformal_coverage: 0.85
+  target_sensitivities:
+    relative_deviation_fractions: [0.03, 0.075]
+    horizon_s: [1.0, 5.0]
+    persistence_s: [0.10, 0.50]

@@ -1,0 +1,4 @@
+# Python's standard CSV writer emits RFC-style CRLF records. Preserve the
+# frozen WP12 artifact bytes while treating CR as part of the line terminator
+# for Git whitespace validation.
+reports/early_warning/*.csv whitespace=cr-at-eol

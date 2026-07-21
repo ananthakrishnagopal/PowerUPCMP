@@ -1,73 +1,211 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PowerUPCMP - Evaluation Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PowerUPCMP — AI Supervisory Control Demo</title>
+  <meta name="description" content="Live physics simulation demonstrating AI-driven predictive safety hold for semiconductor CMP utility disturbances">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="plotly.min.js"></script>
 </head>
 <body>
-    <div class="dashboard-container">
-        <header>
-            <div class="header-content">
-                <h1>PowerUPCMP Results Dashboard</h1>
-                <p class="subtitle">Read-only Evaluation Explorer</p>
-            </div>
-            <div class="disclaimers">
-                <span class="badge synthetic-badge">SYNTHETIC VALUES: All data is simulated POC output</span>
-                <span class="badge proxy-badge">SPATIAL PROXY: Modeled as lumped parameter equivalents</span>
-            </div>
-        </header>
+<main class="dashboard-container">
 
-        <main>
-            <section class="controls panel glassmorphism">
-                <h2>Trace Selection</h2>
-                <div class="control-group">
-                    <label for="trace-select">Select Run Artifact:</label>
-                    <select id="trace-select">
-                        <option value="">Loading traces...</option>
-                    </select>
-                </div>
-            </section>
-
-            <section class="summary-stats panel glassmorphism">
-                <h2>Run Details</h2>
-                <div id="run-summary" class="stats-grid">
-                    <div class="stat-box">
-                        <span class="stat-label">Run ID</span>
-                        <span class="stat-value" id="stat-run-id">--</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">Family</span>
-                        <span class="stat-value" id="stat-family">--</span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="visualizations">
-                <div class="chart-container panel glassmorphism">
-                    <h3>Signals & Truth</h3>
-                    <div id="chart-signals" class="chart"></div>
-                </div>
-                
-                <div class="chart-container panel glassmorphism">
-                    <h3>Predictions & Attribution</h3>
-                    <div id="chart-predictions" class="chart"></div>
-                </div>
-                
-                <div class="chart-container panel glassmorphism">
-                    <h3>Supervisory Actions & Modes</h3>
-                    <div id="chart-actions" class="chart"></div>
-                </div>
-            </section>
-        </main>
-        
-        <footer>
-            <p>WP19 Dashboard — No model or control logic is executed here.</p>
-        </footer>
+  <!-- ═══════════════════ TOP BAR ═══════════════════ -->
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">SEMIFAB / PREDICTIVE SUPERVISORY CONTROL</div>
+      <h1>PowerUP<span class="accent">CMP</span></h1>
+      <p class="subtitle">Digital-twin simulation of AI-driven wafer protection</p>
     </div>
-    <script src="app.js"></script>
+    <div class="header-meta">
+      <span class="status-dot"></span>
+      <span id="connection-status">Ready for demo</span>
+      <span class="version-tag">SIMULATION ONLY</span>
+    </div>
+  </header>
+
+  <!-- ═══════════════════ DISCLAIMER ═══════════════════ -->
+  <section class="disclaimer-bar">
+    <strong>SYNTHETIC VALUES:</strong> this dashboard drives a physics simulator — not live fab telemetry.
+    <span><strong>MODEL:</strong> Logistic Regression early-warning predictor (PR-AUC 0.99, 2.7 s lead time).</span>
+  </section>
+
+  <!-- ═══════════════════ KPI STRIP ═══════════════════ -->
+  <section class="kpi-grid" aria-label="Business outcome summary">
+    <article class="kpi-card">
+      <span class="kpi-label">System status</span>
+      <strong id="kpi-status">Ready</strong>
+      <span id="kpi-status-detail">Choose a scenario to begin</span>
+    </article>
+    <article class="kpi-card">
+      <span class="kpi-label">AI fault confidence (≥50% Hold)</span>
+      <strong id="kpi-confidence">--</strong>
+      <span id="kpi-warning-time">No run loaded</span>
+    </article>
+    <article class="kpi-card">
+      <span class="kpi-label">Supervisor response</span>
+      <strong id="kpi-action">--</strong>
+      <span id="kpi-action-detail">No decision recorded</span>
+    </article>
+    <article class="kpi-card">
+      <span class="kpi-label">Business outcome</span>
+      <strong id="kpi-outcome">--</strong>
+      <span id="kpi-outcome-detail">Run a scenario to see impact</span>
+    </article>
+  </section>
+
+  <!-- ═══════════════════ LAYOUT: SIDEBAR + MAIN ═══════════════════ -->
+  <div class="layout-wrapper">
+
+    <!-- ─── SIDEBAR ─── -->
+    <aside class="sidebar panel">
+      <div class="section-heading">
+        <div><div class="eyebrow">CONTROL ROOM</div><h2>Run a scenario</h2></div>
+        <span class="step-badge">01</span>
+      </div>
+      <p class="helper">Pick a fault scenario and compare AI-shielded vs. unprotected operation.</p>
+
+      <label for="scenario-preset">Demo scenario</label>
+      <select id="scenario-preset" class="full-width">
+        <option value="PUMP_TRIP">Pump trip during polish</option>
+        <option value="VOLTAGE_SAG">Grid voltage sag</option>
+        <option value="VALVE_RESTRICTION">UPW valve restriction</option>
+        <option value="PRESSURE_SENSOR_FAULT">Pressure sensor bias</option>
+        <option value="GRID_INTERRUPTION">Short grid interruption</option>
+        <option value="NORMAL">Normal operation (baseline)</option>
+      </select>
+      <div class="scenario-callout" id="scenario-description">UPW pump trip — the pump loses power and water pressure collapses, threatening pad glazing and wafer damage.</div>
+
+      <label for="sim-controller">Protection mode</label>
+      <select id="sim-controller" class="full-width">
+        <option value="PREDICTIVE">AI Predictive Shield (Active)</option>
+        <option value="NO_ACTION">Legacy System (Unprotected)</option>
+      </select>
+
+      <div class="advanced-toggle">
+        <span>Physics parameters</span>
+        <button id="advanced-toggle" class="icon-button" type="button" aria-expanded="false" title="Show physics parameters">+</button>
+      </div>
+
+      <div id="advanced-parameters" hidden>
+        <div class="split-inputs">
+          <div>
+            <label for="sim-grid-voltage">Grid voltage (PU)</label>
+            <input id="sim-grid-voltage" type="number" value="1.0" step="0.05" min="0.5" max="1.1">
+          </div>
+          <div>
+            <label for="sim-valve-pos">UPW valve (0–1)</label>
+            <input id="sim-valve-pos" type="number" value="1.0" step="0.1" min="0" max="1">
+          </div>
+        </div>
+        <label for="sim-sensor-bias">Pressure sensor bias (Pa)</label>
+        <input id="sim-sensor-bias" class="full-width" type="number" value="0" step="1000">
+        <div class="split-inputs">
+          <div>
+            <label for="sim-event-start">Event start (s)</label>
+            <input id="sim-event-start" type="number" value="7.0" step="0.5" min="0">
+          </div>
+          <div>
+            <label for="sim-event-duration">Event length (s)</label>
+            <input id="sim-event-duration" type="number" value="5.0" step="0.5" min="0.1">
+          </div>
+        </div>
+        <div class="split-inputs">
+          <div>
+            <label for="sim-seed">Seed</label>
+            <input id="sim-seed" type="number" value="123">
+          </div>
+          <div>
+            <label for="sim-duration">Duration (s)</label>
+            <input id="sim-duration" type="number" value="20" min="8" max="60">
+          </div>
+        </div>
+      </div>
+
+      <button id="live-sim-btn" class="primary-button full-width" type="button">▶ Run Scenario</button>
+      <button id="stop-sim-btn" class="secondary-button full-width" type="button" hidden>■ Stop Simulation</button>
+
+      <div class="divider"></div>
+
+      <div class="section-heading">
+        <div><div class="eyebrow">REPLAYABLE EVIDENCE</div><h2>Load an artifact</h2></div>
+        <span class="step-badge">02</span>
+      </div>
+      <label for="trace-selector">Validated local trace</label>
+      <select id="trace-selector" class="full-width"><option value="">Loading artifacts...</option></select>
+      <button id="stream-btn" class="secondary-button full-width" type="button">Replay artifact</button>
+    </aside>
+
+    <!-- ─── MAIN CONTENT ─── -->
+    <section class="main-content">
+
+      <!-- Decision banner -->
+      <section class="decision-banner panel">
+        <div>
+          <div class="eyebrow">DECISION OUTCOME</div>
+          <h2 id="decision-title">No scenario running</h2>
+          <p id="decision-copy">The decision summary will update as the simulated process evolves.</p>
+        </div>
+        <div class="decision-chip" id="decision-chip">READY</div>
+      </section>
+
+      <!-- Charts -->
+      <section class="chart-grid">
+        <article class="panel chart-panel chart-wide">
+          <div class="chart-title">
+            <div>
+              <h3>Material Removal Rate & AI Warning</h3>
+              <p>Blue = true MRR (polishing performance). Red fill = AI fault confidence (Hold threshold: 50%).</p>
+            </div>
+            <span class="chart-key"><i class="key-blue"></i>True MRR <i class="key-purple"></i>Predicted MRR <i class="key-red"></i>AI Warning</span>
+          </div>
+          <div id="chart-predictions" class="chart"></div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="chart-title">
+            <div>
+              <h3>Facility health signals</h3>
+              <p>Grid voltage and raw MRR from the physics engine.</p>
+            </div>
+          </div>
+          <div id="chart-signals" class="chart"></div>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="chart-title">
+            <div>
+              <h3>Operating mode</h3>
+              <p>Machine state: DRESS → PREPARE → POLISH → HOLD.</p>
+            </div>
+          </div>
+          <div id="chart-actions" class="chart"></div>
+        </article>
+      </section>
+
+      <!-- Timeline + evidence -->
+      <section class="detail-grid">
+        <article class="panel">
+          <div class="chart-title"><div><h3>Event timeline</h3><p id="timeline-caption">No events recorded</p></div></div>
+          <ol id="event-timeline" class="timeline"><li class="empty-state">Run a scenario to see detection and response milestones.</li></ol>
+        </article>
+        <article class="panel">
+          <div class="chart-title"><div><h3>Evidence & limits</h3><p>What this PoC demonstrates.</p></div></div>
+          <div class="evidence-list">
+            <div><span class="evidence-icon good">✓</span><p><strong>Demonstrates</strong><br>Physics-driven fault cascade, AI early-warning (Logistic Regression, PR-AUC 0.99), and autonomous safety hold at ≥50% confidence — all in a reproducible simulation.</p></div>
+            <div><span class="evidence-icon neutral">i</span><p><strong>Does not demonstrate</strong><br>Real-fab telemetry, yield protection proof, or production-safe control authority.</p></div>
+            <div><span class="evidence-icon neutral">i</span><p><strong>Model details</strong><br>65 causal streaming features → calibrated logistic classifier → conformal prediction set → supervisory state machine → independent safety filter. Median warning lead time: 2.71 s.</p></div>
+          </div>
+        </article>
+      </section>
+
+    </section>
+  </div>
+
+  <footer>Semifab CMP PoC · Customer technical demonstration · Local simulation dashboard</footer>
+</main>
+<script src="app.js"></script>
 </body>
 </html>

@@ -63,6 +63,24 @@ def _default_sensor_configs() -> tuple[SensorConfig, ...]:
             minimum_value=273.15,
             maximum_value=373.15,
         ),
+        SensorConfig(
+            sensor_id="electrical-grid-voltage",
+            signal_id="electrical.grid_voltage",
+            unit="pu",
+            sample_period_s=0.01,
+            provenance_id="synthetic-voltage-sensor-v1",
+            minimum_value=0.0,
+            maximum_value=1.5,
+        ),
+        SensorConfig(
+            sensor_id="drive-motor-speed",
+            signal_id="drive.motor_angular_speed",
+            unit="rad/s",
+            sample_period_s=0.01,
+            provenance_id="synthetic-speed-sensor-v1",
+            minimum_value=0.0,
+            maximum_value=200.0,
+        ),
     )
 
 

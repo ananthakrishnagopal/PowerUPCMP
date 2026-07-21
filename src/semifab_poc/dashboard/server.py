@@ -237,6 +237,9 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 
                 health = min(grid_h, motor_h, pressure_h)
 
+                if family_str != "NORMAL":
+                    print(f"DEBUG: health={health:.3f}, family={family_str}", flush=True)
+
                 if family_str != "NORMAL" and health < 0.92:
                     self.latch = True
 

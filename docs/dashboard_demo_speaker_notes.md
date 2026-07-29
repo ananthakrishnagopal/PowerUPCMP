@@ -13,9 +13,9 @@ Suggested duration: 15 minutes, followed by 10 minutes of technical questions.
 
 1. Install the project in the documented Python environment.
 2. Start the dashboard with `conda run -n devkki python src/semifab_poc/dashboard/server.py`.
-3. Open `http://localhost:8080` and confirm the page says `Stakeholder demo artifact ready`.
-4. In **Load an artifact**, confirm `stakeholder-demo-predictive-hold` is selected.
-5. Use **Replay stakeholder demo** as the recording path. Live scenarios are backup.
+3. Open `http://localhost:8080` and confirm the page says `Validated demo artifact ready`.
+4. In **Load an artifact**, confirm `stakeholder-demo-stable-polish-fault` is selected.
+5. Use **Replay validated demo** as the recording path. Live scenarios are backup.
 6. Keep the repository documentation available for provenance questions. The primary references are `docs/stakeholder_demo_methodology.md`, `docs/assumptions_and_limitations.md`, `docs/architecture.md`, and the WP12/WP13/WP15/WP16 validation reports.
 
 ## 1. Frame the problem (1 minute)
@@ -36,17 +36,18 @@ Use the charts to identify the normal mode progression. The expected result is n
 
 ## 3. Replay the stakeholder pump-trip trace (3 minutes)
 
-Click **Replay stakeholder demo**. Keep the dashboard visible while the stream
+Click **Replay validated demo**. Keep the dashboard visible while the stream
 progresses. The trace is a curated synthetic replay named
-`stakeholder-demo-predictive-hold.json`. It is the preferred recording artifact
-because it is deterministic and contains the scenario, warning, action, safety,
-and summary fields needed for a clean walkthrough.
+`stakeholder-demo-stable-polish-fault.json`. It is the preferred recording
+artifact because the pump-trip fault is injected after MRR has stabilized in
+POLISH mode, and it contains the scenario, warning, action, safety, and summary
+fields needed for a clean walkthrough.
 
 **Say:** “The event is introduced into the utility side. We are watching three separate things: the physical process response, the warning probability, and the supervisory operating mode. Keeping those separate is important because a high warning is not itself an action.”
 
 Walk through the screens in this order:
 
-- **Process health and warning:** MRR is the simulator outcome; the red curve is the model warning signal on the right axis.
+- **Process health and warning:** MRR is the simulator outcome; start by pointing out the stable MRR plateau before the amber event band. The red curve is the model warning signal on the right axis.
 - **Physical process response:** this is simulator ground truth, not a sensor measurement from a real tool.
 - **Operating mode:** the mode transition is the visible control effect. A `HOLD` state is the action outcome in this demonstration.
 - **Event timeline:** the timeline makes the sequence clear: utility fault, warning threshold crossing, supervisor proposal, safety approval, hold, controlled resume, and completion.
@@ -67,7 +68,7 @@ Compare the operating-mode chart and the process curve. Avoid claiming saved waf
 ## 5. Replay evidence and limitations (2 minutes)
 
 Point to **Load an artifact**, the selected
-`stakeholder-demo-predictive-hold` trace, and **Evidence & limits**.
+`stakeholder-demo-stable-polish-fault` trace, and **Evidence & limits**.
 
 **Say:** “The replay path shows that the dashboard is not dependent on a live calculation for presentation. It can replay a versioned local artifact, which is useful for review, audit, and a repeatable customer conversation.”
 

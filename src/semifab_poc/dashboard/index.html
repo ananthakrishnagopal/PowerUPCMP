@@ -29,7 +29,7 @@
   <!-- ═══════════════════ DISCLAIMER ═══════════════════ -->
   <section class="disclaimer-bar">
     <strong>SYNTHETIC VALUES:</strong> this dashboard replays and streams local simulator traces — not live fab telemetry.
-    <span><strong>LIVE MODEL:</strong> WP12 logistic early-warning artifact for synthetic simulator observations.</span>
+    <span><strong>LIVE MODEL:</strong> dashboard warning classifier trained on synthetic utility-risk scenarios.</span>
   </section>
 
   <!-- ═══════════════════ KPI STRIP ═══════════════════ -->
@@ -40,7 +40,7 @@
       <span id="kpi-status-detail">Choose a scenario to begin</span>
     </article>
     <article class="kpi-card">
-      <span class="kpi-label">Warning probability (>=50% hold)</span>
+      <span class="kpi-label">Warning probability</span>
       <strong id="kpi-confidence">--</strong>
       <span id="kpi-warning-time">No run loaded</span>
     </article>
@@ -69,7 +69,7 @@
 
       <label for="scenario-preset">Demo scenario</label>
       <select id="scenario-preset" class="full-width">
-        <option value="PUMP_TRIP">Stakeholder demo: pump trip</option>
+        <option value="PUMP_TRIP">Predictive hold demo: pump trip</option>
         <option value="NORMAL">Normal operation (baseline)</option>
         <option value="GRID_INTERRUPTION">Backup: grid interruption</option>
         <option value="VALVE_RESTRICTION">Backup: UPW valve restriction</option>
@@ -78,8 +78,8 @@
 
       <label for="sim-controller">Protection mode</label>
       <select id="sim-controller" class="full-width">
-        <option value="UTILITY_THRESHOLD">Live utility threshold protection</option>
-        <option value="PREDICTIVE">Predictive classifier diagnostic</option>
+        <option value="PREDICTIVE">Predictive classifier demo</option>
+        <option value="UTILITY_THRESHOLD">Utility threshold fallback</option>
         <option value="NO_ACTION">Legacy System (Unprotected)</option>
       </select>
 
@@ -134,7 +134,7 @@
       </div>
       <label for="trace-selector">Validated local trace</label>
       <select id="trace-selector" class="full-width"><option value="">Loading artifacts...</option></select>
-      <button id="stream-btn" class="secondary-button full-width" type="button">Replay stakeholder demo</button>
+      <button id="stream-btn" class="secondary-button full-width" type="button">Replay validated demo</button>
     </aside>
 
     <!-- ─── MAIN CONTENT ─── -->
@@ -156,7 +156,7 @@
           <div class="chart-title">
             <div>
               <h3>Material Removal Rate & Protection Signal</h3>
-              <p>Blue = true MRR in nm/s. Red fill = active controller signal. Amber band = injected facility event.</p>
+              <p>Blue = true MRR in nm/s. Red fill = selected controller signal. Amber band = injected facility event.</p>
             </div>
             <span class="chart-key"><i class="key-blue"></i>True MRR <i class="key-purple"></i>MRR reference <i class="key-red"></i>Protection signal</span>
           </div>
@@ -177,7 +177,7 @@
           <div class="chart-title">
             <div>
               <h3>Operating mode</h3>
-              <p>Machine state: DRESS -> HOLD -> RECOVER -> POLISH.</p>
+              <p>Machine state: DRESS -> PREPARE -> POLISH, with HOLD/RECOVER when protection intervenes.</p>
             </div>
           </div>
           <div id="chart-actions" class="chart"></div>

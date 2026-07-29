@@ -224,9 +224,26 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     )
                 return self.inner.act(observation, prediction, constraints)
 
+        class LiveDemoPredictorThrottle:
+            def __init__(self, inner, period_s: float) -> None:
+                self.inner = inner
+                self.period_s = period_s
+                self.last_prediction = None
+
+            def predict(self, observation_window):
+                if (
+                    self.last_prediction is not None
+                    and observation_window.decision_timestamp_s
+                    - self.last_prediction.feature_cutoff_timestamp_s
+                    < self.period_s
+                ):
+                    return self.last_prediction
+                self.last_prediction = self.inner.predict(observation_window)
+                return self.last_prediction
+
         runtime_config = load_runtime_config(
             PROJECT_ROOT / "configs" / "default.yaml"
-        ).model_copy(update={"duration_s": duration})
+        ).model_copy(update={"duration_s": duration, "dt_s": 0.05})
         warning_config = load_early_warning_config(
             PROJECT_ROOT / "configs" / "models" / "early_warning.yaml"
         )
@@ -298,11 +315,26 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             PROJECT_ROOT / "configs" / "controllers" / "baselines.yaml",
             PROJECT_ROOT / "configs" / "controllers" / "safety.yaml",
         )
-        predictor = EarlyWarningPredictor.load(
-            PROJECT_ROOT / "reports" / "early_warning" / "models" / "logistic.pkl"
+        predictor_path = (
+            PROJECT_ROOT / "reports" / "early_warning" / "models" / "dashboard_warning.pkl"
+            if controller_type == "PREDICTIVE"
+            else PROJECT_ROOT / "reports" / "early_warning" / "models" / "logistic.pkl"
         )
+        predictor = EarlyWarningPredictor.load(predictor_path)
         if controller_type == "PREDICTIVE":
-            base_ctrl = PredictiveSupervisor(bundle.predictive)
+            predictor = LiveDemoPredictorThrottle(predictor, period_s=0.25)
+        if controller_type == "PREDICTIVE":
+            predictive_config = bundle.predictive.model_copy(
+                update={
+                    "risk_policy": bundle.predictive.risk_policy.model_copy(
+                        update={
+                            "hold_probability": 0.80,
+                            "maximum_prediction_age_s": 0.30,
+                        }
+                    )
+                }
+            )
+            base_ctrl = PredictiveSupervisor(predictive_config)
         elif controller_type == "UTILITY_THRESHOLD":
             base_ctrl = UtilityThresholdController(bundle.baselines)
         else:

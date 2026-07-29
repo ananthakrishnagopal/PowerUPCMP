@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 
-TRACE_PATH = Path(__file__).with_name("stakeholder-demo-predictive-hold.json")
+TRACE_PATH = Path(__file__).with_name("stakeholder-demo-stable-polish-fault.json")
 
 
 def test_stakeholder_demo_trace_shape_and_story() -> None:
@@ -25,6 +25,18 @@ def test_stakeholder_demo_trace_shape_and_story() -> None:
         if row["warning_probability"] >= row["hold_threshold"]
     ]
     assert threshold_crossings
+    fault_time = payload["summary"]["fault_time_s"]
+    stable_polish_start = payload["summary"]["stable_polish_start_s"]
+    stable_rows = [
+        row for row in payload["truth_rows"]
+        if stable_polish_start <= row["timestamp_s"] < fault_time
+    ]
+    assert stable_rows
+    assert {row["cmp_mode"] for row in stable_rows} == {"POLISH"}
+    stable_mrr = [row["cmp_mrr_m_s"] for row in stable_rows]
+    assert min(stable_mrr) >= 1.96e-08
+    assert max(stable_mrr) <= 2.01e-08
+    assert threshold_crossings[0]["timestamp_s"] > fault_time
 
     hold_actions = [
         action for action in payload["actions"]
@@ -41,5 +53,5 @@ def test_stakeholder_demo_trace_shape_and_story() -> None:
     assert final_hold_decisions[0]["outcome"] == "APPROVED"
 
     modes = {row["cmp_mode"] for row in payload["truth_rows"]}
-    assert {"DRESS", "HOLD", "RECOVER", "POLISH"} <= modes
+    assert {"DRESS", "PREPARE", "HOLD", "RECOVER", "POLISH"} <= modes
     assert payload["summary"]["peak_warning_probability"] >= 0.9

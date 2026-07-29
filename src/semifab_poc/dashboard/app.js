@@ -1,6 +1,6 @@
 /* ═══════════════════ app.js — PowerUPCMP Dashboard ═══════════════════ */
 
-const STAKEHOLDER_TRACE = 'stakeholder-demo-predictive-hold.json';
+const STAKEHOLDER_TRACE = 'stakeholder-demo-stable-polish-fault.json';
 const MRR_TO_NM_PER_S = 1.0e9;
 const state = { stream: null, data: { truth_rows: [], predictions: [], actions: [], safety_decisions: [] }, held: false };
 const $ = (id) => document.getElementById(id);
@@ -24,7 +24,7 @@ const presetDefaults = {
 
 /* ─── Boot ─── */
 document.addEventListener('DOMContentLoaded', () => {
-  $('sim-controller').value = 'UTILITY_THRESHOLD';
+  $('sim-controller').value = 'PREDICTIVE';
   $('sim-event-start').value = '7.2';
   $('sim-event-duration').value = '4.0';
   $('sim-duration').value = '16';
@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       if (payload.traces.includes(STAKEHOLDER_TRACE)) {
         $('trace-selector').value = STAKEHOLDER_TRACE;
-        $('stream-btn').textContent = 'Replay stakeholder demo';
-        setConnection('Stakeholder demo artifact ready');
+        $('stream-btn').textContent = 'Replay validated demo';
+        setConnection('Validated demo artifact ready');
       }
     })
     .catch(() => {
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 $('trace-selector')?.addEventListener('change', () => {
   $('stream-btn').textContent =
     $('trace-selector').value === STAKEHOLDER_TRACE
-      ? 'Replay stakeholder demo'
+      ? 'Replay validated demo'
       : 'Replay artifact';
 });
 
@@ -126,7 +126,10 @@ function startStream(url, runId, family, controller = '') {
     const chunk = JSON.parse(event.data);
     if (chunk.error) { setConnection(chunk.error, true); stopStream(false); return; }
     if (chunk.metadata) state.data.metadata = chunk.metadata;
-    if (chunk.scenario) state.data.scenario = chunk.scenario;
+    if (chunk.scenario) {
+      state.data.scenario = chunk.scenario;
+      if (chunk.scenario.family) state.data.family = chunk.scenario.family;
+    }
     if (chunk.summary) state.data.summary = chunk.summary;
     if (chunk.actions) {
       state.data.actions = chunk.truth
@@ -179,6 +182,7 @@ function renderDashboard(data) {
   const family = data.family || '';
   const controller = data.controller || '';
   const summary = data.summary || {};
+  const warningThreshold = controller === 'PREDICTIVE' ? 0.80 : 0.50;
 
   // ─── KPIs ───
   const peak = predictions.reduce(
@@ -189,7 +193,7 @@ function renderDashboard(data) {
   const isNormal = family === 'NORMAL';
   const isFault = !isNormal && truth.length > 0;
 
-  $('kpi-status').textContent = hold ? 'Shield Active' : peak.warning_probability > 0.5 ? 'Warning' : truth.length ? 'Nominal' : 'Ready';
+  $('kpi-status').textContent = hold ? 'Shield Active' : peak.warning_probability > warningThreshold ? 'Warning' : truth.length ? 'Nominal' : 'Ready';
   $('kpi-status-detail').textContent = truth.length ? `Last mode: ${truth[truth.length - 1].cmp_mode || 'unknown'}` : 'Choose a scenario';
 
   $('kpi-confidence').textContent = predictions.length ? `${(peak.warning_probability * 100).toFixed(1)}%` : '--';
@@ -225,7 +229,7 @@ function renderDashboard(data) {
       ? 'Predictive supervisor triggered a safe hold'
       : 'Live protection triggered a safe hold';
     $('decision-copy').textContent = isPredictive
-      ? `The warning crossed the 50% hold threshold and the safety filter approved a bounded hold at ${Number(summary.hold_time_s ?? hold.timestamp_s).toFixed(1)} s. This is a synthetic demonstration, not a real-fab yield claim.`
+      ? `The warning crossed the configured hold threshold and the safety filter approved a bounded hold at ${Number(summary.hold_time_s ?? hold.timestamp_s).toFixed(1)} s. This is a synthetic demonstration, not a real-fab yield claim.`
       : `The utility threshold controller detected degraded facility support and the safety filter approved a bounded hold at ${Number(summary.hold_time_s ?? hold.timestamp_s).toFixed(1)} s. This is a synthetic live-control demonstration.`;
     $('decision-chip').textContent = 'SAFE HOLD';
     $('decision-chip').className = 'decision-chip chip-blue';
@@ -405,6 +409,7 @@ function renderTimeline(data) {
   const actions = data.actions || [];
   const safetyDecisions = data.safety_decisions || [];
   const summary = data.summary || {};
+  const warningThreshold = data.controller === 'PREDICTIVE' ? 0.80 : 0.50;
   const latestVisibleTime = truth.length ? Number(truth[truth.length - 1].timestamp_s) : 0;
   const list = $('event-timeline');
   list.innerHTML = '';
@@ -433,7 +438,7 @@ function renderTimeline(data) {
   if (eventActive) events.push({ time: eventActive.timestamp_s, title: 'Fault injected', copy: `${data.family} event activated` });
 
   // Warning threshold
-  if (peak.warning_probability > 0.5) {
+  if (peak.warning_probability > warningThreshold) {
     events.push({ time: peak.timestamp_s, title: 'Warning probability peaked', copy: `${(peak.warning_probability * 100).toFixed(1)}% probability` });
   }
 

@@ -783,6 +783,21 @@ class EarlyWarningPredictor:
         weights_by_class = total / (2.0 * counts)
         return weights_by_class[labels]
 
+    @staticmethod
+    def _repair_sklearn_pickle_compatibility(model: Any) -> Any:
+        """Patch known sklearn minor-version pickle attribute drift."""
+
+        steps = getattr(model, "steps", ())
+        estimators = [estimator for _, estimator in steps] if steps else [model]
+        for estimator in estimators:
+            if (
+                estimator.__class__.__name__ == "SimpleImputer"
+                and hasattr(estimator, "_fit_dtype")
+                and not hasattr(estimator, "_fill_dtype")
+            ):
+                estimator._fill_dtype = estimator._fit_dtype
+        return model
+
     def _base_probabilities(self, features: np.ndarray) -> np.ndarray:
         if self.training_prevalence is None:
             raise EarlyWarningError("predictor is not fitted")
@@ -1021,7 +1036,9 @@ class EarlyWarningPredictor:
             ModelConfig.model_validate(payload["model_config"]),
         )
         predictor.feature_names = tuple(payload["feature_names"])
-        predictor.base_model = payload["base_model"]
+        predictor.base_model = cls._repair_sklearn_pickle_compatibility(
+            payload["base_model"]
+        )
         predictor.calibrator = payload["calibrator"]
         predictor.training_prevalence = float(payload["training_prevalence"])
         predictor.conformal_quantile = float(payload["conformal_quantile"])

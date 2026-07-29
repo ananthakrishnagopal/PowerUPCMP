@@ -1,0 +1,6 @@
+{
+  "artifact_version": "1.0.0",
+  "fit_group_sha256": "014a65944574d8fb276dcb894e82edab7d9d64f850bdd3c92280a39c16ae23e1",
+  "model_kind": "GRADIENT_BOOSTED",
+  "sha256": "6fd16cb216b26540a49f4db60250868bb24a1811818c853cfd66fdcccefeef66"
+}

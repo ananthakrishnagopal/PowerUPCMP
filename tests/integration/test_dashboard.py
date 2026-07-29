@@ -20,8 +20,8 @@ def test_local_smoke_test_succeeds(dashboard_server):
         html = response.read().decode('utf-8')
         assert "PowerUPCMP" in html
         assert "SYNTHETIC VALUES:" in html
-        assert "Replay stakeholder demo" in html
-        assert "Live utility threshold protection" in html
+        assert "Replay validated demo" in html
+        assert "Predictive classifier demo" in html
         assert 'value="7.2"' in html
         assert 'value="4.0"' in html
         assert 'value="16"' in html
@@ -32,12 +32,29 @@ def test_api_traces(dashboard_server):
         assert response.status == 200
         data = response.read().decode('utf-8')
         assert "traces" in data
-        assert "stakeholder-demo-predictive-hold.json" in data
+        assert "stakeholder-demo-stable-polish-fault.json" in data
+
+def test_stakeholder_replay_stream_header(dashboard_server):
+    req = urllib.request.Request(
+        f"{dashboard_server}/api/stream/stakeholder-demo-stable-polish-fault.json"
+    )
+    with urllib.request.urlopen(req, timeout=10) as response:
+        assert response.status == 200
+        line = response.readline().decode("utf-8").strip()
+
+    assert line.startswith("data:")
+    payload = json.loads(line.removeprefix("data:").strip())
+    assert payload["scenario"]["family"] == "PUMP_TRIP"
+    assert payload["scenario"]["event_start_s"] == 8.0
+    assert payload["summary"]["stable_polish_start_s"] == 4.0
+    assert payload["summary"]["final_status"] == "Recovered after stable-polish synthetic safe hold"
+    assert payload["actions"][0]["action_type"] == "SAFE_HOLD"
+    assert payload["safety_decisions"][0]["outcome"] == "APPROVED"
 
 def test_live_simulation_streams_model_predictions(dashboard_server):
     req = urllib.request.Request(
         f"{dashboard_server}/api/simulate?"
-        "family=PUMP_TRIP&controller=UTILITY_THRESHOLD&duration=16&"
+        "family=PUMP_TRIP&controller=PREDICTIVE&duration=16&"
         "grid_volt=1.0&valve_pos=1.0&sensor_bias=0&"
         "ev_start=7.2&ev_dur=4.0&seed=123"
     )
@@ -78,7 +95,7 @@ def test_no_unique_model_or_control_logic_in_dashboard():
     assert app_js.exists()
     content = app_js.read_text()
     assert "updateDashboard" in content
-    assert "$('sim-controller').value = 'UTILITY_THRESHOLD'" in content
+    assert "$('sim-controller').value = 'PREDICTIVE'" in content
     assert "$('sim-event-duration').value = '4.0'" in content
     assert "$('sim-duration').value = '16'" in content
     # No logic indicating model execution

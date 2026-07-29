@@ -150,7 +150,24 @@
         <div class="decision-chip" id="decision-chip">READY</div>
       </section>
 
-      <!-- Charts -->
+      <!-- Story flow -->
+      <section class="detail-grid">
+        <article class="panel">
+          <div class="chart-title"><div><h3>Event timeline</h3><p id="timeline-caption">No events recorded</p></div></div>
+          <ol id="event-timeline" class="timeline"><li class="empty-state">Run a scenario to see detection and response milestones.</li></ol>
+        </article>
+
+        <article class="panel chart-panel">
+          <div class="chart-title">
+            <div>
+              <h3>Power-water utility health</h3>
+              <p>Power support, UPW pressure, pump flow, and MRR from the simulator.</p>
+            </div>
+          </div>
+          <div id="chart-signals" class="chart"></div>
+        </article>
+      </section>
+
       <section class="chart-grid">
         <article class="panel chart-panel chart-wide">
           <div class="chart-title">
@@ -166,16 +183,6 @@
         <article class="panel chart-panel">
           <div class="chart-title">
             <div>
-              <h3>Facility health signals</h3>
-              <p>Grid voltage, normalized UPW pressure, pump flow, and MRR from the simulator.</p>
-            </div>
-          </div>
-          <div id="chart-signals" class="chart"></div>
-        </article>
-
-        <article class="panel chart-panel">
-          <div class="chart-title">
-            <div>
               <h3>Operating mode</h3>
               <p>Machine state: DRESS -> PREPARE -> POLISH, with HOLD/RECOVER when protection intervenes.</p>
             </div>
@@ -184,12 +191,8 @@
         </article>
       </section>
 
-      <!-- Timeline + evidence -->
+      <!-- Evidence -->
       <section class="detail-grid">
-        <article class="panel">
-          <div class="chart-title"><div><h3>Event timeline</h3><p id="timeline-caption">No events recorded</p></div></div>
-          <ol id="event-timeline" class="timeline"><li class="empty-state">Run a scenario to see detection and response milestones.</li></ol>
-        </article>
         <article class="panel">
           <div class="chart-title"><div><h3>Evidence & limits</h3><p>What this PoC demonstrates.</p></div></div>
           <div class="evidence-list">

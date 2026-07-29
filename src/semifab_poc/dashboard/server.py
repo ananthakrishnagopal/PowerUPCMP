@@ -22,7 +22,7 @@ DEMO_TRACE_NAMES = (
     "stakeholder-demo-normal-baseline.json",
     "stakeholder-demo-stable-polish-fault.json",
     "stakeholder-demo-grid-interruption.json",
-    "stakeholder-demo-power-water-disturbance.json",
+    "stakeholder-demo-power-to-water-cascade.json",
 )
 
 

@@ -17,7 +17,7 @@ Suggested duration: 15 minutes, followed by 10 minutes of technical questions.
 4. In **Load an artifact**, confirm the replay list contains the baseline plus
    `stakeholder-demo-stable-polish-fault`,
    `stakeholder-demo-grid-interruption`, and
-   `stakeholder-demo-power-water-disturbance`, with the stable-polish fault
+   `stakeholder-demo-power-to-water-cascade`, with the stable-polish fault
    replay selected for the main recording.
 5. Use **Replay validated demo** as the recording path. Live scenarios are backup.
 6. Keep the repository documentation available for provenance questions. The primary references are `docs/stakeholder_demo_methodology.md`, `docs/assumptions_and_limitations.md`, `docs/architecture.md`, and the WP12/WP13/WP15/WP16 validation reports.
@@ -50,10 +50,10 @@ fields needed for a clean walkthrough.
 
 Walk through the screens in this order:
 
+- **Event timeline:** establish the sequence first: stable polishing, utility disturbance, warning threshold crossing, supervisor proposal, safety approval, hold, controlled resume, and completion.
+- **Power-water utility health:** show which side of the utility chain degraded first. In the cascade replay, grid voltage moves first and UPW support follows.
 - **Process health and warning:** MRR is the simulator outcome; start by pointing out the stable MRR plateau before the amber event band. The red curve is the model warning signal on the right axis.
-- **Physical process response:** this is simulator ground truth, not a sensor measurement from a real tool.
 - **Operating mode:** the mode transition is the visible control effect. A `HOLD` state is the action outcome in this demonstration.
-- **Event timeline:** the timeline makes the sequence clear: utility fault, warning threshold crossing, supervisor proposal, safety approval, hold, controlled resume, and completion.
 
 When the decision banner changes, say: “The demonstrated value is the traceability from event to a synthetic warning proxy to a bounded supervisory response. It is not a claim that this response is ready to command a production tool.”
 

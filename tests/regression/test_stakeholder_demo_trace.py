@@ -5,8 +5,8 @@ from pathlib import Path
 TRACE_PATH = Path(__file__).with_name("stakeholder-demo-stable-polish-fault.json")
 BASELINE_TRACE_PATH = Path(__file__).with_name("stakeholder-demo-normal-baseline.json")
 GRID_TRACE_PATH = Path(__file__).with_name("stakeholder-demo-grid-interruption.json")
-POWER_WATER_TRACE_PATH = Path(__file__).with_name(
-    "stakeholder-demo-power-water-disturbance.json"
+POWER_TO_WATER_TRACE_PATH = Path(__file__).with_name(
+    "stakeholder-demo-power-to-water-cascade.json"
 )
 
 
@@ -137,8 +137,9 @@ def test_stakeholder_grid_interruption_trace_shape_and_story() -> None:
     assert min(row["grid_voltage_pu"] for row in payload["truth_rows"]) < 0.2
 
 
-def test_stakeholder_power_water_trace_shape_and_story() -> None:
-    payload = json.loads(POWER_WATER_TRACE_PATH.read_text(encoding="utf-8"))
-    _assert_fault_replay_story(payload, "POWER_WATER_DISTURBANCE", 0.9)
+def test_stakeholder_power_to_water_trace_shape_and_story() -> None:
+    payload = json.loads(POWER_TO_WATER_TRACE_PATH.read_text(encoding="utf-8"))
+    _assert_fault_replay_story(payload, "POWER_TO_WATER_CASCADE", 0.9)
+    assert payload["summary"]["power_disturbance_time_s"] < payload["summary"]["water_disturbance_time_s"]
     assert min(row["grid_voltage_pu"] for row in payload["truth_rows"]) < 0.5
     assert min(row["upw_supply_pressure_pa"] for row in payload["truth_rows"]) < 160000

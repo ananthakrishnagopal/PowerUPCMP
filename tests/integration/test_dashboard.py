@@ -35,7 +35,7 @@ def test_api_traces(dashboard_server):
             "stakeholder-demo-normal-baseline.json",
             "stakeholder-demo-stable-polish-fault.json",
             "stakeholder-demo-grid-interruption.json",
-            "stakeholder-demo-power-water-disturbance.json",
+            "stakeholder-demo-power-to-water-cascade.json",
         ]
 
 def test_baseline_replay_stream_header(dashboard_server):
@@ -74,7 +74,7 @@ def test_stakeholder_replay_stream_header(dashboard_server):
     ("trace_name", "family", "peak_probability"),
     [
         ("stakeholder-demo-grid-interruption.json", "GRID_INTERRUPTION", 0.93),
-        ("stakeholder-demo-power-water-disturbance.json", "POWER_WATER_DISTURBANCE", 0.96),
+        ("stakeholder-demo-power-to-water-cascade.json", "POWER_TO_WATER_CASCADE", 0.96),
     ],
 )
 def test_additional_fault_replay_stream_headers(

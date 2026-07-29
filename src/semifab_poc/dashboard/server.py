@@ -367,7 +367,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     else None
                 )
                 chunk = {"truth": t_row}
-                if prediction is not None and ts >= ev_start:
+                if prediction is not None:
                     chunk["prediction"] = {
                         "timestamp_s": ts,
                         "predicted_mrr": t_row.get("cmp_mrr_m_s", 0.0),

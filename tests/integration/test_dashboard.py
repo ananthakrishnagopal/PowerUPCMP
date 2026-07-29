@@ -61,6 +61,8 @@ def test_live_simulation_streams_model_predictions(dashboard_server):
     with urllib.request.urlopen(req, timeout=30) as response:
         assert response.status == 200
         saw_prediction = False
+        saw_pre_event_prediction = False
+        saw_post_event_prediction = False
         saw_hold = False
         for _ in range(200):
             line = response.readline().decode("utf-8").strip()
@@ -72,19 +74,24 @@ def test_live_simulation_streams_model_predictions(dashboard_server):
                 saw_hold = True
             prediction = payload.get("prediction")
             if prediction is None:
-                if saw_prediction and saw_hold:
+                if saw_pre_event_prediction and saw_post_event_prediction and saw_hold:
                     break
                 continue
-            assert prediction["timestamp_s"] >= 8.0
             assert "warning_probability" in prediction
             assert "conformal_prediction_set" in prediction
             assert "uncertainty_valid" in prediction
             assert isinstance(prediction["warning_probability"], float)
             saw_prediction = True
-            if saw_hold:
+            if prediction["timestamp_s"] < 8.0:
+                saw_pre_event_prediction = True
+            else:
+                saw_post_event_prediction = True
+            if saw_pre_event_prediction and saw_post_event_prediction and saw_hold:
                 break
 
-        assert saw_prediction, "live simulation did not stream a post-event model prediction"
+        assert saw_prediction, "live simulation did not stream model predictions"
+        assert saw_pre_event_prediction, "live simulation did not stream a pre-event warning baseline"
+        assert saw_post_event_prediction, "live simulation did not stream a post-event model prediction"
         assert saw_hold, "live simulation did not enter HOLD under utility protection"
 
 def test_no_unique_model_or_control_logic_in_dashboard():

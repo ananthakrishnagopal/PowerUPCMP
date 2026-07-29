@@ -3,8 +3,9 @@
 
 from __future__ import annotations
 
-import json
 import argparse
+import json
+import sys
 from dataclasses import replace
 from pathlib import Path
 
@@ -57,6 +58,10 @@ LIMITS = {
     "upw.tool_flow": (0.0, 5.0e-4),
     "upw.temperature": (273.15, 373.15),
 }
+
+
+def progress(message: str) -> None:
+    print(message, file=sys.stderr, flush=True)
 
 
 def sensor_configs(config) -> tuple[SensorConfig, ...]:
@@ -172,7 +177,15 @@ def build_dataset(
     min_decision_time_s = config.simulation.polish_start_s - 1.0
 
     for split, (seed_start, count) in split_specs.items():
-        for scenario in scenarios(split, seed_start, count):
+        split_scenarios = scenarios(split, seed_start, count)
+        progress(f"[dataset] {split}: {len(split_scenarios)} scenarios")
+        for scenario_index, scenario in enumerate(split_scenarios, start=1):
+            progress(
+                "[trace] "
+                f"{split} {scenario_index}/{len(split_scenarios)} "
+                f"{scenario.family.value} start={scenario.event_start_s:.2f}s "
+                f"duration={scenario.event_duration_s:.2f}s"
+            )
             trace = chain.run(scenario)
             rows = trace.truth_rows
             row_by_step = {int(row["step_index"]): row for row in rows}
@@ -238,6 +251,7 @@ def build_dataset(
                 decision_steps.append(int(truth_row["step_index"]))
                 decision_times.append(decision_time)
                 first_onsets.append(first_onset)
+        progress(f"[dataset] {split}: accumulated rows={len(labels)}")
 
     if feature_names is None:
         raise RuntimeError("no feature rows generated")
@@ -262,7 +276,9 @@ def main() -> None:
     parser.add_argument("--decision-period-s", type=float, default=0.20)
     args = parser.parse_args()
 
+    progress("[config] loading dashboard warning configuration")
     config = load_early_warning_config(CONFIG_PATH)
+    progress("[dataset] generating synthetic traces and feature rows")
     dataset = build_dataset(
         config,
         train_count=args.train_count,
@@ -271,13 +287,21 @@ def main() -> None:
         test_count=args.test_count,
         decision_period_s=args.decision_period_s,
     )
+    progress(
+        "[dataset] complete "
+        f"rows={len(dataset.labels)} "
+        f"positive_fraction={float(np.mean(dataset.labels)):.3f}"
+    )
+    progress("[fit] fitting gradient-boosted dashboard warning classifier")
     predictor = EarlyWarningPredictor(
         ModelKind.GRADIENT_BOOSTED,
         config.features,
         config.models,
     ).fit(dataset)
+    progress(f"[artifact] writing {ARTIFACT_PATH.relative_to(ROOT)}")
     predictor.save(ARTIFACT_PATH)
 
+    progress("[eval] evaluating TEST split")
     test = dataset.subset("TEST")
     probabilities, sets, latency = predictor.predict_features(test.features)
     metrics = evaluate_predictions(
@@ -297,6 +321,7 @@ def main() -> None:
     }
     METRICS_PATH.parent.mkdir(parents=True, exist_ok=True)
     METRICS_PATH.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    progress(f"[metrics] wrote {METRICS_PATH.relative_to(ROOT)}")
     print(json.dumps(summary, indent=2, sort_keys=True))
 
 

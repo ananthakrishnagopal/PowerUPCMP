@@ -305,12 +305,14 @@ def main() -> None:
     test = dataset.subset("TEST")
     probabilities, sets, latency = predictor.predict_features(test.features)
     metrics = evaluate_predictions(
-        test.labels,
+        test,
         probabilities,
         sets,
-        test.decision_timestamps_s,
-        test.first_excursion_timestamps_s,
-        bins=config.evaluation.calibration_bins,
+        probability_threshold=config.models.probability_threshold,
+        horizon_s=2.0,
+        decision_period_s=args.decision_period_s,
+        calibration_bins=config.evaluation.calibration_bins,
+        latency_s=latency,
     )
     summary = {
         "artifact": str(ARTIFACT_PATH.relative_to(ROOT)),

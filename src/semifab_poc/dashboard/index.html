@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PowerUPCMP — Predictive Supervisory Control Demo</title>
-  <meta name="description" content="Local synthetic simulation demonstrating predictive supervisory hold for semiconductor CMP utility disturbances">
+  <title>PowerUPCMP — Predictive Supervisory Control</title>
+  <meta name="description" content="PowerUPCMP dashboard for predictive supervisory hold under CMP utility disturbances">
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="plotly.min.js"></script>
@@ -17,19 +17,20 @@
     <div>
       <div class="eyebrow">SEMIFAB / PREDICTIVE SUPERVISORY CONTROL</div>
       <h1>PowerUP<span class="accent">CMP</span></h1>
-      <p class="subtitle">Synthetic CMP utility-risk and supervisory hold demonstration</p>
+      <p class="subtitle">CMP utility-risk supervision with predictive safe hold</p>
     </div>
     <div class="header-meta">
       <span class="status-dot"></span>
-      <span id="connection-status">Ready for demo</span>
-      <span class="version-tag">SIMULATION ONLY</span>
+      <span id="connection-status">Ready</span>
+      <span class="version-tag">SYNTHETIC TRACE</span>
+      <button id="theme-toggle" class="theme-toggle" type="button">Light mode</button>
+      <a class="view-link" href="story.html">Story view</a>
     </div>
   </header>
 
   <!-- ═══════════════════ DISCLAIMER ═══════════════════ -->
   <section class="disclaimer-bar">
-    <strong>SYNTHETIC VALUES:</strong> this dashboard replays and streams local simulator traces — not live fab telemetry.
-    <span><strong>LIVE MODEL:</strong> dashboard warning classifier trained on synthetic utility-risk scenarios.</span>
+    <strong>Evidence basis:</strong> local simulator traces and a dashboard warning classifier trained on synthetic utility-risk scenarios.
   </section>
 
   <!-- ═══════════════════ KPI STRIP ═══════════════════ -->
@@ -67,21 +68,30 @@
       </div>
       <p class="helper">Pick a fault scenario and compare predictive supervision vs. unprotected operation.</p>
 
-      <label for="scenario-preset">Demo scenario</label>
+      <label for="scenario-preset">Scenario family</label>
       <select id="scenario-preset" class="full-width">
-        <option value="PUMP_TRIP">Predictive hold demo: pump trip</option>
-        <option value="NORMAL">Normal operation (baseline)</option>
-        <option value="GRID_INTERRUPTION">Backup: grid interruption</option>
-        <option value="VALVE_RESTRICTION">Backup: UPW valve restriction</option>
+        <option value="PUMP_TRIP">UPW pump trip</option>
+        <option value="NORMAL">Normal operation</option>
+        <option value="GRID_INTERRUPTION">Grid interruption</option>
+        <option value="VALVE_RESTRICTION">UPW valve restriction</option>
       </select>
       <div class="scenario-callout" id="scenario-description">UPW pump trip — hydraulic support degrades during polishing, creating visible MRR and protection response.</div>
 
       <label for="sim-controller">Protection mode</label>
       <select id="sim-controller" class="full-width">
-        <option value="PREDICTIVE">Predictive classifier demo</option>
+        <option value="PREDICTIVE">Predictive classifier</option>
         <option value="UTILITY_THRESHOLD">Utility threshold fallback</option>
-        <option value="NO_ACTION">Legacy System (Unprotected)</option>
+        <option value="NO_ACTION">Unprotected baseline</option>
       </select>
+
+      <div class="scenario-setup" aria-label="Scenario setup">
+        <div class="setup-row"><span id="setup-event-start-label">Event start</span><strong id="setup-event-start">8.0 s</strong></div>
+        <div class="setup-row"><span id="setup-event-duration-label">Event length</span><strong id="setup-event-duration">3.0 s</strong></div>
+        <div class="setup-row"><span id="setup-duration-label">Run length</span><strong id="setup-duration">16 s</strong></div>
+        <div class="setup-row"><span id="setup-grid-voltage-label">Grid voltage</span><strong id="setup-grid-voltage">1.00 pu</strong></div>
+        <div class="setup-row"><span id="setup-valve-pos-label">UPW valve</span><strong id="setup-valve-pos">1.00</strong></div>
+        <div class="setup-row"><span id="setup-seed-label">Seed</span><strong id="setup-seed">123</strong></div>
+      </div>
 
       <div class="advanced-toggle">
         <span>Physics parameters</span>
@@ -123,7 +133,7 @@
         </div>
       </div>
 
-      <button id="live-sim-btn" class="primary-button full-width" type="button">▶ Run Scenario</button>
+      <button id="live-sim-btn" class="primary-button full-width" type="button">Run scenario</button>
       <button id="stop-sim-btn" class="secondary-button full-width" type="button" hidden>■ Stop Simulation</button>
 
       <div class="divider"></div>
@@ -134,7 +144,7 @@
       </div>
       <label for="trace-selector">Validated local trace</label>
       <select id="trace-selector" class="full-width"><option value="">Loading artifacts...</option></select>
-      <button id="stream-btn" class="secondary-button full-width" type="button">Replay validated demo</button>
+      <button id="stream-btn" class="secondary-button full-width" type="button">Replay validated artifact</button>
     </aside>
 
     <!-- ─── MAIN CONTENT ─── -->
@@ -194,10 +204,10 @@
       <!-- Evidence -->
       <section class="detail-grid">
         <article class="panel">
-          <div class="chart-title"><div><h3>Evidence & limits</h3><p>What this PoC demonstrates.</p></div></div>
+          <div class="chart-title"><div><h3>Evidence summary</h3><p>What this PoC shows.</p></div></div>
           <div class="evidence-list">
-            <div><span class="evidence-icon good">✓</span><p><strong>Demonstrates</strong><br>Synthetic utility disturbance, early-warning risk signal, bounded supervisory hold proposal, safety-filter approval, and controlled recovery.</p></div>
-            <div><span class="evidence-icon neutral">i</span><p><strong>Does not demonstrate</strong><br>Real-fab telemetry, yield protection proof, or production-safe control authority.</p></div>
+            <div><span class="evidence-icon good">✓</span><p><strong>Shows</strong><br>Synthetic utility disturbance, early-warning risk signal, bounded supervisory hold proposal, safety-filter approval, and controlled recovery.</p></div>
+            <div><span class="evidence-icon neutral">i</span><p><strong>Boundary</strong><br>Not real-fab telemetry, not measured yield protection, and not production-safe control authority.</p></div>
             <div><span class="evidence-icon neutral">i</span><p><strong>Model path</strong><br>Arrived utility observations -> warning probability -> conformal decision set -> supervisor proposal -> independent safety filter.</p></div>
           </div>
         </article>
@@ -206,7 +216,7 @@
     </section>
   </div>
 
-  <footer>Semifab CMP PoC · Customer technical demonstration · Local simulation dashboard</footer>
+  <footer>Semifab CMP PoC · Predictive supervisor · Local simulator evidence</footer>
 </main>
 <script src="app.js"></script>
 </body>

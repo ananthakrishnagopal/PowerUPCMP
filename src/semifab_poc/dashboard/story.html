@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PowerUPCMP - Predictive Supervisor</title>
+  <meta name="description" content="PowerUPCMP dashboard showing facility disturbance, predicted risk, safe hold, and avoided exposure">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="story.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="plotly.min.js"></script>
+</head>
+<body class="story-dashboard">
+<main class="story-shell">
+
+  <header class="story-header">
+    <div>
+      <div class="eyebrow">SEMIFAB / PREDICTIVE SUPERVISORY CONTROL</div>
+      <h1>PowerUP<span class="accent">CMP</span></h1>
+      <p class="subtitle">Facility disturbance -> predicted risk -> safe hold -> avoided exposure</p>
+    </div>
+    <div class="header-meta">
+      <span class="status-dot"></span>
+      <span id="connection-status">Ready</span>
+      <button id="theme-toggle" class="theme-toggle" type="button">Light mode</button>
+      <a class="view-link" href="index.html">Classic view</a>
+    </div>
+  </header>
+
+  <section class="story-board">
+    <aside class="story-scenario panel">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">SCENARIO</div>
+          <h2>Scenario</h2>
+        </div>
+        <span class="step-badge">00</span>
+      </div>
+
+      <label for="trace-selector">Selected scenario</label>
+      <select id="trace-selector" class="full-width"><option value="">Loading artifacts...</option></select>
+      <button id="stream-btn" class="primary-button full-width" type="button">Run</button>
+      <div class="scenario-callout" id="scenario-description">Power-side disturbance propagates into UPW pressure and flow loss after CMP polishing has stabilized.</div>
+
+      <div class="scenario-setup" aria-label="Scenario setup">
+        <div class="setup-row"><span id="setup-event-start-label">Fault starts</span><strong id="setup-event-start">8.0 s</strong></div>
+        <div class="setup-row"><span id="setup-event-duration-label">Fault window</span><strong id="setup-event-duration">4.0 s</strong></div>
+        <div class="setup-row"><span id="setup-duration-label">Trace length</span><strong id="setup-duration">16 s</strong></div>
+        <div class="setup-row"><span id="setup-grid-voltage-label">Lowest grid voltage</span><strong id="setup-grid-voltage">0.34 pu</strong></div>
+        <div class="setup-row"><span id="setup-valve-pos-label">Lowest UPW pressure</span><strong id="setup-valve-pos">45%</strong></div>
+        <div class="setup-row"><span id="setup-seed-label">Artifact seed</span><strong id="setup-seed">230729</strong></div>
+      </div>
+      <p class="setup-explainer" id="setup-explainer">Values summarize the selected replay: timing in seconds, grid voltage in per-unit, and UPW pressure as percent of nominal.</p>
+
+      <div class="divider"></div>
+
+      <div class="advanced-toggle">
+        <span>Live sandbox</span>
+        <button id="advanced-toggle" class="icon-button" type="button" aria-expanded="false" title="Show live sandbox">+</button>
+      </div>
+      <div id="advanced-parameters" class="live-sandbox" hidden>
+        <p class="helper">Use this only for parameter exploration; the selected replay above is the recording path.</p>
+        <label for="scenario-preset">Scenario family</label>
+        <select id="scenario-preset" class="full-width">
+          <option value="PUMP_TRIP">UPW pump trip</option>
+          <option value="NORMAL">Normal operation</option>
+          <option value="GRID_INTERRUPTION">Grid interruption</option>
+          <option value="VALVE_RESTRICTION">UPW valve restriction</option>
+        </select>
+        <div class="scenario-callout live-callout" id="live-scenario-description">UPW pump trip - hydraulic support degrades during polishing, creating visible MRR and protection response.</div>
+
+        <label for="sim-controller">Protection mode</label>
+        <select id="sim-controller" class="full-width">
+          <option value="PREDICTIVE">Predictive classifier</option>
+          <option value="UTILITY_THRESHOLD">Utility threshold fallback</option>
+          <option value="NO_ACTION">Unprotected baseline</option>
+        </select>
+        <button id="live-sim-btn" class="secondary-button full-width" type="button">Run live sandbox</button>
+        <button id="stop-sim-btn" class="secondary-button full-width" type="button" hidden>Stop run</button>
+        <div class="split-inputs">
+          <div>
+            <label for="sim-grid-voltage">Grid voltage (per-unit)</label>
+            <input id="sim-grid-voltage" type="number" value="1.0" step="0.05" min="0.5" max="1.1">
+          </div>
+          <div>
+            <label for="sim-valve-pos">UPW valve opening (0-1)</label>
+            <input id="sim-valve-pos" type="number" value="1.0" step="0.1" min="0" max="1">
+          </div>
+        </div>
+        <label for="sim-sensor-bias">Pressure sensor bias (Pa)</label>
+        <input id="sim-sensor-bias" class="full-width" type="number" value="0" step="1000">
+        <div class="split-inputs">
+          <div>
+            <label for="sim-event-start">Event start (s)</label>
+            <input id="sim-event-start" type="number" value="8.0" step="0.5" min="0">
+          </div>
+          <div>
+            <label for="sim-event-duration">Event length (s)</label>
+            <input id="sim-event-duration" type="number" value="3.0" step="0.5" min="0.1">
+          </div>
+        </div>
+        <div class="split-inputs">
+          <div>
+            <label for="sim-seed">Seed</label>
+            <input id="sim-seed" type="number" value="123">
+          </div>
+          <div>
+            <label for="sim-duration">Run length (s)</label>
+            <input id="sim-duration" type="number" value="16" min="8" max="60">
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="story-timeline panel">
+      <div class="chart-title">
+        <div>
+          <div class="eyebrow">EVENT SEQUENCE</div>
+          <h3>Event timeline</h3>
+          <p id="timeline-caption">No events recorded</p>
+        </div>
+      </div>
+      <ol id="event-timeline" class="timeline"><li class="empty-state">Replay a scenario to see detection and response milestones.</li></ol>
+    </section>
+
+    <section class="story-decision panel decision-banner">
+      <div>
+        <div class="eyebrow">DECISION OUTCOME</div>
+        <h2 id="decision-title">No scenario running</h2>
+        <p id="decision-copy">The decision summary will update as the simulated process evolves.</p>
+      </div>
+      <div class="decision-chip" id="decision-chip">READY</div>
+    </section>
+
+    <section class="story-step story-facility panel chart-panel">
+      <div class="step-number">1</div>
+      <div class="chart-title">
+        <div>
+          <h3>Facility layer</h3>
+          <p id="facility-caption">Grid support falls first; UPW pressure and flow show the coupled response.</p>
+        </div>
+      </div>
+      <div id="chart-signals" class="chart story-chart"></div>
+    </section>
+
+    <section class="story-step story-risk panel chart-panel">
+      <div class="step-number">2</div>
+      <div class="chart-title">
+        <div>
+          <h3>Prediction layer</h3>
+          <p>Warning probability and the supervisor hold gate.</p>
+        </div>
+      </div>
+      <div id="chart-predictions" class="chart story-chart"></div>
+    </section>
+
+    <section class="story-step story-action panel chart-panel">
+      <div class="step-number">3</div>
+      <div class="chart-title">
+        <div>
+          <h3>Supervisor action</h3>
+          <p>Operating state after the safety filter approves intervention.</p>
+        </div>
+      </div>
+      <div id="chart-actions" class="chart story-chart"></div>
+    </section>
+
+    <section class="story-step story-mrr panel chart-panel">
+      <div class="step-number">4</div>
+      <div class="chart-title">
+        <div>
+          <h3>Process outcome</h3>
+          <p>MRR is protected by pausing polishing during the hold interval.</p>
+        </div>
+      </div>
+      <div id="chart-outcome" class="chart story-chart"></div>
+    </section>
+
+    <section class="story-outcome panel">
+      <div class="outcome-grid">
+        <article class="kpi-card">
+          <span class="kpi-label">System status</span>
+          <strong id="kpi-status">Ready</strong>
+          <span id="kpi-status-detail">Choose a scenario</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Warning probability</span>
+          <strong id="kpi-confidence">--</strong>
+          <span id="kpi-warning-time">No run loaded</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Supervisor response</span>
+          <strong id="kpi-action">--</strong>
+          <span id="kpi-action-detail">No decision recorded</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-label">Business outcome</span>
+          <strong id="kpi-outcome">--</strong>
+          <span id="kpi-outcome-detail">Run a scenario to see impact</span>
+        </article>
+      </div>
+      <div class="evidence-list story-evidence">
+        <div><span id="outcome-explainer-icon" class="evidence-icon neutral">i</span><p><strong id="outcome-explainer-title">Outcome explanation</strong><br><span id="outcome-explainer-copy">Run a scenario to see how the final state is interpreted.</span></p></div>
+      </div>
+    </section>
+  </section>
+
+  <footer>PowerUPCMP · Predictive supervisory control</footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

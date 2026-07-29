@@ -1,9 +1,11 @@
 /* ═══════════════════ app.js — PowerUPCMP Dashboard ═══════════════════ */
 
 const STAKEHOLDER_TRACE = 'stakeholder-demo-stable-polish-fault.json';
+const STORY_TRACE = 'stakeholder-demo-power-to-water-cascade.json';
 const MRR_TO_NM_PER_S = 1.0e9;
 const state = { stream: null, data: { truth_rows: [], predictions: [], actions: [], safety_decisions: [] }, held: false };
 const $ = (id) => document.getElementById(id);
+const isStoryView = () => document.body.classList.contains('story-dashboard');
 
 const descriptions = {
   PUMP_TRIP:              'UPW pump trip — hydraulic support degrades during polishing, creating visible MRR and protection response.',
@@ -22,20 +24,58 @@ const presetDefaults = {
   NORMAL:                 { grid: '1.0',  valve: '1.0',  bias: '0' }
 };
 
+const traceLabels = {
+  'stakeholder-demo-normal-baseline.json': 'Normal baseline',
+  'stakeholder-demo-stable-polish-fault.json': 'UPW pump trip after stable polish',
+  'stakeholder-demo-grid-interruption.json': 'Grid interruption backup',
+  'stakeholder-demo-power-to-water-cascade.json': 'Power-to-water cascade',
+};
+
+const traceDescriptions = {
+  'stakeholder-demo-normal-baseline.json': 'No utility disturbance is injected; power and UPW support stay healthy while CMP reaches stable polishing.',
+  'stakeholder-demo-stable-polish-fault.json': 'Water-side support degrades after MRR has stabilized; the supervisor should hold before extended exposed polishing.',
+  'stakeholder-demo-grid-interruption.json': 'Power-side support is interrupted after stable polishing; VFD/motor support falls and the supervisor should hold.',
+  'stakeholder-demo-power-to-water-cascade.json': 'Grid support drops first; UPW pressure and pump flow degrade downstream; CMP holds while the coupled utility system recovers.',
+};
+
+const facilityCaptions = {
+  NORMAL: 'Grid, UPW pressure, and pump flow stay inside the nominal utility envelope.',
+  PUMP_TRIP: 'UPW pressure and pump flow degrade while grid support remains healthy.',
+  GRID_INTERRUPTION: 'Grid support drops first; motor, pump flow, and UPW pressure show the downstream impact.',
+  POWER_TO_WATER_CASCADE: 'Grid support drops first; UPW pressure and pump flow show the coupled water-side response.',
+  VALVE_RESTRICTION: 'UPW hydraulic support falls while power-side support remains nominal.',
+};
+
 /* ─── Boot ─── */
 document.addEventListener('DOMContentLoaded', () => {
+  initializeTheme();
   $('sim-controller').value = 'PREDICTIVE';
   $('sim-event-start').value = '8.0';
   $('sim-event-duration').value = '3.0';
   $('sim-duration').value = '16';
+  renderScenarioSetup();
 
   $('scenario-preset').addEventListener('change', (e) => {
-    $('scenario-description').textContent = descriptions[e.target.value] || '';
+    const target = isStoryView() ? $('live-scenario-description') : $('scenario-description');
+    if (target) target.textContent = descriptions[e.target.value] || '';
+    updateFacilityCaption(e.target.value);
     const d = presetDefaults[e.target.value] || presetDefaults.NORMAL;
     $('sim-grid-voltage').value = d.grid;
     $('sim-valve-pos').value    = d.valve;
     $('sim-sensor-bias').value  = d.bias;
+    renderScenarioSetup();
   });
+
+  [
+    'sim-controller',
+    'sim-grid-voltage',
+    'sim-valve-pos',
+    'sim-sensor-bias',
+    'sim-event-start',
+    'sim-event-duration',
+    'sim-seed',
+    'sim-duration',
+  ].forEach(id => $(id)?.addEventListener('input', renderScenarioSetup));
 
   $('advanced-toggle').addEventListener('click', () => {
     const box = $('advanced-parameters');
@@ -46,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   $('stream-btn').addEventListener('click', () => {
-    if (!$('trace-selector').value) return setConnection('Select an artifact first', true);
+    if (!$('trace-selector').value) return setConnection(isStoryView() ? 'Select a scenario first' : 'Select an artifact first', true);
     startStream(
       `/api/stream/${encodeURIComponent($('trace-selector').value)}`,
       'REPLAY',
@@ -54,24 +94,31 @@ document.addEventListener('DOMContentLoaded', () => {
       'REPLAY'
     );
   });
+  $('trace-selector').addEventListener('change', () => {
+    updateReplaySelectionCopy($('trace-selector').value);
+  });
 
   $('live-sim-btn').addEventListener('click', runScenario);
   $('stop-sim-btn').addEventListener('click', stopStream);
+  $('theme-toggle')?.addEventListener('click', toggleTheme);
 
   fetch('/api/traces')
     .then(r => r.json())
     .then(payload => {
-      $('trace-selector').innerHTML = '<option value="">Select a validated artifact</option>';
+      $('trace-selector').innerHTML = isStoryView()
+        ? '<option value="">Select a scenario</option>'
+        : '<option value="">Select a validated artifact</option>';
       payload.traces.forEach(name => {
         const opt = document.createElement('option');
         opt.value = name;
-        opt.textContent = name.replace('.json', '').replaceAll('-', ' ');
+        opt.textContent = traceLabels[name] || name.replace('.json', '').replaceAll('-', ' ');
         $('trace-selector').appendChild(opt);
       });
-      if (payload.traces.includes(STAKEHOLDER_TRACE)) {
-        $('trace-selector').value = STAKEHOLDER_TRACE;
-        $('stream-btn').textContent = 'Replay validated demo';
-        setConnection('Validated demo artifact ready');
+      const defaultTrace = isStoryView() ? STORY_TRACE : STAKEHOLDER_TRACE;
+      if (payload.traces.includes(defaultTrace)) {
+        $('trace-selector').value = defaultTrace;
+        updateReplaySelectionCopy(defaultTrace);
+        setConnection(isStoryView() ? 'Scenario ready' : 'Validated artifact ready');
       }
     })
     .catch(() => {
@@ -81,12 +128,42 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDashboard(state.data);
 });
 
-$('trace-selector')?.addEventListener('change', () => {
-  $('stream-btn').textContent =
-    $('trace-selector').value === STAKEHOLDER_TRACE
-      ? 'Replay validated demo'
-      : 'Replay artifact';
-});
+function updateReplaySelectionCopy(selected) {
+  if (!selected) return;
+  $('stream-btn').textContent = isStoryView()
+    ? 'Run'
+    : selected === STAKEHOLDER_TRACE
+    ? 'Replay validated demo'
+    : 'Replay artifact';
+  if (isStoryView()) {
+    $('scenario-description').textContent = traceDescriptions[selected] || traceLabels[selected] || selected;
+  }
+  previewReplayArtifact(selected);
+}
+
+function previewReplayArtifact(selected) {
+  fetch(`/api/traces/${encodeURIComponent(selected)}`)
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data || $('trace-selector').value !== selected) return;
+      const preview = {
+        controller: 'REPLAY',
+        metadata: data.metadata,
+        scenario: data.scenario,
+        truth_rows: data.truth_rows || [],
+        predictions: data.predictions || [],
+        actions: data.actions || [],
+        safety_decisions: data.safety_decisions || [],
+      };
+      if (isStoryView() && data.scenario) {
+        $('scenario-description').textContent =
+          data.scenario.disturbance || traceDescriptions[selected] || data.scenario.name || selected;
+        updateFacilityCaption(data.scenario.family);
+      }
+      renderScenarioSetup(preview);
+    })
+    .catch(() => {});
+}
 
 /* ─── Run a live scenario ─── */
 function runScenario() {
@@ -129,6 +206,10 @@ function startStream(url, runId, family, controller = '') {
     if (chunk.scenario) {
       state.data.scenario = chunk.scenario;
       if (chunk.scenario.family) state.data.family = chunk.scenario.family;
+      if (state.data.controller === 'REPLAY') {
+        $('scenario-description').textContent = chunk.scenario.disturbance || traceDescriptions[$('trace-selector').value] || chunk.scenario.name || '';
+        updateFacilityCaption(chunk.scenario.family);
+      }
     }
     if (chunk.summary) state.data.summary = chunk.summary;
     if (chunk.actions) {
@@ -172,6 +253,86 @@ function stopStream(close = true) {
 function setConnection(message, error = false) {
   $('connection-status').textContent = message;
   $('connection-status').classList.toggle('error-text', error);
+}
+
+function cssVar(name) {
+  return getComputedStyle(document.body).getPropertyValue(name).trim();
+}
+
+function initializeTheme() {
+  const saved = localStorage.getItem('powerupcmp-theme') || 'dark';
+  document.body.dataset.theme = saved;
+  updateThemeToggle();
+}
+
+function toggleTheme() {
+  document.body.dataset.theme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+  localStorage.setItem('powerupcmp-theme', document.body.dataset.theme);
+  updateThemeToggle();
+  renderDashboard(state.data);
+}
+
+function updateThemeToggle() {
+  const button = $('theme-toggle');
+  if (button) button.textContent = document.body.dataset.theme === 'light' ? 'Dark mode' : 'Light mode';
+}
+
+function setOptionalText(id, value) {
+  const el = $(id);
+  if (el) el.textContent = value;
+}
+
+function updateFacilityCaption(family) {
+  setOptionalText(
+    'facility-caption',
+    facilityCaptions[family] || 'Power and water utility signals show the disturbance entering the CMP tool.'
+  );
+}
+
+function renderScenarioSetup(data = null) {
+  if (data?.controller === 'REPLAY' || (isStoryView() && data && !data.controller)) {
+    const scenario = data.scenario || {};
+    const metadata = data.metadata || {};
+    const rows = data.truth_rows || [];
+    const start = Number(scenario.event_start_s);
+    const end = Number(scenario.event_end_s);
+    const duration = Number(metadata.duration_s ?? rows.at(-1)?.timestamp_s);
+    const minGrid = rows.length
+      ? Math.min(...rows.map(row => Number(row.grid_voltage_pu ?? 1)))
+      : null;
+    const minUpwHealth = rows.length
+      ? Math.min(...rows.map(row => Number((row.upw_supply_pressure_pa ?? 300000) / 300000)))
+      : null;
+
+    setOptionalText('setup-event-start-label', 'Fault starts');
+    setOptionalText('setup-event-duration-label', 'Fault window');
+    setOptionalText('setup-duration-label', 'Trace length');
+    setOptionalText('setup-grid-voltage-label', 'Lowest grid voltage');
+    setOptionalText('setup-valve-pos-label', 'Lowest UPW pressure');
+    setOptionalText('setup-seed-label', 'Artifact seed');
+    setOptionalText('setup-event-start', Number.isFinite(start) ? `${start.toFixed(1)} s` : '--');
+    setOptionalText('setup-event-duration', Number.isFinite(start) && Number.isFinite(end) ? `${(end - start).toFixed(1)} s` : '--');
+    setOptionalText('setup-duration', Number.isFinite(duration) ? `${duration.toFixed(0)} s` : '--');
+    setOptionalText('setup-grid-voltage', minGrid === null ? '--' : `${minGrid.toFixed(2)} pu`);
+    setOptionalText('setup-valve-pos', minUpwHealth === null ? '--' : `${(Math.max(0, Math.min(1, minUpwHealth)) * 100).toFixed(0)}%`);
+    setOptionalText('setup-seed', metadata.seed ?? '--');
+    setOptionalText('setup-explainer', 'Values summarize the selected replay: timing in seconds, grid voltage in per-unit, and UPW pressure as percent of nominal.');
+    return;
+  }
+
+  setOptionalText('setup-event-start-label', 'Event start');
+  setOptionalText('setup-event-duration-label', 'Event length');
+  setOptionalText('setup-duration-label', 'Run length');
+  setOptionalText('setup-grid-voltage-label', 'Grid voltage');
+  setOptionalText('setup-valve-pos-label', 'UPW valve opening');
+  setOptionalText('setup-seed-label', 'Seed');
+  setOptionalText('setup-event-start', `${Number($('sim-event-start')?.value || 0).toFixed(1)} s`);
+  setOptionalText('setup-event-duration', `${Number($('sim-event-duration')?.value || 0).toFixed(1)} s`);
+  setOptionalText('setup-duration', `${Number($('sim-duration')?.value || 0).toFixed(0)} s`);
+  setOptionalText('setup-grid-voltage', `${Number($('sim-grid-voltage')?.value || 0).toFixed(2)} pu`);
+  setOptionalText('setup-valve-pos', `${(Number($('sim-valve-pos')?.value || 0) * 100).toFixed(0)}%`);
+  setOptionalText('setup-seed', $('sim-seed')?.value || '--');
+  setOptionalText('setup-explainer', 'Live sandbox values are editable: grid voltage is per-unit, UPW valve is percent open, and timing is in seconds.');
 }
 
 /* ═══════════════════ DASHBOARD RENDER ═══════════════════ */
@@ -221,6 +382,7 @@ function renderDashboard(data) {
     $('kpi-outcome').textContent = 'Risk exposure';
     $('kpi-outcome-detail').textContent = 'No hold — polishing continued during the synthetic fault';
   }
+  updateOutcomeExplainer({ truth, family, controller, summary, hold, isNormal, isFault });
 
   // Decision banner
   if (hold) {
@@ -229,8 +391,8 @@ function renderDashboard(data) {
       ? 'Predictive supervisor triggered a safe hold'
       : 'Live protection triggered a safe hold';
     $('decision-copy').textContent = isPredictive
-      ? `The warning crossed the configured hold threshold and the safety filter approved a bounded hold at ${Number(summary.hold_time_s ?? hold.timestamp_s).toFixed(1)} s. This is a synthetic demonstration, not a real-fab yield claim.`
-      : `The utility threshold controller detected degraded facility support and the safety filter approved a bounded hold at ${Number(summary.hold_time_s ?? hold.timestamp_s).toFixed(1)} s. This is a synthetic live-control demonstration.`;
+      ? `The warning crossed the configured hold threshold and the safety filter approved a bounded hold at ${Number(summary.hold_time_s ?? hold.timestamp_s).toFixed(1)} s.`
+      : `The utility threshold controller detected degraded facility support and the safety filter approved a bounded hold at ${Number(summary.hold_time_s ?? hold.timestamp_s).toFixed(1)} s.`;
     $('decision-chip').textContent = 'SAFE HOLD';
     $('decision-chip').className = 'decision-chip chip-blue';
   } else if (isFault && !hold && controller === 'PREDICTIVE') {
@@ -258,11 +420,48 @@ function renderDashboard(data) {
   renderSignals(data);
   renderPredictions(data);
   renderModes(data);
+  renderOutcome(data);
   renderTimeline(data);
+  renderScenarioSetup(data);
 }
 
 /* Compatibility alias */
 function updateDashboard(data) { renderDashboard(data); }
+
+function updateOutcomeExplainer({ truth, controller, summary, hold, isNormal, isFault }) {
+  const icon = $('outcome-explainer-icon');
+  const title = $('outcome-explainer-title');
+  const copy = $('outcome-explainer-copy');
+  if (!icon || !title || !copy) return;
+
+  icon.className = 'evidence-icon';
+  if (!truth.length) {
+    icon.textContent = 'i';
+    icon.classList.add('neutral');
+    title.textContent = 'Outcome explanation';
+    copy.textContent = 'Run a scenario to see how the final state is interpreted.';
+  } else if (isNormal) {
+    icon.textContent = '✓';
+    icon.classList.add('good');
+    title.textContent = 'Clean baseline';
+    copy.textContent = 'No facility disturbance is injected, so the expected outcome is stable polishing with no supervisory hold.';
+  } else if (hold) {
+    icon.textContent = '✓';
+    icon.classList.add('good');
+    title.textContent = 'Controlled hold';
+    copy.textContent = `Polishing pauses at ${Number(summary.hold_time_s ?? hold.timestamp_s).toFixed(1)} s while utility support is degraded. MRR goes to zero because the process is intentionally stopped, then resumes after recovery.`;
+  } else if (isFault && controller === 'PREDICTIVE') {
+    icon.textContent = '!';
+    icon.classList.add('warn');
+    title.textContent = 'Below hold gate';
+    copy.textContent = 'The warning signal did not cross the configured intervention gate in this live run, so no hold was issued.';
+  } else if (isFault) {
+    icon.textContent = '!';
+    icon.classList.add('bad');
+    title.textContent = 'Exposed polishing';
+    copy.textContent = 'The baseline path has no protective hold, so polishing continues through the simulated facility disturbance.';
+  }
+}
 
 /* ═══════════════════ PLOTLY CHARTS ═══════════════════ */
 
@@ -283,7 +482,28 @@ function plot(id, traces, layout) {
     chart.classList.add('chart-fallback');
     return;
   }
-  Plotly.react(id, traces, { ...layoutBase, ...layout }, {
+  const themedLayout = {
+    ...layoutBase,
+    ...layout,
+    font: { ...layoutBase.font, ...(layout?.font || {}), color: cssVar('--text-2') || '#9ba8b8' },
+    xaxis: {
+      ...layoutBase.xaxis,
+      ...(layout?.xaxis || {}),
+      gridcolor: cssVar('--chart-grid') || '#263342',
+    },
+  };
+  if (layout?.yaxis) {
+    themedLayout.yaxis = { ...layout.yaxis, gridcolor: cssVar('--chart-grid') || layout.yaxis.gridcolor };
+  }
+  if (layout?.yaxis2) {
+    themedLayout.yaxis2 = {
+      ...layout.yaxis2,
+      gridcolor: layout.yaxis2.gridcolor === 'transparent'
+        ? 'transparent'
+        : cssVar('--chart-grid') || layout.yaxis2.gridcolor,
+    };
+  }
+  Plotly.react(id, traces, themedLayout, {
     responsive: true,
     displaylogo: false,
     modeBarButtonsToRemove: ['lasso2d', 'select2d'],
@@ -317,6 +537,30 @@ function eventWindowShapes(rows) {
 
 function renderSignals(data) {
   const rows = data.truth_rows || [];
+  if (isStoryView()) {
+    plot('chart-signals', [
+      {
+        x: rows.map(r => r.timestamp_s), y: rows.map(r => r.grid_voltage_pu),
+        name: 'Grid voltage', mode: 'lines',
+        line: { color: '#e8b45c', width: 2 },
+      },
+      {
+        x: rows.map(r => r.timestamp_s), y: rows.map(r => (r.upw_supply_pressure_pa || 0) / 300000),
+        name: 'UPW pressure health', mode: 'lines',
+        line: { color: '#55c99b', width: 2 },
+      },
+      {
+        x: rows.map(r => r.timestamp_s), y: rows.map(r => (r.pump_flow_m3_s || 0) / 0.0002),
+        name: 'Pump flow health', mode: 'lines',
+        line: { color: '#c084fc', width: 2 },
+      },
+    ], {
+      yaxis: { title: 'Utility health', range: [0, 1.1], gridcolor: '#263342', zeroline: false },
+      shapes: eventWindowShapes(rows),
+    });
+    return;
+  }
+
   const mrrNmPerS = rows.map(r => (r.cmp_mrr_m_s || 0) * MRR_TO_NM_PER_S);
   plot('chart-signals', [
     {
@@ -356,6 +600,29 @@ function renderPredictions(data) {
   const protectionSignal = useUtilityRisk
     ? signalRows.map(r => 1 - Math.max(0, Math.min(1, r.effective_availability ?? 1)))
     : signalRows.map(r => r.warning_probability);
+  if (isStoryView()) {
+    const threshold = data.controller === 'PREDICTIVE' || data.controller === 'REPLAY' ? 0.80 : 0.50;
+    plot('chart-predictions', [
+      {
+        x: signalRows.map(r => r.timestamp_s), y: protectionSignal,
+        name: useUtilityRisk ? 'Utility risk' : 'Warning probability',
+        mode: 'lines',
+        line: { color: '#f06464', width: 2 },
+        fill: 'tozeroy', fillcolor: 'rgba(240,100,100,.12)',
+      },
+      {
+        x: truth.map(r => r.timestamp_s), y: truth.map(() => threshold),
+        name: 'Hold gate',
+        mode: 'lines',
+        line: { color: '#e8b45c', width: 2, dash: 'dash' },
+      },
+    ], {
+      yaxis: { title: useUtilityRisk ? 'Utility risk' : 'Warning probability', range: [0, 1], gridcolor: '#263342', zeroline: false, tickformat: '.0%' },
+      shapes: eventWindowShapes(truth),
+    });
+    return;
+  }
+
   plot('chart-predictions', [
     {
       x: truth.map(r => r.timestamp_s), y: trueMrrNmPerS,
@@ -381,6 +648,22 @@ function renderPredictions(data) {
   });
 }
 
+function renderOutcome(data) {
+  if (!$('chart-outcome')) return;
+  const truth = data.truth_rows || [];
+  const mrrNmPerS = truth.map(r => (r.cmp_mrr_m_s || 0) * MRR_TO_NM_PER_S);
+  plot('chart-outcome', [
+    {
+      x: truth.map(r => r.timestamp_s), y: mrrNmPerS,
+      name: 'MRR (nm/s)', mode: 'lines',
+      line: { color: '#4b9cff', width: 2 },
+    },
+  ], {
+    yaxis: { title: 'MRR (nm/s)', gridcolor: '#263342', zeroline: false, rangemode: 'tozero' },
+    shapes: eventWindowShapes(truth),
+  });
+}
+
 function renderModes(data) {
   const rows = data.truth_rows || [];
   const modeMap = { PREPARE: 1, DRESS: 2, POLISH: 3, HOLD: 4, RECOVER: 5, COMPLETE: 6 };
@@ -392,6 +675,7 @@ function renderModes(data) {
       line: { color: '#55c99b', shape: 'hv' }, marker: { size: 3 },
     },
   ], {
+    ...(isStoryView() ? { margin: { t: 8, r: 16, l: 76, b: 36 } } : {}),
     shapes: eventWindowShapes(rows),
     yaxis: {
       title: 'Mode',
@@ -494,5 +778,8 @@ function renderTimeline(data) {
     list.appendChild(li);
   });
 
+  if (list.lastElementChild) {
+    list.lastElementChild.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
   $('timeline-caption').textContent = `${visibleEvents.length} milestones · ${data.family || 'artifact'}`;
 }

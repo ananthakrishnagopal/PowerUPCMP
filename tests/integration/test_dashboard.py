@@ -19,12 +19,25 @@ def test_local_smoke_test_succeeds(dashboard_server):
         assert response.status == 200
         html = response.read().decode('utf-8')
         assert "PowerUPCMP" in html
-        assert "SYNTHETIC VALUES:" in html
-        assert "Replay validated demo" in html
-        assert "Predictive classifier demo" in html
+        assert "Evidence basis:" in html
+        assert "Replay validated artifact" in html
+        assert "Predictive classifier" in html
         assert 'value="8.0"' in html
         assert 'value="3.0"' in html
         assert 'value="16"' in html
+
+def test_story_dashboard_smoke_test_succeeds(dashboard_server):
+    req = urllib.request.Request(f"{dashboard_server}/story.html")
+    with urllib.request.urlopen(req) as response:
+        assert response.status == 200
+        html = response.read().decode('utf-8')
+        assert "Facility disturbance -> predicted risk -> safe hold -> avoided exposure" in html
+        assert "Classic view" in html
+        assert ">Run<" in html
+        assert 'id="chart-signals"' in html
+        assert 'id="chart-predictions"' in html
+        assert 'id="chart-actions"' in html
+        assert 'id="chart-outcome"' in html
 
 def test_api_traces(dashboard_server):
     req = urllib.request.Request(f"{dashboard_server}/api/traces")

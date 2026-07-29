@@ -18,6 +18,10 @@ PROJECT_ROOT = DASHBOARD_DIR.parent.parent.parent
 SRC_ROOT = PROJECT_ROOT / "src"
 LOG_DIR = PROJECT_ROOT / "reports" / "dashboard"
 SIM_ERROR_LOG = LOG_DIR / "simulation_errors.log"
+DEMO_TRACE_NAMES = (
+    "stakeholder-demo-normal-baseline.json",
+    "stakeholder-demo-stable-polish-fault.json",
+)
 
 
 def _record_simulation_error(exc: BaseException) -> str:
@@ -46,6 +50,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         trace_path = trace_dir / trace_name
         valid_trace = (
             trace_name.endswith(".json")
+            and trace_name in DEMO_TRACE_NAMES
             and trace_path.parent == trace_dir
             and trace_path.is_file()
         )
@@ -54,10 +59,10 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            traces = []
-            if trace_dir.exists():
-                for f in trace_dir.glob("*.json"):
-                    traces.append(f.name)
+            traces = [
+                name for name in DEMO_TRACE_NAMES
+                if (trace_dir / name).is_file()
+            ]
             response = json.dumps({"traces": traces})
             self.wfile.write(response.encode('utf-8'))
             return

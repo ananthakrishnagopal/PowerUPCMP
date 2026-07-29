@@ -30,9 +30,26 @@ def test_api_traces(dashboard_server):
     req = urllib.request.Request(f"{dashboard_server}/api/traces")
     with urllib.request.urlopen(req) as response:
         assert response.status == 200
-        data = response.read().decode('utf-8')
-        assert "traces" in data
-        assert "stakeholder-demo-stable-polish-fault.json" in data
+        payload = json.loads(response.read().decode('utf-8'))
+        assert payload["traces"] == [
+            "stakeholder-demo-normal-baseline.json",
+            "stakeholder-demo-stable-polish-fault.json",
+        ]
+
+def test_baseline_replay_stream_header(dashboard_server):
+    req = urllib.request.Request(
+        f"{dashboard_server}/api/stream/stakeholder-demo-normal-baseline.json"
+    )
+    with urllib.request.urlopen(req, timeout=10) as response:
+        assert response.status == 200
+        line = response.readline().decode("utf-8").strip()
+
+    assert line.startswith("data:")
+    payload = json.loads(line.removeprefix("data:").strip())
+    assert payload["scenario"]["family"] == "NORMAL"
+    assert payload["summary"]["peak_warning_probability"] == 0.05
+    assert payload["actions"] == []
+    assert payload["safety_decisions"] == []
 
 def test_stakeholder_replay_stream_header(dashboard_server):
     req = urllib.request.Request(

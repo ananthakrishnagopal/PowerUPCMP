@@ -1,0 +1,100 @@
+{
+  "metadata": {
+    "run_id": "stakeholder-demo-predictive-hold",
+    "title": "Stakeholder demo: predictive hold under utility-service loss",
+    "synthetic_demo_artifact": true,
+    "evidence_plane": "SYNTHETIC_SIMULATOR_DEMO",
+    "topology": "DRESSING_WATER_SUPPORT",
+    "sample_period_s": 0.5,
+    "duration_s": 12.0,
+    "seed": 230501,
+    "limitations": [
+      "Curated synthetic replay for communication.",
+      "Not a real-fab telemetry trace.",
+      "Not production control or yield validation."
+    ]
+  },
+  "scenario": {
+    "family": "PUMP_TRIP",
+    "name": "UPW pump trip during dressing support",
+    "event_start_s": 3.0,
+    "event_end_s": 5.5,
+    "disturbance": "Synthetic pump-side utility degradation reduces dressing-water support before active polishing.",
+    "causal_chain": "utility disturbance -> lower dressing support -> lower pad recovery -> future POLISH MRR risk -> predictive safe hold -> controlled resume"
+  },
+  "truth_rows": [
+    {"timestamp_s": 0.0, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "DRESS", "cmp_pad_surface_activity": 0.500, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 0.5, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "DRESS", "cmp_pad_surface_activity": 0.508, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 1.0, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "DRESS", "cmp_pad_surface_activity": 0.516, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 1.5, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "DRESS", "cmp_pad_surface_activity": 0.524, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 2.0, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "DRESS", "cmp_pad_surface_activity": 0.532, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 2.5, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "DRESS", "cmp_pad_surface_activity": 0.540, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 3.0, "event_active": true, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 165.0, "pump_flow_m3_s": 0.000160, "upw_supply_pressure_pa": 255000, "upw_tool_flow_m3_s": 0.000082, "effective_availability": 0.78, "cmp_mode": "DRESS", "cmp_pad_surface_activity": 0.542, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 3.5, "event_active": true, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 128.0, "pump_flow_m3_s": 0.000105, "upw_supply_pressure_pa": 205000, "upw_tool_flow_m3_s": 0.000058, "effective_availability": 0.42, "cmp_mode": "DRESS", "cmp_pad_surface_activity": 0.538, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 4.0, "event_active": true, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 82.0, "pump_flow_m3_s": 0.000055, "upw_supply_pressure_pa": 150000, "upw_tool_flow_m3_s": 0.000030, "effective_availability": 0.00, "cmp_mode": "DRESS", "cmp_pad_surface_activity": 0.528, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 4.5, "event_active": true, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 70.0, "pump_flow_m3_s": 0.000040, "upw_supply_pressure_pa": 135000, "upw_tool_flow_m3_s": 0.000025, "effective_availability": 0.00, "cmp_mode": "HOLD", "cmp_pad_surface_activity": 0.526, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 5.0, "event_active": true, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 88.0, "pump_flow_m3_s": 0.000065, "upw_supply_pressure_pa": 160000, "upw_tool_flow_m3_s": 0.000034, "effective_availability": 0.08, "cmp_mode": "HOLD", "cmp_pad_surface_activity": 0.526, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 5.5, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 125.0, "pump_flow_m3_s": 0.000115, "upw_supply_pressure_pa": 220000, "upw_tool_flow_m3_s": 0.000063, "effective_availability": 0.52, "cmp_mode": "HOLD", "cmp_pad_surface_activity": 0.527, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 6.0, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 160.0, "pump_flow_m3_s": 0.000165, "upw_supply_pressure_pa": 265000, "upw_tool_flow_m3_s": 0.000085, "effective_availability": 0.82, "cmp_mode": "HOLD", "cmp_pad_surface_activity": 0.529, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 6.5, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 182.0, "pump_flow_m3_s": 0.000192, "upw_supply_pressure_pa": 292000, "upw_tool_flow_m3_s": 0.000097, "effective_availability": 0.97, "cmp_mode": "HOLD", "cmp_pad_surface_activity": 0.532, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 7.0, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "RECOVER", "cmp_pad_surface_activity": 0.535, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 7.5, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "PREPARE", "cmp_pad_surface_activity": 0.540, "cmp_mrr_m_s": 0.00e-8},
+    {"timestamp_s": 8.0, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "POLISH", "cmp_pad_surface_activity": 0.541, "cmp_mrr_m_s": 1.86e-8},
+    {"timestamp_s": 8.5, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "POLISH", "cmp_pad_surface_activity": 0.542, "cmp_mrr_m_s": 1.92e-8},
+    {"timestamp_s": 9.0, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "POLISH", "cmp_pad_surface_activity": 0.542, "cmp_mrr_m_s": 1.96e-8},
+    {"timestamp_s": 9.5, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "POLISH", "cmp_pad_surface_activity": 0.541, "cmp_mrr_m_s": 1.99e-8},
+    {"timestamp_s": 10.0, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "POLISH", "cmp_pad_surface_activity": 0.540, "cmp_mrr_m_s": 2.00e-8},
+    {"timestamp_s": 10.5, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "POLISH", "cmp_pad_surface_activity": 0.539, "cmp_mrr_m_s": 2.00e-8},
+    {"timestamp_s": 11.0, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "POLISH", "cmp_pad_surface_activity": 0.538, "cmp_mrr_m_s": 2.00e-8},
+    {"timestamp_s": 11.5, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "POLISH", "cmp_pad_surface_activity": 0.537, "cmp_mrr_m_s": 2.00e-8},
+    {"timestamp_s": 12.0, "event_active": false, "grid_voltage_pu": 1.00, "motor_speed_rad_s": 188.5, "pump_flow_m3_s": 0.000200, "upw_supply_pressure_pa": 300000, "upw_tool_flow_m3_s": 0.000100, "effective_availability": 1.00, "cmp_mode": "COMPLETE", "cmp_pad_surface_activity": 0.536, "cmp_mrr_m_s": 0.00e-8}
+  ],
+  "predictions": [
+    {"timestamp_s": 0.0, "predicted_mrr": 0.00e-8, "warning_probability": 0.02, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 0.5, "predicted_mrr": 0.00e-8, "warning_probability": 0.02, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 1.0, "predicted_mrr": 0.00e-8, "warning_probability": 0.03, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 1.5, "predicted_mrr": 0.00e-8, "warning_probability": 0.03, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 2.0, "predicted_mrr": 0.00e-8, "warning_probability": 0.04, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 2.5, "predicted_mrr": 0.00e-8, "warning_probability": 0.07, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 3.0, "predicted_mrr": 1.94e-8, "warning_probability": 0.22, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 3.5, "predicted_mrr": 1.78e-8, "warning_probability": 0.44, "hold_threshold": 0.50, "conformal_prediction_set": [0, 1], "uncertainty_valid": true},
+    {"timestamp_s": 4.0, "predicted_mrr": 1.51e-8, "warning_probability": 0.71, "hold_threshold": 0.50, "conformal_prediction_set": [1], "uncertainty_valid": true},
+    {"timestamp_s": 4.5, "predicted_mrr": 0.00e-8, "warning_probability": 0.91, "hold_threshold": 0.50, "conformal_prediction_set": [1], "uncertainty_valid": true},
+    {"timestamp_s": 5.0, "predicted_mrr": 0.00e-8, "warning_probability": 0.93, "hold_threshold": 0.50, "conformal_prediction_set": [1], "uncertainty_valid": true},
+    {"timestamp_s": 5.5, "predicted_mrr": 0.00e-8, "warning_probability": 0.76, "hold_threshold": 0.50, "conformal_prediction_set": [1], "uncertainty_valid": true},
+    {"timestamp_s": 6.0, "predicted_mrr": 0.00e-8, "warning_probability": 0.39, "hold_threshold": 0.50, "conformal_prediction_set": [0, 1], "uncertainty_valid": true},
+    {"timestamp_s": 6.5, "predicted_mrr": 0.00e-8, "warning_probability": 0.18, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 7.0, "predicted_mrr": 0.00e-8, "warning_probability": 0.11, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 7.5, "predicted_mrr": 0.00e-8, "warning_probability": 0.06, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 8.0, "predicted_mrr": 1.84e-8, "warning_probability": 0.04, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 8.5, "predicted_mrr": 1.91e-8, "warning_probability": 0.03, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 9.0, "predicted_mrr": 1.96e-8, "warning_probability": 0.03, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 9.5, "predicted_mrr": 1.99e-8, "warning_probability": 0.02, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 10.0, "predicted_mrr": 2.00e-8, "warning_probability": 0.02, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 10.5, "predicted_mrr": 2.00e-8, "warning_probability": 0.02, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 11.0, "predicted_mrr": 2.00e-8, "warning_probability": 0.02, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 11.5, "predicted_mrr": 2.00e-8, "warning_probability": 0.02, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true},
+    {"timestamp_s": 12.0, "predicted_mrr": 0.00e-8, "warning_probability": 0.01, "hold_threshold": 0.50, "conformal_prediction_set": [0], "uncertainty_valid": true}
+  ],
+  "actions": [
+    {"timestamp_s": 4.0, "decision_step_index": 40, "stage": "PROPOSED", "action_type": "SAFE_HOLD", "target": "cmp.process_mode", "rationale": "Predicted MRR-excursion risk exceeded 50% with singleton positive uncertainty set.", "controller_id": "predictive-hold-supervisor-demo"},
+    {"timestamp_s": 6.5, "decision_step_index": 65, "stage": "PROPOSED", "action_type": "CONTROLLED_RESUME", "target": "cmp.process_mode", "rationale": "Utility service recovered and warning probability cleared below resume threshold.", "controller_id": "predictive-hold-supervisor-demo"}
+  ],
+  "safety_decisions": [
+    {"timestamp_s": 4.0, "decision_step_index": 40, "outcome": "APPROVED", "final_action_type": "SAFE_HOLD", "violated_constraint_ids": [], "sensor_valid": true, "uncertainty_acceptable": true, "process_envelope_valid": true},
+    {"timestamp_s": 6.5, "decision_step_index": 65, "outcome": "APPROVED", "final_action_type": "CONTROLLED_RESUME", "violated_constraint_ids": [], "sensor_valid": true, "uncertainty_acceptable": true, "process_envelope_valid": true}
+  ],
+  "summary": {
+    "fault_time_s": 3.0,
+    "warning_time_s": 4.0,
+    "hold_time_s": 4.5,
+    "resume_proposal_time_s": 6.5,
+    "polish_resume_time_s": 8.0,
+    "peak_warning_probability": 0.93,
+    "hold_duration_s": 2.5,
+    "nominal_mrr_m_s": 2.00e-8,
+    "minimum_predicted_polish_mrr_m_s": 1.51e-8,
+    "final_status": "Recovered after synthetic safe hold",
+    "stakeholder_takeaway": "The replay shows an inspectable synthetic chain from utility disturbance to future-risk warning, bounded supervisor action, safety approval, and recovery."
+  }
+}

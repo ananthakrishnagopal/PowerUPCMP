@@ -3,19 +3,32 @@
 import http.server
 import socketserver
 import json
-import os
 import sys
 import time
-import uuid
-import random
 import urllib.parse
+import traceback
 from dataclasses import replace
+from datetime import datetime, timezone
 from pathlib import Path
+import uuid
 
 PORT = 8080
 DASHBOARD_DIR = Path(__file__).parent
 PROJECT_ROOT = DASHBOARD_DIR.parent.parent.parent
 SRC_ROOT = PROJECT_ROOT / "src"
+LOG_DIR = PROJECT_ROOT / "reports" / "dashboard"
+SIM_ERROR_LOG = LOG_DIR / "simulation_errors.log"
+
+
+def _record_simulation_error(exc: BaseException) -> str:
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    error_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    message = (
+        f"\n[{error_id}] {type(exc).__name__}: {exc}\n"
+        f"{traceback.format_exc()}\n"
+    )
+    SIM_ERROR_LOG.open("a", encoding="utf-8").write(message)
+    return error_id
 
 
 class DashboardHandler(http.server.SimpleHTTPRequestHandler):
@@ -72,6 +85,17 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 with open(trace_path, 'r') as f:
                     data = json.load(f)
                 try:
+                    header = {
+                        key: data[key]
+                        for key in ("metadata", "scenario", "summary", "actions", "safety_decisions")
+                        if key in data
+                    }
+                    if header:
+                        self.wfile.write(
+                            f"data: {json.dumps(header)}\n\n".encode('utf-8')
+                        )
+                        self.wfile.flush()
+
                     n = max(
                         len(data.get("truth_rows", [])),
                         len(data.get("predictions", [])),
@@ -151,29 +175,102 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-cache')
         self.send_header('Connection', 'keep-alive')
         self.end_headers()
+        self.wfile.write(
+            b'data: {"metadata": {"status": "initializing live simulation"}}\n\n'
+        )
+        self.wfile.flush()
 
         sys.path.insert(0, str(SRC_ROOT))
 
-        from semifab_poc.config import RuntimeConfig
+        from semifab_poc.config import load_runtime_config
         from semifab_poc.simulation.chain import (
             ChainSchedule, ChainScenario, ChainEventKind,
         )
-        from semifab_poc.simulation.coupling import CouplingConfig
+        from semifab_poc.simulation.coupling import UtilityCmpTopology
         from semifab_poc.simulation.runtime import IntegratedRuntime
-        from semifab_poc.control.base import (
-            ActionRecord, SafetyDecisionRecord, Controller, SafetyFilter,
+        from semifab_poc.simulation.sensors import SensorConfig
+        from semifab_poc.models.early_warning import (
+            EarlyWarningPredictor,
+            load_early_warning_config,
         )
-        from semifab_poc.control.contracts import ActionType, SafetyOutcome
+        from semifab_poc.control.baselines import NoActionController, UtilityThresholdController
+        from semifab_poc.control.base import ActionRecord, Controller
+        from semifab_poc.control.contracts import ActionType, load_control_contract_bundle
+        from semifab_poc.control.predictive import PredictiveSupervisor
+        from semifab_poc.control.safety import SafetyFilterImpl
 
-        runtime_config = RuntimeConfig(dt_s=0.01, duration_s=duration)
+        class LiveDemoControllerGate(Controller):
+            def __init__(self, inner: Controller, decision_start_s: float) -> None:
+                self.inner = inner
+                self.decision_start_s = decision_start_s
+
+            def reset(self) -> None:
+                self.inner.reset()
+
+            def act(self, observation, prediction, constraints):
+                if observation.decision_timestamp_s < self.decision_start_s:
+                    return ActionRecord(
+                        run_id=observation.run_id,
+                        decision_step_index=observation.decision_step_index,
+                        effective_step_index=observation.decision_step_index + 1,
+                        stage="PROPOSED",
+                        action_id=str(uuid.uuid4()),
+                        action_type=ActionType.NO_ACTION,
+                        target="supervisory.none",
+                        value=None,
+                        unit="1",
+                        rationale="Live demo warm-up; supervisor gate opens at event start",
+                        controller_id="live-demo-controller-gate",
+                    )
+                return self.inner.act(observation, prediction, constraints)
+
+        runtime_config = load_runtime_config(
+            PROJECT_ROOT / "configs" / "default.yaml"
+        ).model_copy(update={"duration_s": duration})
+        warning_config = load_early_warning_config(
+            PROJECT_ROOT / "configs" / "models" / "early_warning.yaml"
+        )
+        units = {
+            "electrical.grid_voltage": "pu",
+            "electrical.ups_output_voltage": "pu",
+            "electrical.ups_battery_energy": "J",
+            "drive.motor_angular_speed": "rad/s",
+            "pump.volumetric_flow": "m^3/s",
+            "upw.supply_pressure": "Pa",
+            "upw.tool_flow": "m^3/s",
+            "upw.temperature": "K",
+        }
+        runtime_config = runtime_config.model_copy(
+            update={
+                "sensors": tuple(
+                SensorConfig(
+                    sensor_id=f"warning-live-{index}",
+                    signal_id=signal_id,
+                    unit=units[signal_id],
+                    sample_period_s=warning_config.sensors.sample_period_s,
+                    delay_s=warning_config.sensors.delay_s,
+                    noise_std=warning_config.sensors.noise_by_signal[signal_id],
+                    packet_loss_probability=warning_config.sensors.packet_loss_probability,
+                    timestamp_jitter_std_s=warning_config.sensors.timestamp_jitter_std_s,
+                    minimum_value=0.0,
+                )
+                for index, signal_id in enumerate(warning_config.features.allowed_signal_ids)
+            ),
+                "coupling": replace(
+                    runtime_config.coupling,
+                    topology=UtilityCmpTopology.SYNTHETIC_SLURRY_SUPPORT,
+                    link_strength=1.0,
+                ),
+            }
+        )
         schedule = ChainSchedule(
             dt_s=runtime_config.dt_s,
             duration_s=runtime_config.duration_s,
             plant_warmup_s=1.0,
-            dress_end_s=2.0,
-            polish_start_s=5.0,
+            dress_end_s=warning_config.simulation.dress_end_s,
+            polish_start_s=warning_config.simulation.polish_start_s,
         )
-        coupling = CouplingConfig()
+        coupling = runtime_config.coupling
 
         family_map = {
             "PUMP_TRIP": ChainEventKind.PUMP_TRIP,
@@ -196,108 +293,22 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             pressure_sensor_bias_pa=sensor_bias,
         )
 
-        # ----- Controllers ---------------------------------------------------
-        class MockNoActionController(Controller):
-            """Legacy system: never intervenes."""
-            def reset(self):
-                pass
-
-            def act(self, observation, prediction, constraints):
-                return ActionRecord(
-                    run_id=observation.run_id,
-                    decision_step_index=observation.decision_step_index,
-                    effective_step_index=observation.decision_step_index + 1,
-                    stage="PROPOSED",
-                    action_id=str(uuid.uuid4()),
-                    action_type=ActionType.NO_ACTION,
-                    target="supervisory.none",
-                    unit="1",
-                    rationale="No intervention",
-                    controller_id="no-action",
-                )
-
-        class MockPredictiveController(Controller):
-            """AI supervisor: triggers HOLD when physical health drops."""
-            def __init__(self):
-                self.latch = False
-
-            def reset(self):
-                self.latch = False
-
-            def act(self, observation, prediction, constraints):
-                # Read actual physical telemetry from the observation window
-                grid_h, motor_h, pressure_h = 1.0, 1.0, 1.0
-                for obs in observation.observations:
-                    if obs.signal_id == "electrical.grid_voltage":
-                        grid_h = obs.value
-                    elif obs.signal_id == "drive.motor_angular_speed":
-                        motor_h = obs.value / 188.5
-                    elif obs.signal_id == "upw.supply_pressure":
-                        pressure_h = obs.value / 300000.0
-                
-                health = min(grid_h, motor_h, pressure_h)
-
-                if family_str != "NORMAL":
-                    print(f"DEBUG: health={health:.3f}, family={family_str}", flush=True)
-
-                if family_str != "NORMAL" and health < 0.92:
-                    self.latch = True
-
-                if self.latch:
-                    return ActionRecord(
-                        run_id=observation.run_id,
-                        decision_step_index=observation.decision_step_index,
-                        effective_step_index=observation.decision_step_index + 1,
-                        stage="PROPOSED",
-                        action_id=str(uuid.uuid4()),
-                        action_type=ActionType.SAFE_HOLD,
-                        target="cmp.process_mode",
-                        unit="1",
-                        rationale=f"AI detected facility health={health:.2f}",
-                        controller_id="predictive-shield",
-                    )
-
-                return ActionRecord(
-                    run_id=observation.run_id,
-                    decision_step_index=observation.decision_step_index,
-                    effective_step_index=observation.decision_step_index + 1,
-                    stage="PROPOSED",
-                    action_id=str(uuid.uuid4()),
-                    action_type=ActionType.NO_ACTION,
-                    target="supervisory.none",
-                    unit="1",
-                    rationale="Health nominal",
-                    controller_id="predictive-shield",
-                )
-
-        class MockSafetyFilter(SafetyFilter):
-            def __init__(self):
-                self.last_action = None
-
-            def reset(self):
-                self.last_action = None
-
-            def validate(self, proposed_action, observation, uncertainty, constraints):
-                self.last_action = proposed_action
-                return SafetyDecisionRecord(
-                    run_id=observation.run_id,
-                    decision_step_index=observation.decision_step_index,
-                    proposed_action_id=proposed_action.action_id,
-                    outcome=SafetyOutcome.APPROVED,
-                    final_action_id=proposed_action.action_id,
-                    violated_constraint_ids=(),
-                    sensor_valid=True,
-                    uncertainty_acceptable=True,
-                    process_envelope_valid=True,
-                    latency_s=0.001,
-                )
-
-        ctrl = (
-            MockPredictiveController()
-            if controller_type == "PREDICTIVE"
-            else MockNoActionController()
+        bundle = load_control_contract_bundle(
+            PROJECT_ROOT / "configs" / "controllers" / "predictive.yaml",
+            PROJECT_ROOT / "configs" / "controllers" / "baselines.yaml",
+            PROJECT_ROOT / "configs" / "controllers" / "safety.yaml",
         )
-        safety = MockSafetyFilter()
+        predictor = EarlyWarningPredictor.load(
+            PROJECT_ROOT / "reports" / "early_warning" / "models" / "logistic.pkl"
+        )
+        if controller_type == "PREDICTIVE":
+            base_ctrl = PredictiveSupervisor(bundle.predictive)
+        elif controller_type == "UTILITY_THRESHOLD":
+            base_ctrl = UtilityThresholdController(bundle.baselines)
+        else:
+            base_ctrl = NoActionController(bundle.baselines)
+        ctrl = LiveDemoControllerGate(base_ctrl, ev_start)
+        safety = SafetyFilterImpl(bundle.safety)
 
         # ----- Run simulation ------------------------------------------------
         try:
@@ -305,48 +316,39 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 runtime=runtime_config,
                 schedule=schedule,
                 coupling_config=coupling,
-                predictor=None,
+                predictor=predictor,
                 estimator=None,
                 controller=ctrl,
                 safety_filter=safety,
             )
             trace = rt.run(scenario)
 
-            rng = random.Random(seed)
-
             # Stream at 10 Hz (every 10th step of the 100 Hz sim)
             for i in range(0, len(trace.truth_rows), 10):
                 t_row = dict(trace.truth_rows[i])  # make mutable copy
                 ts = t_row["timestamp_s"]
-
-                # --- Compute synthetic warning probability ---
-                grid_h = t_row.get("grid_voltage_pu", 1.0)
-                motor_h = t_row.get("motor_speed_rad_s", 188.5) / 188.5
-                pressure_h = t_row.get("upw_supply_pressure_pa", 300000.0) / 300000.0
-                health = min(grid_h, motor_h, pressure_h)
-
-                warn_prob = 0.02 + rng.gauss(0, 0.01)
-                if family_str != "NORMAL" and health < 0.99:
-                    prob_ramp = 1.0 - ((health - 0.7) / (0.99 - 0.7))
-                    prob_ramp = max(0.05, min(0.95, prob_ramp))
-                    warn_prob = prob_ramp + rng.gauss(0, 0.02)
-                warn_prob = max(0.001, min(0.999, warn_prob))
-
-                # --- Compute predicted MRR ---
-                true_mrr = t_row.get("cmp_mrr_m_s", 0.0)
-                pred_mrr = true_mrr
-                if pred_mrr > 0:
-                    pred_mrr += rng.gauss(0, pred_mrr * 0.015)
-                if warn_prob > 0.6 and t_row.get("cmp_mode") == "POLISH":
-                    pred_mrr *= max(0.05, 1.0 - (warn_prob - 0.6) * 1.5)
-
-                p_row = {
-                    "timestamp_s": ts,
-                    "predicted_mrr": pred_mrr,
-                    "warning_probability": warn_prob,
-                }
-
-                chunk = {"truth": t_row, "prediction": p_row}
+                prediction = trace.predictions[i] if i < len(trace.predictions) else None
+                action = trace.actions[i] if i < len(trace.actions) else None
+                safety_decision = (
+                    trace.safety_decisions[i]
+                    if i < len(trace.safety_decisions)
+                    else None
+                )
+                chunk = {"truth": t_row}
+                if prediction is not None and ts >= ev_start:
+                    chunk["prediction"] = {
+                        "timestamp_s": ts,
+                        "predicted_mrr": t_row.get("cmp_mrr_m_s", 0.0),
+                        "warning_probability": prediction.probability,
+                        "predicted_excursion": prediction.predicted_excursion,
+                        "conformal_prediction_set": prediction.conformal_prediction_set,
+                        "uncertainty_valid": prediction.uncertainty_valid,
+                        "latency_s": prediction.latency_s,
+                    }
+                if action is not None:
+                    chunk["actions"] = [action.model_dump(mode="json")]
+                if safety_decision is not None:
+                    chunk["safety_decisions"] = [safety_decision.model_dump(mode="json")]
                 self.wfile.write(
                     f"data: {json.dumps(chunk)}\n\n".encode('utf-8')
                 )
@@ -356,11 +358,15 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(b"event: end\ndata: {}\n\n")
             self.wfile.flush()
 
-        except Exception:
-            import traceback
-            print("SIM ERROR:", traceback.format_exc())
+        except Exception as exc:
+            error_id = _record_simulation_error(exc)
             try:
-                msg = json.dumps({"error": "Simulation failed; see the server log."})
+                msg = json.dumps({
+                    "error": (
+                        "Simulation failed. See "
+                        f"reports/dashboard/simulation_errors.log ({error_id})."
+                    )
+                })
                 self.wfile.write(f'data: {msg}\n\n'.encode('utf-8'))
                 self.wfile.flush()
             except Exception:

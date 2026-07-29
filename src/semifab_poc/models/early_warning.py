@@ -256,6 +256,27 @@ def load_early_warning_config(path: str | Path) -> EarlyWarningConfig:
         raise EarlyWarningError(f"invalid early-warning configuration: {exc}") from exc
 
 
+def normalization_for_warning_runtime(
+    *,
+    scenario_battery_capacity_j: float,
+    runtime: Any,
+) -> dict[str, tuple[float, float]]:
+    """Return the frozen WP12 online feature normalization map."""
+
+    if not math.isfinite(scenario_battery_capacity_j) or scenario_battery_capacity_j <= 0.0:
+        raise EarlyWarningError("scenario battery capacity must be finite and positive")
+    return {
+        "electrical.grid_voltage": (0.0, 1.0),
+        "electrical.ups_output_voltage": (0.0, 1.0),
+        "electrical.ups_battery_energy": (0.0, scenario_battery_capacity_j),
+        "drive.motor_angular_speed": (0.0, runtime.drive.nominal_motor_speed_rad_s),
+        "pump.volumetric_flow": (0.0, runtime.pump.reference_flow_m3_s),
+        "upw.supply_pressure": (0.0, runtime.upw.nominal_supply_pressure_pa),
+        "upw.tool_flow": (0.0, runtime.upw.nominal_tool_demand_m3_s),
+        "upw.temperature": (runtime.upw.nominal_temperature_k, 10.0),
+    }
+
+
 def split_conformal_quantile(scores: Sequence[float], alpha: float) -> float:
     """Return the exact finite-sample split-conformal order statistic."""
 

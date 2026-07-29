@@ -73,6 +73,57 @@ class MockSafetyFilter(SafetyFilter):
         )
 
 
+class PassThroughSafetyFilter(SafetyFilter):
+    def reset(self):
+        self.last_action = None
+
+    def validate(self, proposed_action, observation, uncertainty, constraints):
+        self.last_action = proposed_action.model_copy(update={"stage": "FINAL"})
+        return SafetyDecisionRecord(
+            run_id=observation.run_id,
+            decision_step_index=observation.decision_step_index,
+            proposed_action_id=proposed_action.action_id,
+            outcome=SafetyOutcome.APPROVED,
+            final_action_id=proposed_action.action_id,
+            violated_constraint_ids=(),
+            sensor_valid=True,
+            uncertainty_acceptable=True,
+            process_envelope_valid=True,
+            latency_s=0.001,
+        )
+
+
+class DressInterruptionController(Controller):
+    def reset(self):
+        pass
+
+    def act(self, observation, prediction, constraints):
+        action_type = ActionType.NO_ACTION
+        target = "supervisory.none"
+        rationale = "No action"
+        if observation.decision_step_index == 2:
+            action_type = ActionType.SAFE_HOLD
+            target = "cmp.process_mode"
+            rationale = "Enter hold during dressing"
+        elif observation.decision_step_index == 4:
+            action_type = ActionType.CONTROLLED_RESUME
+            target = "cmp.process_mode"
+            rationale = "Resume through recovery route"
+
+        return ActionRecord(
+            run_id=observation.run_id,
+            decision_step_index=observation.decision_step_index,
+            effective_step_index=observation.decision_step_index + 1,
+            stage="PROPOSED",
+            action_id=f"dress-interrupt-{observation.decision_step_index}",
+            action_type=action_type,
+            target=target,
+            unit="1",
+            rationale=rationale,
+            controller_id="dress-interruption-test",
+        )
+
+
 @pytest.fixture
 def runtime_dependencies():
     runtime_config = RuntimeConfig(dt_s=0.01, duration_s=0.2)
@@ -138,3 +189,40 @@ def test_complete_structured_audit_log_written(runtime_dependencies):
 def test_fixed_seed_reference_trace_reproduces():
     pass
 
+
+def test_recovery_during_dress_routes_through_prepare():
+    runtime_config = RuntimeConfig(dt_s=0.01, duration_s=0.7)
+    schedule = ChainSchedule(
+        dt_s=0.01,
+        duration_s=0.7,
+        plant_warmup_s=0.0,
+        dress_end_s=0.65,
+        polish_start_s=0.68,
+    )
+    scenario = ChainScenario(
+        run_id="dress-interruption",
+        family=ChainEventKind.NORMAL,
+        seed=123,
+        event_start_s=0.02,
+        event_duration_s=0.02,
+    )
+    runtime = IntegratedRuntime(
+        runtime=runtime_config,
+        schedule=schedule,
+        coupling_config=CouplingConfig(),
+        predictor=None,
+        estimator=None,
+        controller=DressInterruptionController(),
+        safety_filter=PassThroughSafetyFilter(),
+    )
+
+    trace = runtime.run(scenario)
+    modes = [row["cmp_mode"] for row in trace.truth_rows]
+
+    assert "HOLD" in modes
+    assert "RECOVER" in modes
+    assert "PREPARE" in modes
+    recover_index = modes.index("RECOVER")
+    prepare_index = modes.index("PREPARE", recover_index)
+    dress_index = modes.index("DRESS", prepare_index)
+    assert recover_index < prepare_index < dress_index

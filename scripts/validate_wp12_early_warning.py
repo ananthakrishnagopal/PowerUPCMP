@@ -31,6 +31,7 @@ from semifab_poc.models.early_warning import (
     evaluate_predictions,
     generate_excursion_labels,
     load_early_warning_config,
+    normalization_for_warning_runtime,
 )
 from semifab_poc.simulation.chain import (
     ChainEventKind,
@@ -354,16 +355,10 @@ def normalization_for_scenario(
     scenario: ChainScenario,
     runtime: Any,
 ) -> dict[str, tuple[float, float]]:
-    return {
-        "electrical.grid_voltage": (0.0, 1.0),
-        "electrical.ups_output_voltage": (0.0, 1.0),
-        "electrical.ups_battery_energy": (0.0, scenario.battery_capacity_j),
-        "drive.motor_angular_speed": (0.0, runtime.drive.nominal_motor_speed_rad_s),
-        "pump.volumetric_flow": (0.0, runtime.pump.reference_flow_m3_s),
-        "upw.supply_pressure": (0.0, runtime.upw.nominal_supply_pressure_pa),
-        "upw.tool_flow": (0.0, runtime.upw.nominal_tool_demand_m3_s),
-        "upw.temperature": (runtime.upw.nominal_temperature_k, 10.0),
-    }
+    return normalization_for_warning_runtime(
+        scenario_battery_capacity_j=scenario.battery_capacity_j,
+        runtime=runtime,
+    )
 
 
 def build_dataset(

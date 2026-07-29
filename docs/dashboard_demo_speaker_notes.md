@@ -2,7 +2,10 @@
 
 ## Demo objective
 
-Show how a controlled CMP disturbance moves through the simulator, becomes a warning signal, and can result in a supervisory safe hold. Keep the distinction between **demonstrated in simulation** and **validated in a fab** explicit throughout the conversation.
+Show how a controlled CMP utility disturbance moves through the simulator,
+becomes a warning signal, and results in a bounded supervisory safe hold. Keep
+the distinction between **demonstrated in simulation** and **validated in a
+fab** explicit throughout the conversation.
 
 Suggested duration: 15 minutes, followed by 10 minutes of technical questions.
 
@@ -10,9 +13,10 @@ Suggested duration: 15 minutes, followed by 10 minutes of technical questions.
 
 1. Install the project in the documented Python environment.
 2. Start the dashboard with `conda run -n devkki python src/semifab_poc/dashboard/server.py`.
-3. Open `http://localhost:8080` and confirm the page says `Ready for demo`.
-4. Keep the repository documentation available for provenance questions. The primary references are `docs/assumptions_and_limitations.md`, `docs/architecture.md`, and the WP12/WP13/WP15/WP16 validation reports.
-5. Use the default seed and parameters for the first run so the result is repeatable.
+3. Open `http://localhost:8080` and confirm the page says `Stakeholder demo artifact ready`.
+4. In **Load an artifact**, confirm `stakeholder-demo-predictive-hold` is selected.
+5. Use **Replay stakeholder demo** as the recording path. Live scenarios are backup.
+6. Keep the repository documentation available for provenance questions. The primary references are `docs/stakeholder_demo_methodology.md`, `docs/assumptions_and_limitations.md`, `docs/architecture.md`, and the WP12/WP13/WP15/WP16 validation reports.
 
 ## 1. Frame the problem (1 minute)
 
@@ -22,15 +26,21 @@ Point to the yellow banner. Explain that the values are synthetic and that the s
 
 ## 2. Establish the baseline (1 minute)
 
-Select **Normal operation** and keep **Predictive shield** selected. Run the scenario.
+Use the canonical replay first. If time allows, select **Normal operation** and
+keep **Predictive shield** selected, then run the scenario as a no-false-hold
+baseline.
 
 **Say:** “We start with a healthy reference. The point is to establish expected process modes and avoid interpreting every model signal as an event.”
 
 Use the charts to identify the normal mode progression. The expected result is no safe hold and a low warning probability. This is a useful negative control: the supervisor should not intervene without a simulated disturbance.
 
-## 3. Inject a pump disturbance (3 minutes)
+## 3. Replay the stakeholder pump-trip trace (3 minutes)
 
-Select **Pump trip during polish** and run with the default seed. Keep the dashboard visible while the stream progresses. Other useful branches are **Grid voltage sag**, **UPW valve restriction**, **Pressure sensor bias**, and **Short grid interruption**; use them when the audience wants to see electrical, hydraulic, sensor-quality, or recovery behavior.
+Click **Replay stakeholder demo**. Keep the dashboard visible while the stream
+progresses. The trace is a curated synthetic replay named
+`stakeholder-demo-predictive-hold.json`. It is the preferred recording artifact
+because it is deterministic and contains the scenario, warning, action, safety,
+and summary fields needed for a clean walkthrough.
 
 **Say:** “The event is introduced into the utility side. We are watching three separate things: the physical process response, the warning probability, and the supervisory operating mode. Keeping those separate is important because a high warning is not itself an action.”
 
@@ -39,25 +49,31 @@ Walk through the screens in this order:
 - **Process health and warning:** MRR is the simulator outcome; the red curve is the model warning signal on the right axis.
 - **Physical process response:** this is simulator ground truth, not a sensor measurement from a real tool.
 - **Operating mode:** the mode transition is the visible control effect. A `HOLD` state is the action outcome in this demonstration.
-- **Event timeline:** the timeline makes the sequence clear: initialization, warning, hold if observed, and completion.
+- **Event timeline:** the timeline makes the sequence clear: utility fault, warning threshold crossing, supervisor proposal, safety approval, hold, controlled resume, and completion.
 
 When the decision banner changes, say: “The demonstrated value is the traceability from event to a synthetic warning proxy to a bounded supervisory response. It is not a claim that this response is ready to command a production tool.”
 
 ## 4. Compare against no action (2 minutes)
 
-Change **Controller mode** to **No-action comparator** and rerun the same scenario with the same seed. Point out that the seed, duration, and disturbance are held constant.
+If time allows, change **Protection mode** to **Legacy System (Unprotected)**
+and run the same pump-trip scenario. Point out that the seed, duration, and
+disturbance are held constant. Treat this as a qualitative backup comparison,
+not as the formal evidence path for the recording.
 
 **Say:** “This is the paired comparator. A credible efficacy study needs the same disturbance and initial conditions, with only the controller policy changed.”
 
 Compare the operating-mode chart and the process curve. Avoid claiming saved wafers or a measured yield improvement from this view. The current dashboard is a trace viewer; paired aggregate metrics belong in the evaluation reports.
 
-## 5. Replay evidence (2 minutes)
+## 5. Replay evidence and limitations (2 minutes)
 
-Open **Load an artifact**, select `demo-predictive-intervention`, and use **Replay artifact**.
+Point to **Load an artifact**, the selected
+`stakeholder-demo-predictive-hold` trace, and **Evidence & limits**.
 
 **Say:** “The replay path shows that the dashboard is not dependent on a live calculation for presentation. It can replay a versioned local artifact, which is useful for review, audit, and a repeatable customer conversation.”
 
-Point to **Evidence and limits**. Explain that the selected compact demo artifact contains truth rows and predictions, but does not contain attribution or safety-decision arrays. The UI says that explicitly rather than filling the gap with inferred values.
+Explain that the selected compact demo artifact contains truth rows,
+predictions, proposed actions, safety decisions, and summary KPIs. It is marked
+as a synthetic communication artifact rather than a new validation result.
 
 ## 6. Technical deep dive (4 minutes)
 
@@ -67,7 +83,7 @@ Use these prompts if the audience wants more detail:
 - **Timing:** the dashboard samples the simulation for readability. It is not a latency benchmark or a promise of real-time execution.
 - **Model boundary:** the warning is an early-warning signal for the frozen simulator target. Root-cause attribution and uncertainty must be discussed with their dedicated validation artifacts and limitations.
 - **Data boundary:** public PHM data and simulator results are separate evidence planes. A public-data offline metric should not be presented as proof of online control.
-- **Safety:** a demo `HOLD` is an observed simulator mode. It is not an independent production safety certification.
+- **Safety:** a demo `HOLD` is an observed simulator mode approved by the local safety-filter path for this synthetic replay. It is not an independent production safety certification.
 
 ## Questions to handle carefully
 
@@ -93,7 +109,7 @@ Use these prompts if the audience wants more detail:
 
 ## Recovery notes
 
-- If the live run is too slow, use the replay artifact.
+- Use the replay artifact for the recording. Use live runs only as backup.
 - If a stream is interrupted, click **Run scenario** again; the server is stateless.
 - If no artifact appears, confirm the server was started from the repository environment and that `tests/regression/*.json` exists.
 - If a customer asks for root-cause detail during the compact replay, switch to the dedicated attribution validation report rather than inferring it from the scenario name.

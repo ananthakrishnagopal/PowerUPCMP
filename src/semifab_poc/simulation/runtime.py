@@ -17,7 +17,12 @@ from semifab_poc.control.base import ActionRecord, Controller, SafetyDecisionRec
 from semifab_poc.control.contracts import ActionType, SafetyOutcome
 from semifab_poc.data.schema import LatentStateRecord, ObservationRecord, RootCause
 from semifab_poc.models.attribution import Attribution, AttributionObservationWindow, RootCauseEstimator
-from semifab_poc.models.early_warning import EarlyWarningPredictor, Prediction, WarningObservationWindow
+from semifab_poc.models.early_warning import (
+    EarlyWarningPredictor,
+    Prediction,
+    WarningObservationWindow,
+    normalization_for_warning_runtime,
+)
 from semifab_poc.simulation.chain import ChainEventKind, ChainScenario, ChainSchedule, ChainRunnerError
 from semifab_poc.simulation.cmp import CmpHoldReason, CmpMode, CmpSubsystem
 from semifab_poc.simulation.coupling import CouplingConfig, UtilityToCmpCoupler
@@ -286,6 +291,17 @@ class IntegratedRuntime:
                 elif final_action.action_type == ActionType.PLATEN_SPEED_REDUCTION and final_action.value is not None:
                     cmp_action["platen_speed_reduction"] = final_action.value
 
+            if (
+                cmp_state.mode is CmpMode.RECOVER
+                and cmp_action.get("mode_request") == "DRESS"
+            ):
+                cmp_action["mode_request"] = "PREPARE"
+            elif (
+                cmp_state.mode is CmpMode.HOLD
+                and cmp_action.get("mode_request") not in {"HOLD", "RECOVER", "COMPLETE"}
+            ):
+                cmp_action["mode_request"] = "HOLD"
+
             # Step 2: Update electrical and UPS latent state
             electrical_state = electrical.step(
                 electrical_state, None, electrical_disturbance, self.schedule.dt_s
@@ -347,33 +363,24 @@ class IntegratedRuntime:
                 observations=arrived_observations,
                 process_mode=cmp_state.mode.value,
                 polish_start_s=self.schedule.polish_start_s,
-                normalization_by_signal=self.predictor.feature_config.normalization_by_signal if hasattr(self.predictor, 'feature_config') else {},
+                normalization_by_signal=(
+                    normalization_for_warning_runtime(
+                        scenario_battery_capacity_j=scenario.battery_capacity_j,
+                        runtime=self.runtime,
+                    )
+                    if self.predictor is not None
+                    else {}
+                ),
                 sensor_sample_period_s=self.runtime.sensors[0].sample_period_s,
                 battery_capacity_ratio=electrical_state.battery_energy_j / electrical_config.battery_capacity_j,
-                ups_load_ratio=scenario.ups_load_power_w / 2500.0,
+                ups_load_ratio=scenario.ups_load_power_w / self.runtime.electrical.ups_rated_power_w,
             )
 
             # Step 9: Update streaming features & Step 10: Predict MRR
             prediction = None
             if self.predictor is not None:
-                # Assuming predictor has a predict method for online use. 
-                # Since EarlyWarningPredictor doesn't natively expose an online predict, 
-                # we wrap it manually if needed, or pass None if this is just open-loop.
-                # The prompt implies we have a fitted Predictor and Estimator.
-                feature_vector = self.predictor.extractor.transform(warning_window)
-                if self.predictor.base_model is not None:
-                    # In a real run, this would be properly integrated with model serving
-                    prob = float(self.predictor._calibrated_probabilities(feature_vector.values.reshape(1, -1))[0])
-                    prediction = Prediction(
-                        probability=prob,
-                        predicted_excursion=prob >= self.predictor.model_config.probability_threshold,
-                        conformal_prediction_set=(1,) if prob >= self.predictor.conformal_quantile else (0,),
-                        uncertainty_valid=True,
-                        feature_cutoff_step_index=step_index,
-                        feature_cutoff_timestamp_s=timestamp_s,
-                        latency_s=0.001
-                    )
-                    predictions.append(prediction)
+                prediction = self.predictor.predict(warning_window)
+                predictions.append(prediction)
 
             # Step 11: Estimate the initiating cause
             attribution = None

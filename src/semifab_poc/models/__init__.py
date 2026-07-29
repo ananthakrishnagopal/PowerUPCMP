@@ -33,6 +33,7 @@ from .early_warning import (
     evaluate_predictions,
     generate_excursion_labels,
     load_early_warning_config,
+    normalization_for_warning_runtime,
 )
 from .virtual_metrology import (
     FeatureRoleBundle,
@@ -88,6 +89,7 @@ __all__ = [
     "evaluate_predictions",
     "generate_excursion_labels",
     "load_early_warning_config",
+    "normalization_for_warning_runtime",
     "load_attribution_config",
     "load_virtual_metrology_config",
     "prepare_feature_only_roles",

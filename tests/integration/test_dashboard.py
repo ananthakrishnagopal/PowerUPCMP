@@ -22,8 +22,8 @@ def test_local_smoke_test_succeeds(dashboard_server):
         assert "SYNTHETIC VALUES:" in html
         assert "Replay validated demo" in html
         assert "Predictive classifier demo" in html
-        assert 'value="7.2"' in html
-        assert 'value="4.0"' in html
+        assert 'value="8.0"' in html
+        assert 'value="3.0"' in html
         assert 'value="16"' in html
 
 def test_api_traces(dashboard_server):
@@ -56,7 +56,7 @@ def test_live_simulation_streams_model_predictions(dashboard_server):
         f"{dashboard_server}/api/simulate?"
         "family=PUMP_TRIP&controller=PREDICTIVE&duration=16&"
         "grid_volt=1.0&valve_pos=1.0&sensor_bias=0&"
-        "ev_start=7.2&ev_dur=4.0&seed=123"
+        "ev_start=8.0&ev_dur=3.0&seed=123"
     )
     with urllib.request.urlopen(req, timeout=30) as response:
         assert response.status == 200
@@ -75,7 +75,7 @@ def test_live_simulation_streams_model_predictions(dashboard_server):
                 if saw_prediction and saw_hold:
                     break
                 continue
-            assert prediction["timestamp_s"] >= 7.2
+            assert prediction["timestamp_s"] >= 8.0
             assert "warning_probability" in prediction
             assert "conformal_prediction_set" in prediction
             assert "uncertainty_valid" in prediction
@@ -96,7 +96,8 @@ def test_no_unique_model_or_control_logic_in_dashboard():
     content = app_js.read_text()
     assert "updateDashboard" in content
     assert "$('sim-controller').value = 'PREDICTIVE'" in content
-    assert "$('sim-event-duration').value = '4.0'" in content
+    assert "$('sim-event-start').value = '8.0'" in content
+    assert "$('sim-event-duration').value = '3.0'" in content
     assert "$('sim-duration').value = '16'" in content
     # No logic indicating model execution
     assert "class Controller" not in content

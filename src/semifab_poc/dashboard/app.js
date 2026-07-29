@@ -25,8 +25,8 @@ const presetDefaults = {
 /* ─── Boot ─── */
 document.addEventListener('DOMContentLoaded', () => {
   $('sim-controller').value = 'PREDICTIVE';
-  $('sim-event-start').value = '7.2';
-  $('sim-event-duration').value = '4.0';
+  $('sim-event-start').value = '8.0';
+  $('sim-event-duration').value = '3.0';
   $('sim-duration').value = '16';
 
   $('scenario-preset').addEventListener('change', (e) => {

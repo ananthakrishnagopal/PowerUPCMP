@@ -4,6 +4,51 @@ from pathlib import Path
 
 TRACE_PATH = Path(__file__).with_name("stakeholder-demo-stable-polish-fault.json")
 BASELINE_TRACE_PATH = Path(__file__).with_name("stakeholder-demo-normal-baseline.json")
+GRID_TRACE_PATH = Path(__file__).with_name("stakeholder-demo-grid-interruption.json")
+POWER_WATER_TRACE_PATH = Path(__file__).with_name(
+    "stakeholder-demo-power-water-disturbance.json"
+)
+
+
+def _assert_fault_replay_story(payload: dict, family: str, peak_floor: float) -> None:
+    assert payload["metadata"]["synthetic_demo_artifact"] is True
+    assert payload["scenario"]["family"] == family
+
+    truth_times = [row["timestamp_s"] for row in payload["truth_rows"]]
+    prediction_times = [row["timestamp_s"] for row in payload["predictions"]]
+    assert truth_times == sorted(truth_times)
+    assert prediction_times == sorted(prediction_times)
+    assert truth_times[0] == prediction_times[0]
+    assert truth_times[-1] == prediction_times[-1]
+
+    fault_time = payload["summary"]["fault_time_s"]
+    stable_polish_start = payload["summary"]["stable_polish_start_s"]
+    stable_rows = [
+        row for row in payload["truth_rows"]
+        if stable_polish_start <= row["timestamp_s"] < fault_time
+    ]
+    assert stable_rows
+    assert {row["cmp_mode"] for row in stable_rows} == {"POLISH"}
+    stable_mrr = [row["cmp_mrr_m_s"] for row in stable_rows]
+    assert min(stable_mrr) >= 1.96e-08
+    assert max(stable_mrr) <= 2.01e-08
+
+    threshold_crossings = [
+        row for row in payload["predictions"]
+        if row["warning_probability"] >= row["hold_threshold"]
+    ]
+    assert threshold_crossings
+    assert threshold_crossings[0]["timestamp_s"] >= fault_time
+
+    assert any(action["action_type"] == "SAFE_HOLD" for action in payload["actions"])
+    assert any(
+        decision["final_action_type"] == "SAFE_HOLD"
+        and decision["outcome"] == "APPROVED"
+        for decision in payload["safety_decisions"]
+    )
+    modes = {row["cmp_mode"] for row in payload["truth_rows"]}
+    assert {"DRESS", "PREPARE", "HOLD", "RECOVER", "POLISH"} <= modes
+    assert payload["summary"]["peak_warning_probability"] >= peak_floor
 
 
 def test_stakeholder_demo_trace_shape_and_story() -> None:
@@ -84,3 +129,16 @@ def test_stakeholder_baseline_trace_shape_and_story() -> None:
     stable_mrr = [row["cmp_mrr_m_s"] for row in stable_rows]
     assert min(stable_mrr) >= 1.96e-08
     assert max(stable_mrr) <= 2.01e-08
+
+
+def test_stakeholder_grid_interruption_trace_shape_and_story() -> None:
+    payload = json.loads(GRID_TRACE_PATH.read_text(encoding="utf-8"))
+    _assert_fault_replay_story(payload, "GRID_INTERRUPTION", 0.9)
+    assert min(row["grid_voltage_pu"] for row in payload["truth_rows"]) < 0.2
+
+
+def test_stakeholder_power_water_trace_shape_and_story() -> None:
+    payload = json.loads(POWER_WATER_TRACE_PATH.read_text(encoding="utf-8"))
+    _assert_fault_replay_story(payload, "POWER_WATER_DISTURBANCE", 0.9)
+    assert min(row["grid_voltage_pu"] for row in payload["truth_rows"]) < 0.5
+    assert min(row["upw_supply_pressure_pa"] for row in payload["truth_rows"]) < 160000

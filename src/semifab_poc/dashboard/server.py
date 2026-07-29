@@ -21,6 +21,8 @@ SIM_ERROR_LOG = LOG_DIR / "simulation_errors.log"
 DEMO_TRACE_NAMES = (
     "stakeholder-demo-normal-baseline.json",
     "stakeholder-demo-stable-polish-fault.json",
+    "stakeholder-demo-grid-interruption.json",
+    "stakeholder-demo-power-water-disturbance.json",
 )
 
 

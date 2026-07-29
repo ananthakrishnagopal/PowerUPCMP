@@ -34,6 +34,8 @@ def test_api_traces(dashboard_server):
         assert payload["traces"] == [
             "stakeholder-demo-normal-baseline.json",
             "stakeholder-demo-stable-polish-fault.json",
+            "stakeholder-demo-grid-interruption.json",
+            "stakeholder-demo-power-water-disturbance.json",
         ]
 
 def test_baseline_replay_stream_header(dashboard_server):
@@ -65,6 +67,28 @@ def test_stakeholder_replay_stream_header(dashboard_server):
     assert payload["scenario"]["event_start_s"] == 8.0
     assert payload["summary"]["stable_polish_start_s"] == 4.0
     assert payload["summary"]["final_status"] == "Recovered after stable-polish synthetic safe hold"
+    assert payload["actions"][0]["action_type"] == "SAFE_HOLD"
+    assert payload["safety_decisions"][0]["outcome"] == "APPROVED"
+
+@pytest.mark.parametrize(
+    ("trace_name", "family", "peak_probability"),
+    [
+        ("stakeholder-demo-grid-interruption.json", "GRID_INTERRUPTION", 0.93),
+        ("stakeholder-demo-power-water-disturbance.json", "POWER_WATER_DISTURBANCE", 0.96),
+    ],
+)
+def test_additional_fault_replay_stream_headers(
+    dashboard_server, trace_name, family, peak_probability
+):
+    req = urllib.request.Request(f"{dashboard_server}/api/stream/{trace_name}")
+    with urllib.request.urlopen(req, timeout=10) as response:
+        assert response.status == 200
+        line = response.readline().decode("utf-8").strip()
+
+    assert line.startswith("data:")
+    payload = json.loads(line.removeprefix("data:").strip())
+    assert payload["scenario"]["family"] == family
+    assert payload["summary"]["peak_warning_probability"] == peak_probability
     assert payload["actions"][0]["action_type"] == "SAFE_HOLD"
     assert payload["safety_decisions"][0]["outcome"] == "APPROVED"
 

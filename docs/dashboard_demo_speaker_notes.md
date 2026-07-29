@@ -14,7 +14,11 @@ Suggested duration: 15 minutes, followed by 10 minutes of technical questions.
 1. Install the project in the documented Python environment.
 2. Start the dashboard with `conda run -n devkki python src/semifab_poc/dashboard/server.py`.
 3. Open `http://localhost:8080` and confirm the page says `Validated demo artifact ready`.
-4. In **Load an artifact**, confirm only `stakeholder-demo-normal-baseline` and `stakeholder-demo-stable-polish-fault` are listed, with the stable-polish fault replay selected.
+4. In **Load an artifact**, confirm the replay list contains the baseline plus
+   `stakeholder-demo-stable-polish-fault`,
+   `stakeholder-demo-grid-interruption`, and
+   `stakeholder-demo-power-water-disturbance`, with the stable-polish fault
+   replay selected for the main recording.
 5. Use **Replay validated demo** as the recording path. Live scenarios are backup.
 6. Keep the repository documentation available for provenance questions. The primary references are `docs/stakeholder_demo_methodology.md`, `docs/assumptions_and_limitations.md`, `docs/architecture.md`, and the WP12/WP13/WP15/WP16 validation reports.
 
@@ -66,9 +70,8 @@ Compare the operating-mode chart and the process curve. Avoid claiming saved waf
 
 ## 5. Replay evidence and limitations (2 minutes)
 
-Point to **Load an artifact**, the two replayable traces
-`stakeholder-demo-normal-baseline` and `stakeholder-demo-stable-polish-fault`,
-and **Evidence & limits**.
+Point to **Load an artifact**, the replayable baseline and the three replayable
+fault traces, and **Evidence & limits**.
 
 **Say:** “The replay path shows that the dashboard is not dependent on a live calculation for presentation. It can replay a versioned local artifact, which is useful for review, audit, and a repeatable customer conversation.”
 

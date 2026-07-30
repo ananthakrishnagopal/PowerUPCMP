@@ -62,6 +62,41 @@ conda run -n devkki python scripts/train_dashboard_warning.py \
   --decision-period-s 0.10
 ```
 
+## Model Comparison Run
+
+Use this when you need to justify why the dashboard artifact uses the selected
+model family. It trains candidate models on the same generated dataset and
+writes a side-by-side report. This comparison does not replace the dashboard
+artifact.
+
+```bash
+conda run -n devkki python scripts/compare_dashboard_warning_models.py \
+  --train-count 8 \
+  --calibration-count 4 \
+  --conformal-count 4 \
+  --test-count 4 \
+  --decision-period-s 0.20
+```
+
+Compared candidates:
+
+```text
+prevalence
+logistic
+gradient_boosted
+xgboost
+```
+
+`xgboost` is optional. If the package is not installed, the script records the
+candidate as skipped rather than failing the comparison.
+
+Comparison outputs:
+
+```text
+reports/early_warning/dashboard_model_comparison.json
+reports/early_warning/dashboard_model_comparison.md
+```
+
 ## Outputs To Copy Back
 
 Copy these files back into the same paths in this repo:
@@ -80,8 +115,9 @@ For the demo, look for:
 
 ```text
 test_metrics.pr_auc meaningfully above prevalence
-test_metrics.roc_auc high enough to separate faults from normal
-test_metrics.median_lead_time_s positive
+test_metrics.precision and test_metrics.recall balanced for the scenario
+test_metrics.brier_score and test_metrics.expected_calibration_error acceptable
+test_metrics.median_warning_lead_time_s positive
 latency_mean_s small
 ```
 
